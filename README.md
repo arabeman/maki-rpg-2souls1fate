@@ -1,6 +1,6 @@
 # Maki H
 
-A 2D game built with [Maki](https://github.com/tialops/maki).
+A 2D game built with [Maki](https://www.npmjs.com/package/@tialops/maki).
 
 ## Setup
 
