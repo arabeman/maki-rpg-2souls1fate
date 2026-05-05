@@ -1,10 +1,12 @@
 import { Scene, manager } from '@tialops/maki'
+import { SpriteLoader } from '../utils/SpriteLoader.js'
+import { PlayerController } from '../utils/PlayerController.js'
 
 export default class GameScene extends Scene {
     preload() {
         super.preload()
-        this.lia = this.maki.player('lia')
-        manager.map(this, 'default_map')
+        SpriteLoader.load(this, 'player', 'player')
+        manager.map(this, 'begin')
         manager.preload(this)
     }
 
@@ -12,13 +14,13 @@ export default class GameScene extends Scene {
         super.create()
         manager.create(this)
 
-        // Place lia in the center of the map (50×50 tiles × 16px = 800×800)
-        this.lia.sprite.setPosition(400, 400)
-
-        this.physics.add.collider(this.lia.sprite, manager.getWallGroup(this, 'default_map'))
+        this.player = PlayerController.create(this, 152, 152, 'player')
+        this.keys = PlayerController.setupInput(this)
+        SpriteLoader.createAnims(this, 'player', 'player')
+        this.physics.add.collider(this.player, manager.getWallGroup(this, 'begin'))
     }
 
     update() {
-        this.maki.move(this.lia)
+        PlayerController.handleMovement(this.player, this.keys)
     }
 }
