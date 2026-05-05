@@ -11,6 +11,16 @@
 - **Config**: `game/maki.config.js` (canvas size, maps, sprites)
 - **Scenes**: `game/scenes/*.js` (extend `Scene` from `@tialops/maki`)
 
+## Conventions
+
+Follow the [commit convention](../COMMIT_CONVENTION.md) when committing changes:
+
+```
+<type>(optional-scope): <short description>
+```
+
+Example: `feat(auth): add Google login`
+
 ## Setup
 
 - Run `yarn` to install dependencies
