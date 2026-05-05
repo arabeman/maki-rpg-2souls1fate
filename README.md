@@ -10,5 +10,5 @@ yarn
 
 ## Commands
 
-- `yarn run` — Start dev server
+- `yarn dev` — Start dev server
 - `yarn tilemap` — Open tilemap editor

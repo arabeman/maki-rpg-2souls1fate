@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "run": "cd game && maki dev",
+    "dev": "cd game && maki dev",
     "tilemap": "cd game && maki tilemap"
   },
   "dependencies": {

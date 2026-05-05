@@ -2,7 +2,7 @@
 
 ## Commands
 
-- `yarn run` — Start dev server (runs `cd game && maki dev`)
+- `yarn dev` — Start dev server (runs `cd game && maki dev`)
 - `yarn tilemap` — Open tilemap editor (runs `cd game && maki tilemap`)
 
 ## Architecture
@@ -14,4 +14,4 @@
 ## Setup
 
 - Run `yarn` to install dependencies
-- Run `yarn run` to start dev server at http://localhost:5173
+- Run `yarn dev` to start dev server at http://localhost:5173
