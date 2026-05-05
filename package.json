@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "run": "cd game && maki dev",
+    "tilemap": "cd game && maki tilemap"
+  },
+  "dependencies": {
+    "@tialops/maki": "^1.1.0"
+  }
+}
