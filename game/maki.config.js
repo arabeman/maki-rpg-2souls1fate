@@ -3,6 +3,6 @@ export default {
   width: 800,   // game canvas width in px — editor canvas matches this
   height: 600,  // game canvas height in px — editor canvas matches this
   maps: ['default_map'],
-  sprites: ['lia'],
+  sprites: ['lia', 'tilemap_packed'],
   debug: false
 }
