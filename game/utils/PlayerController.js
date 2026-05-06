@@ -22,6 +22,8 @@ export class PlayerController {
         for (const { key, vel, anim } of movements) {
             if (keys[key].isDown) {
                 player.setVelocity(vel.x, vel.y)
+                if (key === 'left') player.setFlipX(true)
+                if (key === 'right') player.setFlipX(false)
                 player.anims.play(`player-${anim}`, true)
                 return
             }
