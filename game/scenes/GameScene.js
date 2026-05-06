@@ -91,6 +91,9 @@ export default class GameScene extends Scene {
       if (Dialog.isOpen()) {
         Dialog.skip();
       } else {
+        // Turn to face player
+        this.dad.setFlipX(this.player.x < this.dad.x);
+
         // Hide emote when starting to talk
         if (this.dadEmote) {
           this.dadEmote.destroy();
