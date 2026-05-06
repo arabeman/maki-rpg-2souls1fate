@@ -1,10 +1,19 @@
+/**
+ * Dialog - HTML-based dialog system with typewriter effect
+ *
+ * Creates an absolute positioned dialog box overlay on the webpage.
+ * Handles typing animation and dialog progression.
+ */
 export class Dialog {
+  /**
+   * Open dialog with given data
+   * @param {Phaser.Scene} scene - Game scene reference
+   * @param {Array} dialogData - Array of { text, isEndOfDialog? }
+   */
   static open(scene, dialogData) {
     if (!dialogData || !dialogData.length) return;
 
-    if (this.isActive) {
-      this.close();
-    }
+    if (this.isActive) this.close();
 
     this.scene = scene;
     this.data = dialogData;
@@ -17,6 +26,7 @@ export class Dialog {
     this.charDelay = 30;
     this.isActive = true;
 
+    // Create dialog container
     this.bg = document.createElement("div");
     this.bg.style.cssText = `
       position: absolute;
@@ -38,6 +48,7 @@ export class Dialog {
     `;
     document.body.appendChild(this.bg);
 
+    // Create text display element
     this.textObj = document.createElement("div");
     this.textObj.style.cssText = `
       color: #fff;
@@ -46,6 +57,7 @@ export class Dialog {
     `;
     this.bg.appendChild(this.textObj);
 
+    // Create skip hint
     this.skipHint = document.createElement("div");
     this.skipHint.textContent = "[E] NEXT";
     this.skipHint.style.cssText = `
@@ -57,6 +69,9 @@ export class Dialog {
     this.showCurrentLine();
   }
 
+  /**
+   * Display current line and prepare for typewriter effect
+   */
   static showCurrentLine() {
     if (this.currentIndex >= this.data.length) {
       this.close();
@@ -70,6 +85,10 @@ export class Dialog {
     this.isTyping = true;
   }
 
+  /**
+   * Update typewriter effect - call every frame in scene.update()
+   * @param {number} time - Current game time from scene.update()
+   */
   static update(time) {
     if (!this.isOpen() || !this.isTyping) return;
 
@@ -85,6 +104,10 @@ export class Dialog {
     }
   }
 
+  /**
+   * Skip typing or advance to next line
+   * @param {number} time - Current game time
+   */
   static skip(time) {
     if (!this.isOpen()) return;
 
@@ -97,6 +120,9 @@ export class Dialog {
     }
   }
 
+  /**
+   * Advance to next dialog line
+   */
   static next() {
     if (!this.isOpen()) return;
 
@@ -115,6 +141,9 @@ export class Dialog {
     this.showCurrentLine();
   }
 
+  /**
+   * Close dialog and clean up DOM elements
+   */
   static close() {
     if (this.bg && this.bg.parentNode) {
       this.bg.parentNode.removeChild(this.bg);
@@ -127,6 +156,10 @@ export class Dialog {
     this.data = null;
   }
 
+  /**
+   * Check if dialog is currently open
+   * @returns {boolean}
+   */
   static isOpen() {
     return this.isActive === true;
   }

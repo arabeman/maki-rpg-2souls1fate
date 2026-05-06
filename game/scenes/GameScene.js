@@ -1,15 +1,23 @@
 import { Scene, manager } from "@tialops/maki";
 
-import { NPCController } from "../utils/NPCController.js";
-import { PlayerController } from "../utils/PlayerController.js";
-import { SpriteLoader } from "../utils/SpriteLoader.js";
-import { Dialog } from "../utils/Dialog.js";
+import { NPCController } from "../core/NPCController.js";
+import { PlayerController } from "../core/PlayerController.js";
+import { SpriteLoader } from "../core/SpriteLoader.js";
+import { Dialog } from "../components/Dialog.js";
+import { dad as dadDialog } from "../data/dialogs.js";
 
-const dadDialog = [
-  { text: "Hello world!", isEndOfDialog: true },
-];
-
+/**
+ * Main game scene - initializes and updates all game objects
+ *
+ * Handles:
+ * - Player movement and animations
+ * - NPC creation and interactions
+ * - Dialog system
+ */
 export default class GameScene extends Scene {
+  /**
+   * Load assets (sprites, maps) before scene starts
+   */
   preload() {
     super.preload();
     SpriteLoader.load(this, "player", "player");
@@ -18,27 +26,38 @@ export default class GameScene extends Scene {
     manager.preload(this);
   }
 
+  /**
+   * Create game objects after scene loads
+   */
   create() {
     super.create();
     manager.create(this);
 
     this.player = PlayerController.create(this, 152, 152, "player");
-    this.dad = NPCController.create(this, 16*16.5, 16*9, "dad");
+    this.dad = NPCController.create(this, 16 * 16.5, 16 * 9, "dad");
     this.keys = PlayerController.setupInput(this);
+
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "dad", "dad");
+
+    // Wall collisions
     this.physics.add.collider(this.player, manager.getWallGroup(this, "begin"));
     this.physics.add.collider(this.dad, manager.getWallGroup(this, "begin"));
     this.dad.body.setImmovable(true);
     this.physics.add.collider(this.player, this.dad);
   }
 
+  /**
+   * Update loop - runs every frame
+   * @param {number} time - Current timestamp in milliseconds
+   */
   update(time) {
     PlayerController.handleMovement(this.player, this.keys);
     PlayerController.handleAnimation(this.player, this.keys, time);
     NPCController.handleAnimation(this.dad, time);
     Dialog.update(time);
 
+    // Handle E key press for NPC interaction
     if (!this.ePressed && this.keys.e.isDown) {
       this.ePressed = true;
       this.handleNPCTalk();
@@ -48,6 +67,9 @@ export default class GameScene extends Scene {
     }
   }
 
+  /**
+   * Handle NPC interaction when E is pressed near an NPC
+   */
   handleNPCTalk() {
     const dx = this.player.x - this.dad.x;
     const dy = this.player.y - this.dad.y;
