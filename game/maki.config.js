@@ -39,5 +39,6 @@ export default {
     { name: "music", file: "emotes_kenney/emote_music.png" },
     { name: "anger", file: "emotes_kenney/emote_anger.png" },
     { name: "dots", file: "emotes_kenney/emote_dots1.png" },
+    { name: "sword1", file: "tiles_kenney/sword1.png" },
   ],
 };

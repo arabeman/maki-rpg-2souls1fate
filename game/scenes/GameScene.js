@@ -5,6 +5,7 @@ import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
 import { Inventory } from "../core/Inventory.js";
+import { Equipment } from "../core/Equipment.js";
 import { dad as dadDialog } from "../data/dialogs.js";
 import { showEmote } from "../core/EmoteController.js";
 import { showItemPickup } from "../core/ItemPickupEffect.js";
@@ -25,7 +26,7 @@ export default class GameScene extends Scene {
     super.preload();
     SpriteLoader.load(this, "player", "player");
     SpriteLoader.load(this, "dad", "dad");
-    SpriteLoader.load(this, "sword", "sword1");
+    SpriteLoader.loadImage(this, "sword_pickup", "sword1");
     SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
     manager.map(this, "begin");
     manager.preload(this);
@@ -56,7 +57,7 @@ export default class GameScene extends Scene {
 
     // Create pickable objects
     this.pickables = [];
-    this.createPickable(200, 200, "sword", { id: "sword", name: "Sword" });
+    this.createPickable(208 + 8, 192 + 8, "sword_pickup", { id: "sword", name: "Sword" });
   }
 
   createPickable(x, y, sprite, data) {
@@ -76,6 +77,7 @@ export default class GameScene extends Scene {
       PlayerController.handleMovement(this.player, this.keys);
       PlayerController.handleAnimation(this.player, this.keys, time);
     }
+    Equipment.update(this, this.player);
     NPCController.handleAnimation(this.dad, time);
     Dialog.update(time);
 
@@ -135,8 +137,14 @@ export default class GameScene extends Scene {
 
   handlePickup(obj) {
     if (obj.pickupData) {
-      Inventory.add(obj.pickupData);
-      showItemPickup(this, obj, obj.pickupData.name);
+      const itemData = {
+        ...obj.pickupData,
+        texture: obj.texture.key,
+        slot: "mainHand",
+      };
+      Inventory.add(itemData);
+      showItemPickup(this, obj, obj.texture.key);
+      Equipment.equip(this, this.player, itemData);
       obj.destroy();
       this.pickables = this.pickables.filter(p => p !== obj);
     }

@@ -1,22 +1,17 @@
-export function showItemPickup(scene, target, itemName) {
-  const text = scene.add.text(target.x, target.y - 20, `+ ${itemName}`, {
-    fontFamily: "Monocraft",
-    fontSize: "12px",
-    color: "#db9764",
-    stroke: "#000000",
-    strokeThickness: 2,
-  });
-  text.setOrigin(0.5);
-  text.setDepth(200);
+export function showItemPickup(scene, target, itemSprite) {
+  const sprite = scene.add.sprite(target.x, target.y - 20, itemSprite);
+  sprite.setOrigin(0.5);
+  sprite.setDepth(200);
+  sprite.setRotation(-Math.PI / 2);
 
   scene.tweens.add({
-    targets: text,
+    targets: sprite,
     y: target.y - 40,
     alpha: 0,
-    duration: 1000,
+    duration: 2000,
     ease: "Sine.easeOut",
-    onComplete: () => text.destroy(),
+    onComplete: () => sprite.destroy(),
   });
 
-  return text;
+  return sprite;
 }
