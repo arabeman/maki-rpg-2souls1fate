@@ -57,31 +57,41 @@ export default class GameScene extends Scene {
    * @param {number} time - Current timestamp in milliseconds
    */
   update(time) {
-    PlayerController.handleMovement(this.player, this.keys);
-    PlayerController.handleAnimation(this.player, this.keys, time);
+    if (!Dialog.isOpen()) {
+      PlayerController.handleMovement(this.player, this.keys);
+      PlayerController.handleAnimation(this.player, this.keys, time);
+    }
     NPCController.handleAnimation(this.dad, time);
     Dialog.update(time);
 
-    // Handle E or Space key press for NPC interaction
-    if (
-      (!this.ePressed && this.keys.e.isDown) ||
-      (!this.spacePressed && this.keys.space.isDown)
-    ) {
-      this.ePressed = true;
+    // Update interact prompt
+    const nearNPC = this.isNearNPC();
+    if (nearNPC && !Dialog.isOpen()) {
+      Dialog.showInteractPrompt(this);
+    } else {
+      Dialog.hideInteractPrompt();
+    }
+
+    // Handle Space key press for NPC interaction
+    if (!this.spacePressed && this.keys.space.isDown) {
       this.spacePressed = true;
       this.handleNPCTalk();
-    }
-    if (!this.keys.e.isDown) {
-      this.ePressed = false;
     }
     if (!this.keys.space.isDown) {
       this.spacePressed = false;
     }
   }
 
-  /**
-   * Handle NPC interaction when E is pressed near an NPC
-   */
+  isNearNPC() {
+    const dx = this.player.x - this.dad.x;
+    const dy = this.player.y - this.dad.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    return dist < 40;
+  }
+
+/**
+    * Handle NPC interaction when Space is pressed near an NPC
+    */
   handleNPCTalk() {
     const dx = this.player.x - this.dad.x;
     const dy = this.player.y - this.dad.y;

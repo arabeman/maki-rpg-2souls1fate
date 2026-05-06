@@ -62,6 +62,13 @@ export class Dialog {
     const style = document.createElement("style");
     style.id = "dialog-kenney-styles";
     style.textContent = `
+      :root {
+        --dialog-primary: #db9764;
+        --dialog-text: #c3bcbc;
+        --dialog-muted: #60687f;
+        --dialog-bg: #161010;
+      }
+
       @font-face {
         font-family: 'Monocraft';
         src: url('../assets/fonts/Monocraft-ttf/Monocraft.ttf') format('truetype');
@@ -95,7 +102,8 @@ export class Dialog {
         border-image-width: 18px;
         border-style: solid;
         border-image-source: url('${KENNEY_UI_PATH}/panel-border-010.png');
-        background-color: rgba(10, 12, 18, 0.97);
+        background-color: rgba(63, 38, 49, 0.97);
+        background-color: var(--dialog-bg);
         padding: 14px 20px 12px 20px;
         box-sizing: border-box;
         display: flex;
@@ -109,7 +117,7 @@ export class Dialog {
         font-family: 'Monocraft', monospace;
         font-size: 14px;
         font-weight: 600;
-        color: #d4b84a;
+        color: var(--dialog-primary);
         letter-spacing: 2px;
         text-transform: uppercase;
         text-align: left;
@@ -121,7 +129,7 @@ export class Dialog {
         font-family: 'Monocraft', monospace;
         font-size: 14px;
         font-weight: 600;
-        color: #ddd8cc;
+        color: var(--dialog-text);
         line-height: 1.5;
         text-align: left;
         flex: 1;
@@ -149,7 +157,7 @@ export class Dialog {
       .dialog-kenney-hint {
         font-family: 'Monocraft', monospace;
         font-size: 10px;
-        color: #888070;
+        color: var(--dialog-muted);
         letter-spacing: 1.5px;
         text-transform: uppercase;
         display: flex;
@@ -162,7 +170,7 @@ export class Dialog {
         display: inline-block;
         width: 7px;
         height: 12px;
-        background: #888070;
+        background: var(--dialog-muted);
         animation: dialog-blink 1s step-end infinite;
       }
 
@@ -203,7 +211,7 @@ export class Dialog {
 
     this.skipHint = document.createElement("div");
     this.skipHint.className = "dialog-kenney-hint typing";
-    this.skipHint.textContent = "E to skip";
+    this.skipHint.textContent = "Space to skip";
     footer.appendChild(this.skipHint);
 
     this.bg.appendChild(footer);
@@ -238,7 +246,7 @@ export class Dialog {
 
     if (this.skipHint) {
       this.skipHint.classList.add("typing");
-      this.skipHint.textContent = "E to skip";
+      this.skipHint.textContent = "Space to skip";
     }
   }
 
@@ -262,7 +270,7 @@ export class Dialog {
         this.isTyping = false;
         if (this.skipHint) {
           this.skipHint.classList.remove("typing");
-          this.skipHint.textContent = "E to continue";
+          this.skipHint.textContent = "Space to continue";
         }
       }
     }
@@ -284,7 +292,7 @@ export class Dialog {
       this.isTyping = false;
       if (this.skipHint) {
         this.skipHint.classList.remove("typing");
-        this.skipHint.textContent = "E to continue";
+        this.skipHint.textContent = "Space to continue";
       }
     } else {
       this.next();
@@ -343,11 +351,64 @@ export class Dialog {
     this.data = null;
   }
 
-  /**
-   * Check if dialog is currently open
-   * @returns {boolean}
-   */
+/**
+    * Check if dialog is currently open
+    * @returns {boolean}
+    */
   static isOpen() {
     return this.isActive === true;
+  }
+
+  static _injectInteractStyles() {
+    if (document.getElementById("interact-prompt-styles")) return;
+
+    this._injectStyles();
+
+    const style = document.createElement("style");
+    style.id = "interact-prompt-styles";
+    style.textContent = `
+      .interact-prompt {
+        position: absolute;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9998;
+        font-family: 'Monocraft', monospace;
+        font-size: 10px;
+        color: var(--dialog-muted);
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        pointer-events: none;
+      }
+
+      .interact-prompt.visible {
+        opacity: 1;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  static showInteractPrompt(scene) {
+    this._injectInteractStyles();
+
+    if (!this.interactPrompt) {
+      this.interactPrompt = document.createElement("div");
+      this.interactPrompt.className = "interact-prompt";
+      this.interactPrompt.textContent = "SPACE to interact";
+      document.body.appendChild(this.interactPrompt);
+    }
+
+    this.interactPrompt.classList.add("visible");
+  }
+
+  static hideInteractPrompt() {
+    if (this.interactPrompt) {
+      this.interactPrompt.classList.remove("visible");
+    }
   }
 }

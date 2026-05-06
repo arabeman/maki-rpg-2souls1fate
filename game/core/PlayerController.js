@@ -12,7 +12,6 @@ export class PlayerController {
 
   static setupInput(scene) {
     const keys = scene.input.keyboard.createCursorKeys();
-    keys.e = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     keys.space = scene.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE,
     );
