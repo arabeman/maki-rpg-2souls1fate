@@ -20,7 +20,8 @@ export default class GameScene extends Scene {
         this.physics.add.collider(this.player, manager.getWallGroup(this, 'begin'))
     }
 
-    update() {
+    update(time) {
         PlayerController.handleMovement(this.player, this.keys)
+        PlayerController.handleIdle(this.player, time)
     }
 }
