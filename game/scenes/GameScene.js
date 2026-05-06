@@ -57,13 +57,17 @@ export default class GameScene extends Scene {
     NPCController.handleAnimation(this.dad, time);
     Dialog.update(time);
 
-    // Handle E key press for NPC interaction
-    if (!this.ePressed && this.keys.e.isDown) {
+    // Handle E or Space key press for NPC interaction
+    if ((!this.ePressed && this.keys.e.isDown) || (!this.spacePressed && this.keys.space.isDown)) {
       this.ePressed = true;
+      this.spacePressed = true;
       this.handleNPCTalk();
     }
     if (!this.keys.e.isDown) {
       this.ePressed = false;
+    }
+    if (!this.keys.space.isDown) {
+      this.spacePressed = false;
     }
   }
 
