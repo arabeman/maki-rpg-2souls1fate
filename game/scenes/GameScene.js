@@ -19,12 +19,14 @@ export default class GameScene extends Scene {
     manager.create(this);
 
     this.player = PlayerController.create(this, 152, 152, "player");
-    this.dad = NPCController.create(this, 16*4.5, 16*5.5, "dad");
+    this.dad = NPCController.create(this, 16*16.5, 16*9, "dad");
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "dad", "dad");
     this.physics.add.collider(this.player, manager.getWallGroup(this, "begin"));
     this.physics.add.collider(this.dad, manager.getWallGroup(this, "begin"));
+    this.dad.body.setImmovable(true);
+    this.physics.add.collider(this.player, this.dad);
   }
 
   update(time) {
