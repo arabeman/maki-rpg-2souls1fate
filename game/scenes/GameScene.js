@@ -1,11 +1,12 @@
 import { Scene, manager } from "@tialops/maki";
 
 import { Dialog } from "../components/Dialog.js";
+import { Equipment } from "../core/Equipment.js";
+import { EquipmentHUD } from "../components/EquipmentHUD.js";
+import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
-import { Inventory } from "../core/Inventory.js";
-import { Equipment } from "../core/Equipment.js";
 import { dad as dadDialog } from "../data/dialogs.js";
 import { showEmote } from "../core/EmoteController.js";
 import { showItemPickup } from "../core/ItemPickupEffect.js";
@@ -45,6 +46,7 @@ export default class GameScene extends Scene {
 
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "dad", "dad");
+    EquipmentHUD.init();
 
     // Wall collisions
     this.physics.add.collider(this.player, manager.getWallGroup(this, "begin"));
@@ -80,6 +82,7 @@ export default class GameScene extends Scene {
     Equipment.update(this, this.player);
     NPCController.handleAnimation(this.dad, time);
     Dialog.update(time);
+    EquipmentHUD.update();
 
     // Update interact prompt
     const nearInteractable = this.getNearInteractable();
