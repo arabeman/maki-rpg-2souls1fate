@@ -1,10 +1,8 @@
+import { createCharacter, handleIdle, handleWalking, PlayerConfig } from "./CharacterAnimation.js";
+
 export class PlayerController {
   static create(scene, x, y, name) {
-    const player = scene.physics.add.sprite(x, y, name);
-    player.setDepth(100);
-    player.setDisplaySize(14, 14);
-    player.animOffset = Math.random() * 1000;
-    return player;
+    return createCharacter(scene, x, y, name);
   }
 
   static setupInput(scene) {
@@ -20,15 +18,8 @@ export class PlayerController {
     return keys;
   }
 
-  static handleMovement(player, keys, speed = 160) {
+  static handleMovement(player, keys, speed = PlayerConfig.defaultSpeed) {
     player.setVelocity(0);
-
-    const movements = [
-      { key: "left", vel: { x: -speed, y: 0 }, anim: "left" },
-      { key: "right", vel: { x: speed, y: 0 }, anim: "right" },
-      { key: "up", vel: { x: 0, y: -speed }, anim: "up" },
-      { key: "down", vel: { x: 0, y: speed }, anim: "down" },
-    ];
 
     const isLeft = keys.left.isDown || keys.a.isDown;
     const isRight = keys.right.isDown || keys.d.isDown;
@@ -38,23 +29,23 @@ export class PlayerController {
     if (isLeft) {
       player.setVelocity(-speed, 0);
       player.setFlipX(true);
-      player.anims.play("player-left", true);
+      player.anims.play(`${PlayerConfig.animPrefix}left`, true);
       return;
     }
     if (isRight) {
       player.setVelocity(speed, 0);
       player.setFlipX(false);
-      player.anims.play("player-right", true);
+      player.anims.play(`${PlayerConfig.animPrefix}right`, true);
       return;
     }
     if (isUp) {
       player.setVelocity(0, -speed);
-      player.anims.play("player-up", true);
+      player.anims.play(`${PlayerConfig.animPrefix}up`, true);
       return;
     }
     if (isDown) {
       player.setVelocity(0, speed);
-      player.anims.play("player-down", true);
+      player.anims.play(`${PlayerConfig.animPrefix}down`, true);
       return;
     }
 
@@ -75,22 +66,10 @@ export class PlayerController {
   }
 
   static handleIdle(player, time) {
-    const widthPulse = Math.sin((time + player.animOffset) / 110);
-    const heightPulse = Math.sin((time + player.animOffset) / 80);
-
-    const width = 16 + widthPulse * 0.6;
-    const height = 14 + heightPulse * 0.5;
-
-    player.setDisplaySize(width, height);
+    handleIdle(player, time, PlayerConfig);
   }
 
   static handleWalking(player, time) {
-    const widthPulse = Math.sin((time + player.animOffset) / 110);
-    const heightPulse = Math.sin((time + player.animOffset) / 80);
-
-    const width = 14 + widthPulse * 0.6;
-    const height = 15 + heightPulse * 0.5;
-
-    player.setDisplaySize(width, height);
+    handleWalking(player, time, PlayerConfig);
   }
 }

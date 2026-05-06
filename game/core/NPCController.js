@@ -1,10 +1,8 @@
+import { createCharacter, handleIdle, handleWalking, NPCConfig } from "./CharacterAnimation.js";
+
 export class NPCController {
   static create(scene, x, y, name) {
-    const npc = scene.physics.add.sprite(x, y, name);
-    npc.setDepth(100);
-    npc.setDisplaySize(14, 14);
-    npc.animOffset = Math.random() * 1000;
-    return npc;
+    return createCharacter(scene, x, y, name);
   }
 
   static createWithDialog(scene, x, y, name, dialogId) {
@@ -13,12 +11,12 @@ export class NPCController {
     return npc;
   }
 
-  static handleMovement(npc, targetX, targetY, speed = 160) {
+  static handleMovement(npc, targetX, targetY, speed = NPCConfig.defaultSpeed) {
     const dx = targetX - npc.x;
     const dy = targetY - npc.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    if (distance < 4) {
+    if (distance < NPCConfig.stopDistance) {
       npc.setVelocity(0);
       npc.anims.stop();
       return true;
@@ -28,9 +26,9 @@ export class NPCController {
 
     if (Math.abs(dx) > Math.abs(dy)) {
       npc.setFlipX(dx < 0);
-      npc.anims.play(`npc-${dx < 0 ? "left" : "right"}`, true);
+      npc.anims.play(`${NPCConfig.animPrefix}${dx < 0 ? "left" : "right"}`, true);
     } else {
-      npc.anims.play(`npc-${dy < 0 ? "up" : "down"}`, true);
+      npc.anims.play(`${NPCConfig.animPrefix}${dy < 0 ? "up" : "down"}`, true);
     }
 
     return false;
@@ -47,22 +45,10 @@ export class NPCController {
   }
 
   static handleIdle(npc, time) {
-    const widthPulse = Math.sin((time + npc.animOffset) / 110);
-    const heightPulse = Math.sin((time + npc.animOffset) / 80);
-
-    const width = 16 + widthPulse * 0.6;
-    const height = 14 + heightPulse * 0.5;
-
-    npc.setDisplaySize(width, height);
+    handleIdle(npc, time, NPCConfig);
   }
 
   static handleWalking(npc, time) {
-    const widthPulse = Math.sin((time + npc.animOffset) / 110);
-    const heightPulse = Math.sin((time + npc.animOffset) / 80);
-
-    const width = 14 + widthPulse * 0.6;
-    const height = 15 + heightPulse * 0.5;
-
-    npc.setDisplaySize(width, height);
+    handleWalking(npc, time, NPCConfig);
   }
 }
