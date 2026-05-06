@@ -1,5 +1,11 @@
 export class Dialog {
   static open(scene, dialogData) {
+    if (!dialogData || !dialogData.length) return;
+
+    if (this.isActive) {
+      this.close();
+    }
+
     this.scene = scene;
     this.data = dialogData;
     this.currentIndex = 0;
@@ -11,30 +17,42 @@ export class Dialog {
     this.charDelay = 30;
     this.isActive = true;
 
-    if (this.container) this.container.destroy();
+    this.bg = document.createElement("div");
+    this.bg.style.cssText = `
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 100px;
+      background: #222;
+      border: 4px solid #0f0;
+      font-family: "Courier New", monospace;
+      font-size: 20px;
+      color: #fff;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 9999;
+    `;
+    document.body.appendChild(this.bg);
 
-    this.container = scene.add.container(0, 0);
-    this.container.setDepth(1000);
-    this.container.setVisible(true);
+    this.textObj = document.createElement("div");
+    this.textObj.style.cssText = `
+      color: #fff;
+      font-size: 18px;
+      line-height: 1.4;
+    `;
+    this.bg.appendChild(this.textObj);
 
-    this.bg = scene.add.rectangle(400, 520, 760, 140, 0x000000, 0.9);
-    this.bg.setStrokeStyle(2, 0xffffff);
-    this.container.add(this.bg);
-
-    this.textObj = scene.add.text(30, 470, "", {
-      fontFamily: '"Press Start 2P"',
-      fontSize: 12,
-      color: "#ffffff",
-      wordWrap: { width: 740 },
-    });
-    this.container.add(this.textObj);
-
-    this.skipHint = scene.add.text(650, 540, "PRESS SPACE", {
-      fontFamily: '"Press Start 2P"',
-      fontSize: 8,
-      color: "#888888",
-    });
-    this.container.add(this.skipHint);
+    this.skipHint = document.createElement("div");
+    this.skipHint.textContent = "[E] NEXT";
+    this.skipHint.style.cssText = `
+      color: #0f0;
+      font-size: 14px;
+    `;
+    this.bg.appendChild(this.skipHint);
 
     this.showCurrentLine();
   }
@@ -58,7 +76,7 @@ export class Dialog {
     if (time - this.lastCharTime > this.charDelay) {
       if (this.charIndex < this.currentText.length) {
         this.displayedText += this.currentText[this.charIndex];
-        this.textObj.setText(this.displayedText);
+        if (this.textObj) this.textObj.textContent = this.displayedText;
         this.charIndex++;
         this.lastCharTime = time;
       } else {
@@ -72,7 +90,7 @@ export class Dialog {
 
     if (this.isTyping) {
       this.displayedText = this.currentText;
-      this.textObj.setText(this.displayedText);
+      if (this.textObj) this.textObj.textContent = this.displayedText;
       this.isTyping = false;
     } else {
       this.next();
@@ -98,10 +116,12 @@ export class Dialog {
   }
 
   static close() {
-    if (this.container) {
-      this.container.destroy();
-      this.container = null;
+    if (this.bg && this.bg.parentNode) {
+      this.bg.parentNode.removeChild(this.bg);
     }
+    this.bg = null;
+    this.textObj = null;
+    this.skipHint = null;
     this.isActive = false;
     this.scene = null;
     this.data = null;

@@ -8,7 +8,9 @@ export class PlayerController {
   }
 
   static setupInput(scene) {
-    return scene.input.keyboard.createCursorKeys();
+    const keys = scene.input.keyboard.createCursorKeys();
+    keys.e = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    return keys;
   }
 
   static handleMovement(player, keys, speed = 160) {

@@ -3,8 +3,12 @@ import { Scene, manager } from "@tialops/maki";
 import { NPCController } from "../utils/NPCController.js";
 import { PlayerController } from "../utils/PlayerController.js";
 import { SpriteLoader } from "../utils/SpriteLoader.js";
+import { Dialog } from "../utils/Dialog.js";
 
-// add dad in the map
+const dadDialog = [
+  { text: "Hello world!", isEndOfDialog: true },
+];
+
 export default class GameScene extends Scene {
   preload() {
     super.preload();
@@ -33,5 +37,28 @@ export default class GameScene extends Scene {
     PlayerController.handleMovement(this.player, this.keys);
     PlayerController.handleAnimation(this.player, this.keys, time);
     NPCController.handleAnimation(this.dad, time);
+    Dialog.update(time);
+
+    if (!this.ePressed && this.keys.e.isDown) {
+      this.ePressed = true;
+      this.handleNPCTalk();
+    }
+    if (!this.keys.e.isDown) {
+      this.ePressed = false;
+    }
+  }
+
+  handleNPCTalk() {
+    const dx = this.player.x - this.dad.x;
+    const dy = this.player.y - this.dad.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < 40) {
+      if (Dialog.isOpen()) {
+        Dialog.next();
+      } else {
+        Dialog.open(this, dadDialog);
+      }
+    }
   }
 }
