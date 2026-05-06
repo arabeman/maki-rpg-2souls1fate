@@ -36,7 +36,7 @@ export class Dialog {
     this.displayedText = "";
     this.charIndex = 0;
     this.lastCharTime = 0;
-    this.charDelay = 30;
+    this.charDelay = 50;
     this.isActive = true;
     this.debug = debug;
 

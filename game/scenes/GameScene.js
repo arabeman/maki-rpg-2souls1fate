@@ -7,7 +7,12 @@ import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
-import { dad as dadDialog } from "../data/dialogs.js";
+import {
+  GameState,
+  dadDialogNoSword,
+  dadDialogHasSword,
+  dadDialogUnlock,
+} from "../data/dialogs.js";
 import { showEmote } from "../core/EmoteController.js";
 import { showItemPickup } from "../core/ItemPickupEffect.js";
 
@@ -82,6 +87,13 @@ export default class GameScene extends Scene {
     Equipment.update(this, this.player);
     NPCController.handleAnimation(this.dad, time);
     Dialog.update(time);
+
+    if (this.shouldUnlockOnClose && !Dialog.isOpen()) {
+      this.shouldUnlockOnClose = false;
+      GameState.exitUnlocked = true;
+      this.unlockExit();
+    }
+
     EquipmentHUD.update();
 
     // Update interact prompt
@@ -148,6 +160,10 @@ export default class GameScene extends Scene {
       Inventory.add(itemData);
       showItemPickup(this, obj, obj.texture.key);
       Equipment.equip(this, this.player, itemData);
+
+      GameState.hasSword = true;
+      this.talkCount = 1;
+
       obj.destroy();
       this.pickables = this.pickables.filter(p => p !== obj);
     }
@@ -172,16 +188,35 @@ export default class GameScene extends Scene {
       if (Dialog.isOpen()) {
         Dialog.skip();
       } else {
-        // Turn to face player
         this.dad.setFlipX(this.player.x < this.dad.x);
 
-        // Hide emote when starting to talk
         if (this.dadEmote) {
           this.dadEmote.destroy();
           this.dadEmote = null;
         }
-        Dialog.open(this, dadDialog);
+
+        if (GameState.exitUnlocked) {
+          Dialog.open(this, dadDialogUnlock);
+          return;
+        }
+
+        if (GameState.hasSword && this.talkCount === 1) {
+          Dialog.open(this, dadDialogHasSword);
+          this.talkCount = 2;
+        } else if (GameState.hasSword && this.talkCount === 2 && !GameState.exitUnlocked) {
+          this.shouldUnlockOnClose = true;
+          Dialog.open(this, dadDialogUnlock);
+        } else {
+          Dialog.open(this, dadDialogNoSword);
+        }
       }
     }
+  }
+
+  unlockExit() {
+    this.dad.setVelocity(100, 0);
+    setTimeout(() => {
+      this.dad.body.setImmovable(false);
+    }, 500);
   }
 }
