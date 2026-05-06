@@ -81,7 +81,7 @@ export default class GameScene extends Scene {
 
     if (dist < 40) {
       if (Dialog.isOpen()) {
-        Dialog.next();
+        Dialog.skip();
       } else {
         Dialog.open(this, dadDialog);
       }

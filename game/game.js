@@ -13,5 +13,8 @@ new Phaser.Game({
         default: 'arcade',
         arcade: { debug: false }
     },
-    scene: [GameScene]
+    scene: [GameScene],
+    render: {
+        pixelArt: true,
+    }
 })
