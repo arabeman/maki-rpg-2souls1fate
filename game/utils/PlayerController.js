@@ -33,12 +33,35 @@ export class PlayerController {
     player.anims.stop();
   }
 
+  static handleAnimation(player, keys, time) {
+    if (
+      keys.left.isDown ||
+      keys.right.isDown ||
+      keys.up.isDown ||
+      keys.down.isDown
+    ) {
+      this.handleWalking(player, time);
+    } else {
+      this.handleIdle(player, time);
+    }
+  }
+
   static handleIdle(player, time) {
     const widthPulse = Math.sin(time / 110);
     const heightPulse = Math.sin(time / 80);
 
     const width = 16 + widthPulse * 0.6;
     const height = 14 + heightPulse * 0.5;
+
+    player.setDisplaySize(width, height);
+  }
+
+  static handleWalking(player, time) {
+    const widthPulse = Math.sin(time / 110);
+    const heightPulse = Math.sin(time / 80);
+
+    const width = 14 + widthPulse * 0.6;
+    const height = 15 + heightPulse * 0.5;
 
     player.setDisplaySize(width, height);
   }
