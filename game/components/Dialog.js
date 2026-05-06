@@ -393,16 +393,16 @@ export class Dialog {
     document.head.appendChild(style);
   }
 
-  static showInteractPrompt(scene) {
+  static showInteractPrompt(scene, text = "SPACE to interact") {
     this._injectInteractStyles();
 
     if (!this.interactPrompt) {
       this.interactPrompt = document.createElement("div");
       this.interactPrompt.className = "interact-prompt";
-      this.interactPrompt.textContent = "SPACE to interact";
       document.body.appendChild(this.interactPrompt);
     }
 
+    this.interactPrompt.textContent = text;
     this.interactPrompt.classList.add("visible");
   }
 

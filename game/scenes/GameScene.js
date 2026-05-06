@@ -4,6 +4,7 @@ import { Dialog } from "../components/Dialog.js";
 import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
+import { Inventory } from "../core/Inventory.js";
 import { dad as dadDialog } from "../data/dialogs.js";
 import { showEmote } from "../core/EmoteController.js";
 
@@ -23,6 +24,7 @@ export default class GameScene extends Scene {
     super.preload();
     SpriteLoader.load(this, "player", "player");
     SpriteLoader.load(this, "dad", "dad");
+    SpriteLoader.load(this, "sword", "sword1");
     SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
     manager.map(this, "begin");
     manager.preload(this);
@@ -50,6 +52,18 @@ export default class GameScene extends Scene {
 
     // Show emote over dad when scene appears
     this.dadEmote = showEmote(this, this.dad, "exclamation", 0); // 0 = infinite, no auto-hide
+
+    // Create pickable objects
+    this.pickables = [];
+    this.createPickable(200, 200, "sword", { id: "sword", name: "Sword" });
+  }
+
+  createPickable(x, y, sprite, data) {
+    const obj = this.physics.add.sprite(x, y, sprite);
+    obj.setInteractive();
+    obj.pickupData = data;
+    this.pickables.push(obj);
+    return obj;
   }
 
   /**
@@ -65,20 +79,64 @@ export default class GameScene extends Scene {
     Dialog.update(time);
 
     // Update interact prompt
-    const nearNPC = this.isNearNPC();
-    if (nearNPC && !Dialog.isOpen()) {
-      Dialog.showInteractPrompt(this);
+    const nearInteractable = this.getNearInteractable();
+    if (nearInteractable && !Dialog.isOpen()) {
+      const prompt = nearInteractable.type === "pickable" 
+        ? "Space to pick up" 
+        : "Space to interact";
+      Dialog.showInteractPrompt(this, prompt);
     } else {
       Dialog.hideInteractPrompt();
     }
 
-    // Handle Space key press for NPC interaction
+    // Handle Space key press for interaction
     if (!this.spacePressed && this.keys.space.isDown) {
       this.spacePressed = true;
-      this.handleNPCTalk();
+      this.handleInteraction();
     }
     if (!this.keys.space.isDown) {
       this.spacePressed = false;
+    }
+  }
+
+  getNearInteractable() {
+    // Check NPC
+    const dx = this.player.x - this.dad.x;
+    const dy = this.player.y - this.dad.y;
+    const distToNPC = Math.sqrt(dx * dx + dy * dy);
+    if (distToNPC < 40) {
+      return { type: "npc", target: this.dad };
+    }
+
+    // Check pickables
+    for (const obj of this.pickables) {
+      const pdx = this.player.x - obj.x;
+      const pdy = this.player.y - obj.y;
+      const dist = Math.sqrt(pdx * pdx + pdy * pdy);
+      if (dist < 30) {
+        return { type: "pickable", target: obj };
+      }
+    }
+
+    return null;
+  }
+
+  handleInteraction() {
+    const interactable = this.getNearInteractable();
+    if (!interactable) return;
+
+    if (interactable.type === "npc") {
+      this.handleNPCTalk();
+    } else if (interactable.type === "pickable") {
+      this.handlePickup(interactable.target);
+    }
+  }
+
+  handlePickup(obj) {
+    if (obj.pickupData) {
+      Inventory.add(obj.pickupData);
+      obj.destroy();
+      this.pickables = this.pickables.filter(p => p !== obj);
     }
   }
 
