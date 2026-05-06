@@ -30,4 +30,14 @@ export default {
     },
     "tilemap_packed",
   ],
+  emotes: [
+    { name: "exclamation", file: "emotes_kenney/emote_exclamation.png" },
+    { name: "question", file: "emotes_kenney/emote_question.png" },
+    { name: "heart", file: "emotes_kenney/emote_heart.png" },
+    { name: "stars", file: "emotes_kenney/emote_stars.png" },
+    { name: "drop", file: "emotes_kenney/emote_drop.png" },
+    { name: "music", file: "emotes_kenney/emote_music.png" },
+    { name: "anger", file: "emotes_kenney/emote_anger.png" },
+    { name: "dots", file: "emotes_kenney/emote_dots1.png" },
+  ],
 };
