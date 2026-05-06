@@ -3,6 +3,7 @@ export class PlayerController {
     const player = scene.physics.add.sprite(x, y, name);
     player.setDepth(100);
     player.setDisplaySize(14, 14);
+    player.animOffset = Math.random() * 1000;
     return player;
   }
 
@@ -47,8 +48,8 @@ export class PlayerController {
   }
 
   static handleIdle(player, time) {
-    const widthPulse = Math.sin(time / 110);
-    const heightPulse = Math.sin(time / 80);
+    const widthPulse = Math.sin((time + player.animOffset) / 110);
+    const heightPulse = Math.sin((time + player.animOffset) / 80);
 
     const width = 16 + widthPulse * 0.6;
     const height = 14 + heightPulse * 0.5;
@@ -57,8 +58,8 @@ export class PlayerController {
   }
 
   static handleWalking(player, time) {
-    const widthPulse = Math.sin(time / 110);
-    const heightPulse = Math.sin(time / 80);
+    const widthPulse = Math.sin((time + player.animOffset) / 110);
+    const heightPulse = Math.sin((time + player.animOffset) / 80);
 
     const width = 14 + widthPulse * 0.6;
     const height = 15 + heightPulse * 0.5;
