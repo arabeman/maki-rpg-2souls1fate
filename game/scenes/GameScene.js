@@ -7,6 +7,7 @@ import { SpriteLoader } from "../core/SpriteLoader.js";
 import { Inventory } from "../core/Inventory.js";
 import { dad as dadDialog } from "../data/dialogs.js";
 import { showEmote } from "../core/EmoteController.js";
+import { showItemPickup } from "../core/ItemPickupEffect.js";
 
 /**
  * Main game scene - initializes and updates all game objects
@@ -135,6 +136,7 @@ export default class GameScene extends Scene {
   handlePickup(obj) {
     if (obj.pickupData) {
       Inventory.add(obj.pickupData);
+      showItemPickup(this, obj, obj.pickupData.name);
       obj.destroy();
       this.pickables = this.pickables.filter(p => p !== obj);
     }
