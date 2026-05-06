@@ -1,9 +1,10 @@
+import { showEmote } from "../core/EmoteController.js";
+
 import { Scene, manager } from "@tialops/maki";
 
 import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
-import { showEmote as showEmote } from "../core/EmoteController.js";
 import { Dialog } from "../components/Dialog.js";
 import { dad as dadDialog } from "../data/dialogs.js";
 
@@ -46,6 +47,9 @@ export default class GameScene extends Scene {
     this.physics.add.collider(this.dad, manager.getWallGroup(this, "begin"));
     this.dad.body.setImmovable(true);
     this.physics.add.collider(this.player, this.dad);
+
+    // Show emote over dad when scene appears
+    this.dadEmote = showEmote(this, this.dad, "exclamation", 0); // 0 = infinite, no auto-hide
   }
 
   /**
@@ -84,14 +88,12 @@ export default class GameScene extends Scene {
       if (Dialog.isOpen()) {
         Dialog.skip();
       } else {
-        this.dadEmote = showEmote(this, this.dad, "exclamation");
+        // Hide emote when starting to talk
+        if (this.dadEmote) {
+          this.dadEmote.destroy();
+          this.dadEmote = null;
+        }
         Dialog.open(this, dadDialog);
-        Dialog.onCloseCallback(() => {
-          if (this.dadEmote) {
-            this.dadEmote.destroy();
-            this.dadEmote = null;
-          }
-        });
       }
     }
   }
