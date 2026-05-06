@@ -10,6 +10,20 @@
 - **Game entry**: `game/game.js`
 - **Config**: `game/maki.config.js` (canvas size, maps, sprites)
 - **Scenes**: `game/scenes/*.js` (extend `Scene` from `@tialops/maki`)
+- **Components**: `game/components/*.js` (Dialog, HUD, etc.)
+- **Core**: `game/core/*.js` (PlayerController, NPCController, SpriteLoader)
+- **Data**: `game/data/*.js` (dialogs, events, quests)
+
+## Dialog System
+
+- **Dialog data**: `game/data/dialogs.js` — Array of `{ text, portrait?, isEndOfDialog? }`
+- **Dialog component**: `game/components/Dialog.js` — HTML overlay with typewriter effect
+- Press `E` to skip typing or advance to next line
+
+## Controllers
+
+- **PlayerController**: Player creation, input handling, movement, animation
+- **NPCController**: NPC creation, dialog triggering, pathfinding movement
 
 ## Conventions
 
