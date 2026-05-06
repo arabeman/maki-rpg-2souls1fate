@@ -24,6 +24,19 @@ export class SpriteLoader {
   }
 
   /**
+   * Load a single image
+   * @param {Phaser.Scene} scene - The scene to load into
+   * @param {string} name - Asset key name (use in scene.add.image)
+   * @param {string} configName - Name in maki.config emotes array
+   */
+  static loadImage(scene, name, configName) {
+    const emoteConfig = config.emotes.find((e) => e && e.name === configName);
+    if (!emoteConfig) return;
+
+    scene.load.image(name, `assets/${emoteConfig.file}`);
+  }
+
+  /**
    * Create animations for a sprite based on config directions
    * @param {Phaser.Scene} scene - The scene to create anims in
    * @param {string} name - Sprite name for animation keys

@@ -24,6 +24,7 @@ export default class GameScene extends Scene {
     super.preload();
     SpriteLoader.load(this, "player", "player");
     SpriteLoader.load(this, "dad", "dad");
+    SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
     manager.map(this, "begin");
     manager.preload(this);
   }
