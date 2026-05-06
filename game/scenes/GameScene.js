@@ -3,6 +3,7 @@ import { Scene, manager } from "@tialops/maki";
 import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
+import { EmoteController } from "../core/EmoteController.js";
 import { Dialog } from "../components/Dialog.js";
 import { dad as dadDialog } from "../data/dialogs.js";
 
@@ -83,7 +84,14 @@ export default class GameScene extends Scene {
       if (Dialog.isOpen()) {
         Dialog.skip();
       } else {
+        this.dadEmote = EmoteController.showEmote(this, this.dad, "exclamation");
         Dialog.open(this, dadDialog);
+        Dialog.onCloseCallback(() => {
+          if (this.dadEmote) {
+            this.dadEmote.destroy();
+            this.dadEmote = null;
+          }
+        });
       }
     }
   }

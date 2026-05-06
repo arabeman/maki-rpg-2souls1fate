@@ -46,6 +46,14 @@ export class Dialog {
   }
 
   /**
+   * Set callback to run when dialog closes
+   * @param {Function} callback
+   */
+  static onCloseCallback(callback) {
+    this.onCloseCallback = callback;
+  }
+
+  /**
    * Inject shared CSS (once per page load)
    */
   static _injectStyles() {
@@ -316,6 +324,11 @@ export class Dialog {
    * Close dialog and clean up DOM elements
    */
   static close() {
+    if (this.onCloseCallback) {
+      this.onCloseCallback();
+      this.onCloseCallback = null;
+    }
+
     if (this.bg && this.bg.parentNode) {
       this.bg.parentNode.removeChild(this.bg);
     }
