@@ -2,24 +2,33 @@ import config from "../maki.config.js";
 
 export const EmoteConfig = {
   offsetY: -8,
-  bounceAmplitude: 3,
-  bounceSpeed: 0.005,
+  bounceAmplitude: 0,
+  bounceSpeed: 0,
   fadeSpeed: 0.01,
   defaultDuration: 2000,
 };
 
-export function showEmote(scene, target, emoteName, duration = EmoteConfig.defaultDuration) {
+export function showEmote(
+  scene,
+  target,
+  emoteName,
+  duration = EmoteConfig.defaultDuration,
+) {
   const emoteFile = config.emotes.find((e) => e && e.name === emoteName);
   if (!emoteFile) return null;
 
   const imageKey = `emote_${emoteName}`;
-  const emote = scene.add.image(target.x, target.y + EmoteConfig.offsetY, imageKey);
+  const emote = scene.add.image(
+    target.x,
+    target.y + EmoteConfig.offsetY,
+    imageKey,
+  );
   emote.setDepth(200);
   emote.setOrigin(0.5, 1);
 
   scene.tweens.add({
     targets: emote,
-    y: emote.y - 2,
+    y: emote.y - 1,
     duration: 600,
     yoyo: true,
     repeat: -1,

@@ -14,10 +14,22 @@ export const AnimationConfig = {
   npcAnimPrefix: "npc-",
 };
 
-export const PlayerConfig = { ...AnimationConfig, animPrefix: AnimationConfig.playerAnimPrefix };
-export const NPCConfig = { ...AnimationConfig, animPrefix: AnimationConfig.npcAnimPrefix };
+export const PlayerConfig = {
+  ...AnimationConfig,
+  animPrefix: AnimationConfig.playerAnimPrefix,
+};
+export const NPCConfig = {
+  ...AnimationConfig,
+  animPrefix: AnimationConfig.npcAnimPrefix,
+};
 
-export function createCharacter(scene, x, y, name, offset = Math.random() * 1000) {
+export function createCharacter(
+  scene,
+  x,
+  y,
+  name,
+  offset = Math.random() * 1000,
+) {
   const sprite = scene.physics.add.sprite(x, y, name);
   sprite.setDepth(AnimationConfig.depth);
   sprite.setDisplaySize(AnimationConfig.baseWidth, AnimationConfig.baseHeight);
@@ -26,8 +38,12 @@ export function createCharacter(scene, x, y, name, offset = Math.random() * 1000
 }
 
 export function handleIdle(sprite, time, config = AnimationConfig) {
-  const widthPulse = Math.sin((time + sprite.animOffset) / config.pulsePeriod.width);
-  const heightPulse = Math.sin((time + sprite.animOffset) / config.pulsePeriod.height);
+  const widthPulse = Math.sin(
+    (time + sprite.animOffset) / config.pulsePeriod.width,
+  );
+  const heightPulse = Math.sin(
+    (time + sprite.animOffset) / config.pulsePeriod.height,
+  );
 
   const width = config.idleWidth + widthPulse * config.pulseAmplitude.width;
   const height = config.idleHeight + heightPulse * config.pulseAmplitude.height;
@@ -36,8 +52,12 @@ export function handleIdle(sprite, time, config = AnimationConfig) {
 }
 
 export function handleWalking(sprite, time, config = AnimationConfig) {
-  const widthPulse = Math.sin((time + sprite.animOffset) / config.pulsePeriod.width);
-  const heightPulse = Math.sin((time + sprite.animOffset) / config.pulsePeriod.height);
+  const widthPulse = Math.sin(
+    (time + sprite.animOffset) / config.pulsePeriod.width,
+  );
+  const heightPulse = Math.sin(
+    (time + sprite.animOffset) / config.pulsePeriod.height,
+  );
 
   const width = config.walkWidth + widthPulse * config.pulseAmplitude.width;
   const height = config.walkHeight + heightPulse * config.pulseAmplitude.height;

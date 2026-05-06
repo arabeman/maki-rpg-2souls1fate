@@ -1,12 +1,11 @@
-import { showEmote } from "../core/EmoteController.js";
-
 import { Scene, manager } from "@tialops/maki";
 
+import { Dialog } from "../components/Dialog.js";
 import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
-import { Dialog } from "../components/Dialog.js";
 import { dad as dadDialog } from "../data/dialogs.js";
+import { showEmote } from "../core/EmoteController.js";
 
 /**
  * Main game scene - initializes and updates all game objects
@@ -64,7 +63,10 @@ export default class GameScene extends Scene {
     Dialog.update(time);
 
     // Handle E or Space key press for NPC interaction
-    if ((!this.ePressed && this.keys.e.isDown) || (!this.spacePressed && this.keys.space.isDown)) {
+    if (
+      (!this.ePressed && this.keys.e.isDown) ||
+      (!this.spacePressed && this.keys.space.isDown)
+    ) {
       this.ePressed = true;
       this.spacePressed = true;
       this.handleNPCTalk();

@@ -1,4 +1,9 @@
-import { createCharacter, handleIdle, handleWalking, NPCConfig } from "./CharacterAnimation.js";
+import {
+  NPCConfig,
+  createCharacter,
+  handleIdle,
+  handleWalking,
+} from "./CharacterAnimation.js";
 
 export class NPCController {
   static create(scene, x, y, name) {
@@ -26,7 +31,10 @@ export class NPCController {
 
     if (Math.abs(dx) > Math.abs(dy)) {
       npc.setFlipX(dx < 0);
-      npc.anims.play(`${NPCConfig.animPrefix}${dx < 0 ? "left" : "right"}`, true);
+      npc.anims.play(
+        `${NPCConfig.animPrefix}${dx < 0 ? "left" : "right"}`,
+        true,
+      );
     } else {
       npc.anims.play(`${NPCConfig.animPrefix}${dy < 0 ? "up" : "down"}`, true);
     }

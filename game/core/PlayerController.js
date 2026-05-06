@@ -1,4 +1,9 @@
-import { createCharacter, handleIdle, handleWalking, PlayerConfig } from "./CharacterAnimation.js";
+import {
+  PlayerConfig,
+  createCharacter,
+  handleIdle,
+  handleWalking,
+} from "./CharacterAnimation.js";
 
 export class PlayerController {
   static create(scene, x, y, name) {
@@ -8,7 +13,9 @@ export class PlayerController {
   static setupInput(scene) {
     const keys = scene.input.keyboard.createCursorKeys();
     keys.e = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
-    keys.space = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    keys.space = scene.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.SPACE,
+    );
 
     keys.a = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     keys.d = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
