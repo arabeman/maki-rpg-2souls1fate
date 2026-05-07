@@ -86,7 +86,7 @@ export default class BeginScene extends Scene {
     Dialog.update(time);
 
     if (this.player.x < 0 || this.player.x > 288 || this.player.y < 0 || this.player.y > 288) {
-      this.cameras.main.fadeOut(500, 0, 0, 0, () => {
+      this.cameras.main.fadeOut(1000, 0, 0, 0, () => {
         this.scene.start(Act1Scene);
       });
     }
