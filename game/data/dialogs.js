@@ -68,6 +68,11 @@ export const dadDialogHasSword = [
     text: "I might lose you too.",
     isEndOfDialog: true,
   },
+  {
+    speaker: "Dad",
+    text: "But I won't stop you.",
+    isEndOfDialog: true,
+  },
 ];
 
 export const dadDialogUnlock = [

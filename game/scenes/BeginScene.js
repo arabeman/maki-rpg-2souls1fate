@@ -175,32 +175,33 @@ isNearNPC() {
      */
   handleNPCTalk() {
     if (!InteractionManager.isNear(this.player, this.dad, 25)) return;
-      if (Dialog.isOpen()) {
-        Dialog.skip();
-      } else {
-        this.dad.setFlipX(this.player.x < this.dad.x);
-
-        if (this.dadEmote) {
-          this.dadEmote.destroy();
-          this.dadEmote = null;
-        }
-
-        if (GameState.exitUnlocked) {
-          Dialog.open(this, dadDialogUnlock);
-          return;
-        }
-
-        if (GameState.hasSword && this.talkCount === 1) {
-          Dialog.open(this, dadDialogHasSword);
-          this.talkCount = 2;
-        } else if (GameState.hasSword && this.talkCount === 2 && !GameState.exitUnlocked) {
-          this.shouldUnlockOnClose = true;
-          Dialog.open(this, dadDialogUnlock);
-        } else {
-          Dialog.open(this, dadDialogNoSword);
-        }
-      }
+    if (Dialog.isOpen()) {
+      Dialog.skip();
+      return;
     }
+
+    this.dad.setFlipX(this.player.x < this.dad.x);
+
+    if (this.dadEmote) {
+      this.dadEmote.destroy();
+      this.dadEmote = null;
+    }
+
+    if (GameState.exitUnlocked) {
+      Dialog.open(this, dadDialogUnlock);
+      return;
+    }
+
+    if (GameState.hasSword && this.talkCount === 1) {
+      Dialog.open(this, dadDialogHasSword);
+      this.talkCount = 2;
+    } else if (GameState.hasSword && this.talkCount === 2 && !GameState.exitUnlocked) {
+      this.shouldUnlockOnClose = true;
+      Dialog.open(this, dadDialogUnlock);
+    } else {
+      Dialog.open(this, dadDialogNoSword);
+    }
+  }
 
   unlockExit() {
     this.dad.setVelocity(100, 0);
