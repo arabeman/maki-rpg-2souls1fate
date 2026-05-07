@@ -31,6 +31,12 @@ static _injectStyles() {
         align-items: center;
         justify-content: center;
         box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        opacity: 0;
+        transition: opacity 0.1s ease-out;
+      }
+
+      .equipment-hud.visible {
+        opacity: 1;
       }
 
       .equipment-hud-panel {
@@ -92,12 +98,14 @@ static _injectStyles() {
 
     if (Equipment.slots.mainHand) {
       const item = Equipment.slots.mainHand.item;
+      this.container.classList.add("visible");
       this.slot.className = "equipment-hud-img";
       this.slot.innerHTML = "";
       const img = document.createElement("img");
       img.src = `assets/tiles_kenney/${this._getItemImage(item.texture)}`;
       this.slot.appendChild(img);
     } else {
+      this.container.classList.remove("visible");
       this.slot.className = "equipment-hud-empty";
       this.slot.innerHTML = "";
     }
