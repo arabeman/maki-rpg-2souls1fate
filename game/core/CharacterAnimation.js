@@ -33,7 +33,7 @@ export function createCharacter(
   const sprite = scene.physics.add.sprite(x, y, name);
   sprite.setDepth(AnimationConfig.depth);
   sprite.setDisplaySize(AnimationConfig.baseWidth, AnimationConfig.baseHeight);
-  sprite.body.setSize(12, 12);
+  sprite.body.setSize(14, 14);
   sprite.body.setOffset(2, 4);
   sprite.animOffset = offset;
   return sprite;

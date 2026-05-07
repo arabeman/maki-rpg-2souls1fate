@@ -1,4 +1,4 @@
-import GameScene from "./scenes/GameScene.js";
+import { BeginScene } from "./scenes/index.js";
 import Phaser from "phaser";
 
 new Phaser.Game({
@@ -13,7 +13,7 @@ new Phaser.Game({
     default: "arcade",
     arcade: { debug: false },
   },
-  scene: [GameScene],
+  scene: [BeginScene],
   render: {
     pixelArt: true,
   },

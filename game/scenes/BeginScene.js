@@ -9,6 +9,7 @@ import { Scene, manager } from "@tialops/maki";
 import { Dialog } from "../components/Dialog.js";
 import { Equipment } from "../core/Equipment.js";
 import { EquipmentHUD } from "../components/EquipmentHUD.js";
+import { InteractionManager } from "../core/InteractionManager.js";
 import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
@@ -17,14 +18,9 @@ import { showEmote } from "../core/EmoteController.js";
 import { showItemPickup } from "../core/ItemPickupEffect.js";
 
 /**
- * Main game scene - initializes and updates all game objects
- *
- * Handles:
- * - Player movement and animations
- * - NPC creation and interactions
- * - Dialog system
+ * Begin scene - first scene of the game
  */
-export default class GameScene extends Scene {
+export default class BeginScene extends Scene {
   /**
    * Load assets (sprites, maps) before scene starts
    */
@@ -118,22 +114,14 @@ export default class GameScene extends Scene {
   }
 
   getNearInteractable() {
-    // Check NPC
-    const dx = this.player.x - this.dad.x;
-    const dy = this.player.y - this.dad.y;
-    const distToNPC = Math.sqrt(dx * dx + dy * dy);
-    if (distToNPC < 25) {
-      return { type: "npc", target: this.dad };
+    const nearNPC = InteractionManager.getNearObject(this.player, [this.dad], 25);
+    if (nearNPC) {
+      return { type: "npc", target: nearNPC };
     }
 
-    // Check pickables
-    for (const obj of this.pickables) {
-      const pdx = this.player.x - obj.x;
-      const pdy = this.player.y - obj.y;
-      const dist = Math.sqrt(pdx * pdx + pdy * pdy);
-      if (dist < 18) {
-        return { type: "pickable", target: obj };
-      }
+    const nearPickable = InteractionManager.getNearObject(this.player, this.pickables, 18);
+    if (nearPickable) {
+      return { type: "pickable", target: nearPickable };
     }
 
     return null;
@@ -169,22 +157,15 @@ export default class GameScene extends Scene {
     }
   }
 
-  isNearNPC() {
-    const dx = this.player.x - this.dad.x;
-    const dy = this.player.y - this.dad.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    return dist < 25;
+isNearNPC() {
+    return InteractionManager.isNear(this.player, this.dad, 25);
   }
 
-/**
-    * Handle NPC interaction when Space is pressed near an NPC
-    */
+  /**
+     * Handle NPC interaction when Space is pressed near an NPC
+     */
   handleNPCTalk() {
-    const dx = this.player.x - this.dad.x;
-    const dy = this.player.y - this.dad.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    if (dist < 25) {
+    if (!InteractionManager.isNear(this.player, this.dad, 25)) return;
       if (Dialog.isOpen()) {
         Dialog.skip();
       } else {
@@ -211,7 +192,6 @@ export default class GameScene extends Scene {
         }
       }
     }
-  }
 
   unlockExit() {
     this.dad.setVelocity(100, 0);
