@@ -7,6 +7,7 @@ export default class Act1Scene extends Scene {
 
   create() {
     super.create();
+    this.cameras.main.fadeIn(500);
   }
 
   update(time) {
