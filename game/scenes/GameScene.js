@@ -122,7 +122,7 @@ export default class GameScene extends Scene {
     const dx = this.player.x - this.dad.x;
     const dy = this.player.y - this.dad.y;
     const distToNPC = Math.sqrt(dx * dx + dy * dy);
-    if (distToNPC < 40) {
+    if (distToNPC < 25) {
       return { type: "npc", target: this.dad };
     }
 
@@ -131,7 +131,7 @@ export default class GameScene extends Scene {
       const pdx = this.player.x - obj.x;
       const pdy = this.player.y - obj.y;
       const dist = Math.sqrt(pdx * pdx + pdy * pdy);
-      if (dist < 30) {
+      if (dist < 20) {
         return { type: "pickable", target: obj };
       }
     }
@@ -173,7 +173,7 @@ export default class GameScene extends Scene {
     const dx = this.player.x - this.dad.x;
     const dy = this.player.y - this.dad.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    return dist < 40;
+    return dist < 25;
   }
 
 /**
@@ -184,7 +184,7 @@ export default class GameScene extends Scene {
     const dy = this.player.y - this.dad.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
-    if (dist < 40) {
+    if (dist < 25) {
       if (Dialog.isOpen()) {
         Dialog.skip();
       } else {
