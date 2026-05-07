@@ -32,7 +32,7 @@ static _injectStyles() {
         justify-content: center;
         box-shadow: 0 2px 8px rgba(0,0,0,0.5);
         opacity: 0;
-        transition: opacity 0.1s ease-out;
+        transition: opacity 0.2s ease-out;
       }
 
       .equipment-hud.visible {
@@ -47,7 +47,7 @@ static _injectStyles() {
         border-style: solid;
         border-image-source: url('assets/ui_kenney/PNG/Default/Panel/panel-010.png');
         background-color: var(--dialog-bg);
-        opacity: 0.5;
+        opacity: 1;
         pointer-events: none;
       }
 

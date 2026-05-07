@@ -5,6 +5,7 @@ import {
   dadDialogUnlock,
 } from "../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
+import Act1Scene from "./Act1Scene.js";
 
 import { Dialog } from "../components/Dialog.js";
 import { Equipment } from "../core/Equipment.js";
@@ -83,6 +84,10 @@ export default class BeginScene extends Scene {
     Equipment.update(this, this.player);
     NPCController.handleAnimation(this.dad, time);
     Dialog.update(time);
+
+    if (this.player.x < 0 || this.player.x > 288 || this.player.y < 0 || this.player.y > 288) {
+      this.scene.start(Act1Scene);
+    }
 
     if (this.shouldUnlockOnClose && !Dialog.isOpen()) {
       this.shouldUnlockOnClose = false;
