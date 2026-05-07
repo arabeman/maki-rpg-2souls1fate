@@ -1,3 +1,9 @@
+import {
+  GameState,
+  dadDialogHasSword,
+  dadDialogNoSword,
+  dadDialogUnlock,
+} from "../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
 
 import { Dialog } from "../components/Dialog.js";
@@ -7,12 +13,6 @@ import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
-import {
-  GameState,
-  dadDialogNoSword,
-  dadDialogHasSword,
-  dadDialogUnlock,
-} from "../data/dialogs.js";
 import { showEmote } from "../core/EmoteController.js";
 import { showItemPickup } from "../core/ItemPickupEffect.js";
 
@@ -131,7 +131,7 @@ export default class GameScene extends Scene {
       const pdx = this.player.x - obj.x;
       const pdy = this.player.y - obj.y;
       const dist = Math.sqrt(pdx * pdx + pdy * pdy);
-      if (dist < 20) {
+      if (dist < 18) {
         return { type: "pickable", target: obj };
       }
     }
