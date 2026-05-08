@@ -95,8 +95,26 @@ export const dadDialogUnlock = [
   },
 ];
 
+export const dadAct1Dialog = [
+  {
+    speaker: "Dad",
+    text: "Before you go any further... you need to know how to defend yourself.",
+  },
+  { speaker: "Dad", text: "That sword isn't just for show. Listen carefully." },
+  {
+    speaker: "Dad",
+    text: "Use W A S D to attack. The direction you press determines where you strike.",
+  },
+  {
+    speaker: "Dad",
+    text: "Don't swing wildly. Wait between attacks... or you'll leave yourself open.",
+  },
+  { speaker: "Dad", text: "Try it a few times." },
+];
+
 export default {
   dadDialogNoSword,
   dadDialogHasSword,
   dadDialogUnlock,
+  dadAct1Dialog,
 };
