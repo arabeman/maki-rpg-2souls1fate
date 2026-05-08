@@ -33,46 +33,20 @@ export const dadDialogNoSword = [
     isEndOfDialog: true,
   },
 ];
-
 export const dadDialogHasSword = [
+  { speaker: "Dad", text: "... You found it." },
   {
     speaker: "Dad",
-    text: "...",
+    text: "That sword was mine. Back when I thought I could protect everyone.",
   },
+  { speaker: "Dad", text: "I was wrong." },
+  { speaker: "Dad", text: "I miss your mom." },
   {
     speaker: "Dad",
-    text: "You found it.",
-  },
-  {
-    speaker: "Dad",
-    text: "That sword was mine.",
-  },
-  {
-    speaker: "Dad",
-    text: "Back when I thought I could protect everyone.",
-  },
-  {
-    speaker: "Dad",
-    text: "I was wrong.",
-  },
-  {
-    speaker: "Dad",
-    text: "I miss your mom.",
-  },
-  {
-    speaker: "Dad",
-    text: "If you go...",
-  },
-  {
-    speaker: "Dad",
-    text: "I might lose you too.",
+    text: "If you go... I might lose you too.",
     isEndOfDialog: true,
   },
-  {
-    speaker: "Dad",
-    text: "But I won't stop you.",
-    isEndOfDialog: true,
-  },
+  { speaker: "Dad", text: "But I won't stop you.", isEndOfDialog: true },
 ];
 
 export const dadDialogUnlock = [

@@ -1,15 +1,15 @@
+import { GameState, dadAct1Dialog } from "../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
 
 import { BattleController } from "../core/BattleController.js";
 import { Dialog } from "../components/Dialog.js";
 import { Equipment } from "../core/Equipment.js";
-import { GameState, dadAct1Dialog } from "../data/dialogs.js";
+import { InteractionManager } from "../core/InteractionManager.js";
 import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
 import { showEmote } from "../core/EmoteController.js";
-import { InteractionManager } from "../core/InteractionManager.js";
 
 class Act1Scene extends Scene {
   constructor() {
@@ -18,7 +18,7 @@ class Act1Scene extends Scene {
 
   init() {
     this.scale.resize(640, 448);
-    this.cameras.main.setZoom(1.5);
+    this.cameras.main.setZoom(1.4);
   }
 
   preload() {
