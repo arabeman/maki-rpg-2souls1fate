@@ -4,51 +4,49 @@ import Phaser from "phaser";
 export class BattleController {
   static setup(scene, player) {
     scene.attackKeys = {
-      left: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+      left:  scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
       right: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
-      up: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
-      down: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+      up:    scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+      down:  scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
     };
   }
 
   static attack(scene, player, keys) {
-    const isRight = scene.attackKeys.right.isDown;
+    const { left, right, up, down } = scene.attackKeys;
 
-    if (!isRight) return;
+    // Determine which direction is pressed (priority: right > left > up > down)
+    let dx = 0, dy = 0, angle = 0;
+    if      (right.isDown) { dx =  16; dy =   0; angle =  90; }
+    else if (left.isDown)  { dx = -16; dy =   0; angle = -90; }
+    else if (up.isDown)    { dx =   0; dy = -16; angle =   0; }
+    else if (down.isDown)  { dx =   0; dy =  16; angle = 180; }
+    else return; // no direction key held
 
     const mainHand = Equipment.getMainHand();
     if (!mainHand) return;
-
     if (scene.isAttacking) return;
 
     scene.isAttacking = true;
 
-    // Hide the equipped sword on the player
     const equippedSword = mainHand.sprite;
     if (equippedSword) equippedSword.setVisible(false);
 
-    // Sword starts at player position
-    const startX = player.x;
-    const startY = player.y;
+    const startX  = player.x;
+    const startY  = player.y;
+    const targetX = player.x + dx;
+    const targetY = player.y + dy;
 
-    // Target position: 16px to the right (where the attack tile used to appear)
-    const targetX = player.x + 16;
-    const targetY = player.y;
-
-    // Create the sword sprite at the player's position, rotated 90° and above the player
     const swordSprite = scene.add
       .image(startX, startY, mainHand.textureKey ?? "sword")
       .setOrigin(0.5)
-      .setAngle(90)
+      .setAngle(angle)
       .setDepth(player.depth + 2);
 
-    // Attack tile visual at the hit position
     scene.attackTile = scene.add
       .image(targetX, targetY, "attack")
       .setOrigin(0.5)
       .setDepth(player.depth + 1);
 
-    // Slide the sword outward to the attack position
     scene.tweens.add({
       targets: swordSprite,
       x: targetX,
@@ -56,7 +54,6 @@ export class BattleController {
       duration: 100,
       ease: "Linear",
       onComplete: () => {
-        // Brief pause at the hit position, then retract
         scene.time.delayedCall(80, () => {
           scene.tweens.add({
             targets: swordSprite,
