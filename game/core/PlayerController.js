@@ -3,6 +3,7 @@ import {
   createCharacter,
   handleIdle,
   handleWalking,
+  syncSpriteToHitbox,
 } from "./CharacterAnimation.js";
 
 export class PlayerController {
@@ -20,7 +21,8 @@ export class PlayerController {
   }
 
   static handleMovement(player, keys, speed = PlayerConfig.defaultSpeed) {
-    player.setVelocity(0);
+    const hitbox = player.hitbox;
+    hitbox.body.setVelocity(0);
 
     const isLeft = keys.left.isDown;
     const isRight = keys.right.isDown;
@@ -28,24 +30,24 @@ export class PlayerController {
     const isDown = keys.down.isDown;
 
     if (isLeft) {
-      player.setVelocity(-speed, 0);
+      hitbox.body.setVelocity(-speed, 0);
       player.setFlipX(true);
       player.anims.play(`${PlayerConfig.animPrefix}left`, true);
       return;
     }
     if (isRight) {
-      player.setVelocity(speed, 0);
+      hitbox.body.setVelocity(speed, 0);
       player.setFlipX(false);
       player.anims.play(`${PlayerConfig.animPrefix}right`, true);
       return;
     }
     if (isUp) {
-      player.setVelocity(0, -speed);
+      hitbox.body.setVelocity(0, -speed);
       player.anims.play(`${PlayerConfig.animPrefix}up`, true);
       return;
     }
     if (isDown) {
-      player.setVelocity(0, speed);
+      hitbox.body.setVelocity(0, speed);
       player.anims.play(`${PlayerConfig.animPrefix}down`, true);
       return;
     }
@@ -54,6 +56,8 @@ export class PlayerController {
   }
 
   static handleAnimation(player, keys, time) {
+    syncSpriteToHitbox(player);
+
     const isLeft = keys.left.isDown;
     const isRight = keys.right.isDown;
     const isUp = keys.up.isDown;

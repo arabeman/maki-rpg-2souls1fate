@@ -3,6 +3,7 @@ import {
   createCharacter,
   handleIdle,
   handleWalking,
+  syncSpriteToHitbox,
 } from "./CharacterAnimation.js";
 
 export class NPCController {
@@ -17,17 +18,18 @@ export class NPCController {
   }
 
   static handleMovement(npc, targetX, targetY, speed = NPCConfig.defaultSpeed) {
-    const dx = targetX - npc.x;
-    const dy = targetY - npc.y;
+    const hitbox = npc.hitbox;
+    const dx = targetX - hitbox.x;
+    const dy = targetY - hitbox.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     if (distance < NPCConfig.stopDistance) {
-      npc.setVelocity(0);
+      hitbox.body.setVelocity(0);
       npc.anims.stop();
       return true;
     }
 
-    npc.setVelocity((dx / distance) * speed, (dy / distance) * speed);
+    hitbox.body.setVelocity((dx / distance) * speed, (dy / distance) * speed);
 
     if (Math.abs(dx) > Math.abs(dy)) {
       npc.setFlipX(dx < 0);
@@ -43,7 +45,9 @@ export class NPCController {
   }
 
   static handleAnimation(npc, time) {
-    const isMoving = npc.body.velocity.x !== 0 || npc.body.velocity.y !== 0;
+    syncSpriteToHitbox(npc);
+
+    const isMoving = npc.hitbox.body.velocity.x !== 0 || npc.hitbox.body.velocity.y !== 0;
 
     if (isMoving) {
       this.handleWalking(npc, time);

@@ -36,7 +36,7 @@ class Act1Scene extends Scene {
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
 
-    this.physics.add.collider(this.player, manager.getWallGroup(this, "act_1"));
+    this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "act_1"));
 
     if (GameState.hasSword) {
       const swordItem = Inventory.items.find(i => i.id === "sword");

@@ -52,10 +52,10 @@ class BeginScene extends Scene {
     EquipmentHUD.init();
 
     // Wall collisions
-    this.physics.add.collider(this.player, manager.getWallGroup(this, "begin"));
-    this.physics.add.collider(this.dad, manager.getWallGroup(this, "begin"));
-    this.dad.body.setImmovable(true);
-    this.physics.add.collider(this.player, this.dad);
+    this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "begin"));
+    this.physics.add.collider(this.dad.hitbox, manager.getWallGroup(this, "begin"));
+    this.dad.hitbox.body.setImmovable(true);
+    this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
 
     // Show emote over dad when scene appears
     this.dadEmote = showEmote(this, this.dad, "exclamation", 0); // 0 = infinite, no auto-hide
@@ -205,9 +205,9 @@ isNearNPC() {
   }
 
   unlockExit() {
-    this.dad.setVelocity(100, 0);
+    this.dad.hitbox.body.setVelocity(100, 0);
     setTimeout(() => {
-      this.dad.body.setImmovable(false);
+      this.dad.hitbox.body.setImmovable(false);
     }, 500);
   }
 }

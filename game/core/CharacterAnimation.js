@@ -30,12 +30,22 @@ export function createCharacter(
   name,
   offset = Math.random() * 1000,
 ) {
-  const sprite = scene.physics.add.sprite(x, y, name);
+  const sprite = scene.add.sprite(x, y, name);
   sprite.setDepth(AnimationConfig.depth);
   sprite.setDisplaySize(AnimationConfig.baseWidth, AnimationConfig.baseHeight);
-  sprite.body.setSize(14, 14);
-  sprite.body.setOffset(2, 4);
+
+  // Create a separate hitbox for collision (invisible image with physics body)
+  const hitbox = scene.add.image(x, y, name);
+  hitbox.setVisible(false);
+  scene.physics.add.existing(hitbox);
+  hitbox.body.setSize(14, 14);
+  hitbox.body.setOffset(1, 1);
+  hitbox.body.syncBoundingBox = false;
+
+  sprite.hitbox = hitbox;
   sprite.animOffset = offset;
+  sprite.x = x;
+  sprite.y = y;
   return sprite;
 }
 
@@ -65,4 +75,11 @@ export function handleWalking(sprite, time, config = AnimationConfig) {
   const height = config.walkHeight + heightPulse * config.pulseAmplitude.height;
 
   sprite.setDisplaySize(width, height);
+}
+
+export function syncSpriteToHitbox(sprite) {
+  if (sprite.hitbox) {
+    sprite.x = sprite.hitbox.x;
+    sprite.y = sprite.hitbox.y;
+  }
 }

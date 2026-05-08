@@ -60,9 +60,9 @@ create() {
   SpriteLoader.createAnims(this, "npc_name", "npc");
 
   // Physics setup
-  this.physics.add.collider(this.player, manager.getWallGroup(this, "map_name"));
-  this.physics.add.collider(this.player, this.npc);
-  this.npc.body.setImmovable(true);
+  this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "map_name"));
+  this.physics.add.collider(this.player.hitbox, this.npc.hitbox);
+  this.npc.hitbox.body.setImmovable(true);
 
   // HUD setup (if using equipment)
   EquipmentHUD.init();
