@@ -1,7 +1,8 @@
 import { Scene, manager } from "@tialops/maki";
+
+import { Dialog } from "../components/Dialog.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
-import { Dialog } from "../components/Dialog.js";
 
 class Act1Scene extends Scene {
   constructor() {
@@ -10,6 +11,7 @@ class Act1Scene extends Scene {
 
   init() {
     this.scale.resize(640, 448);
+    this.cameras.main.setZoom(1.5);
   }
 
   preload() {
@@ -28,6 +30,8 @@ class Act1Scene extends Scene {
     SpriteLoader.createAnims(this, "player", "player");
 
     this.physics.add.collider(this.player, manager.getWallGroup(this, "act_1"));
+
+    this.cameras.main.startFollow(this.player, true, 0.03, 0.03);
 
     this.cameras.main.fadeIn(500);
   }
