@@ -35,6 +35,22 @@ Follow the [commit convention](../COMMIT_CONVENTION.md) when committing changes:
 
 Example: `feat(auth): add Google login`
 
+## Scene Setup
+
+Every scene must define a unique key via the constructor:
+
+```javascript
+import { Scene, manager } from "@tialops/maki";
+
+class MyScene extends Scene {
+  constructor() {
+    super({ key: "MyScene" });
+  }
+}
+```
+
+Phaser uses `"default"` as the scene key if no key is provided, causing a "duplicate key" error when multiple scenes are registered. Always use `super({ key: "SceneName" })`.
+
 ## Setup
 
 - Run `yarn` to install dependencies
