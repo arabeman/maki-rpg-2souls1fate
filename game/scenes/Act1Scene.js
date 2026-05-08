@@ -21,8 +21,8 @@ class Act1Scene extends Scene {
   preload() {
     super.preload();
     SpriteLoader.load(this, "player", "player");
-    SpriteLoader.load(this, "sword", "sword");
-    SpriteLoader.loadImage(this, "sword_pickup", "sword1");
+    SpriteLoader.loadImage(this, "sword1", "sword1");
+    SpriteLoader.loadImage(this, "hammer", "hammer");
     SpriteLoader.loadImage(this, "attack", "attack");
     manager.map(this, "act_1");
     manager.preload(this);
@@ -38,10 +38,10 @@ class Act1Scene extends Scene {
 
     this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "act_1"));
 
-    if (GameState.hasSword) {
-      const swordItem = Inventory.items.find(i => i.id === "sword");
-      if (swordItem) {
-        Equipment.equip(this, this.player, swordItem);
+    if (GameState.hasWeapon) {
+      const weaponItem = Inventory.items[Inventory.items.length - 1];
+      if (weaponItem) {
+        Equipment.equip(this, this.player, weaponItem);
       }
     }
 

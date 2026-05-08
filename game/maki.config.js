@@ -29,7 +29,7 @@ export default {
       },
     },
     {
-      name: "sword",
+      name: "sword1",
       file: "tiles_kenney/sword1.png",
       frameWidth: 16,
       frameHeight: 16,

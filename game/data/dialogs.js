@@ -9,7 +9,7 @@
  */
 
 export const GameState = {
-  hasSword: false,
+  hasWeapon: false,
   exitUnlocked: false,
 };
 

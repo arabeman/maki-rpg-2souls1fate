@@ -1,6 +1,6 @@
 export const WEAPONS = {
-  sword: {
-    id: "sword",
+  sword1: {
+    id: "sword1",
     name: "Sword",
     texture: "sword1",
     range: 16,

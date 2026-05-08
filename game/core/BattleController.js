@@ -38,7 +38,7 @@ export class BattleController {
     const progress = { t: 0 };
 
     const swordSprite = scene.add
-      .image(player.x, player.y, weapon.texture ?? "sword")
+      .image(player.x, player.y, weapon.texture ?? "sword1")
       .setOrigin(0.5)
       .setAngle(angle)
       .setDepth(player.depth + 2);

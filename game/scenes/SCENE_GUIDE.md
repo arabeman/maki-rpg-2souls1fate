@@ -243,11 +243,11 @@ Use `GameState` to track persistent game state across scenes.
 import { GameState } from "../data/dialogs.js";
 
 // Examples
-GameState.hasSword = true;
+GameState.hasWeapon = true;
 GameState.exitUnlocked = true;
 
 // Check in update
-if (GameState.hasSword) { ... }
+if (GameState.hasWeapon) { ... }
 ```
 
 ### Scene Transitions

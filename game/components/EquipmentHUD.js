@@ -87,10 +87,7 @@ static _injectStyles() {
   }
 
   static _getItemImage(texture) {
-    const map = {
-      "sword_pickup": "sword1.png",
-    };
-    return map[texture] || "sword1.png";
+    return `${texture}.png`;
   }
 
   static update() {
@@ -102,7 +99,7 @@ static _injectStyles() {
       this.slot.className = "equipment-hud-img";
       this.slot.innerHTML = "";
       const img = document.createElement("img");
-      img.src = `assets/tiles_kenney/${this._getItemImage(item.texture)}`;
+      img.src = `assets/tiles_kenney/${item.texture}.png`;
       this.slot.appendChild(img);
     } else {
       this.container.classList.remove("visible");

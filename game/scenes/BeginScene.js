@@ -4,7 +4,6 @@ import {
   dadDialogNoSword,
   dadDialogUnlock,
 } from "../data/dialogs.js";
-import { WEAPONS } from "../data/weapons.js";
 import { Scene, manager } from "@tialops/maki";
 
 import { Dialog } from "../components/Dialog.js";
@@ -15,6 +14,7 @@ import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
+import { WEAPONS } from "../data/weapons.js";
 import { showEmote } from "../core/EmoteController.js";
 import { showItemPickup } from "../core/ItemPickupEffect.js";
 
@@ -30,7 +30,8 @@ class BeginScene extends Scene {
     super.preload();
     SpriteLoader.load(this, "player", "player");
     SpriteLoader.load(this, "dad", "dad");
-    SpriteLoader.loadImage(this, "sword_pickup", "sword1");
+    SpriteLoader.loadImage(this, "sword1", "sword1");
+    SpriteLoader.loadImage(this, "hammer", "hammer");
     SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
     manager.map(this, "begin");
     manager.preload(this);
@@ -62,7 +63,7 @@ class BeginScene extends Scene {
 
     // Create pickable objects
     this.pickables = [];
-    this.createPickable(208 + 8, 192 + 8, "sword_pickup", WEAPONS.sword);
+    this.createPickable(208 + 8, 192 + 8, "sword1", WEAPONS.sword1);
   }
 
   createPickable(x, y, sprite, data) {
@@ -159,7 +160,7 @@ class BeginScene extends Scene {
       showItemPickup(this, obj, obj.texture.key);
       Equipment.equip(this, this.player, itemData);
 
-      GameState.hasSword = true;
+      GameState.hasWeapon = true;
       this.talkCount = 1;
 
       obj.destroy();
@@ -193,10 +194,10 @@ isNearNPC() {
       return;
     }
 
-    if (GameState.hasSword && this.talkCount === 1) {
+    if (GameState.hasWeapon && this.talkCount === 1) {
       Dialog.open(this, dadDialogHasSword);
       this.talkCount = 2;
-    } else if (GameState.hasSword && this.talkCount === 2 && !GameState.exitUnlocked) {
+    } else if (GameState.hasWeapon && this.talkCount === 2 && !GameState.exitUnlocked) {
       this.shouldUnlockOnClose = true;
       Dialog.open(this, dadDialogUnlock);
     } else {
