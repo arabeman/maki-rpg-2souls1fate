@@ -82,7 +82,7 @@ export function handleWalking(sprite, time, config = AnimationConfig, direction 
 
 export function syncSpriteToHitbox(sprite) {
   if (sprite.hitbox) {
-    sprite.x = sprite.hitbox.x;
-    sprite.y = sprite.hitbox.y;
+    sprite.x = Math.round(sprite.hitbox.x);
+    sprite.y = Math.round(sprite.hitbox.y);
   }
 }

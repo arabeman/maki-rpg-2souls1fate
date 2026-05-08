@@ -46,7 +46,7 @@ export class BattleController {
     scene.attackTile = scene.add
       .image(player.x + dx, player.y + dy, "attack")
       .setOrigin(0.5)
-      .setDepth(player.depth + 1);
+      .setDepth(player.depth - 1);
 
     // Helper: reposition both sprites anchored to the current player position
     const syncPositions = (t) => {
