@@ -12,7 +12,7 @@ new Phaser.Game({
   backgroundColor: "#000000",
   physics: {
     default: "arcade",
-    arcade: { debug: true },
+    arcade: { debug: false },
   },
   scene: [BeginScene, Act1Scene],
   render: {
