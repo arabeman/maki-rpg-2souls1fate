@@ -64,7 +64,12 @@ export class PlayerController {
     const isDown = keys.down.isDown;
 
     if (isLeft || isRight || isUp || isDown) {
-      this.handleWalking(player, time);
+      let direction = null;
+      if (isUp) direction = "up";
+      else if (isDown) direction = "down";
+      else if (isLeft) direction = "left";
+      else if (isRight) direction = "right";
+      this.handleWalking(player, time, direction);
     } else {
       this.handleIdle(player, time);
     }
@@ -74,7 +79,7 @@ export class PlayerController {
     handleIdle(player, time, PlayerConfig);
   }
 
-  static handleWalking(player, time) {
-    handleWalking(player, time, PlayerConfig);
+  static handleWalking(player, time, direction = null) {
+    handleWalking(player, time, PlayerConfig, direction);
   }
 }

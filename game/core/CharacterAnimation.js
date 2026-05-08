@@ -6,7 +6,7 @@ export const AnimationConfig = {
   idleHeight: 14,
   walkWidth: 14,
   walkHeight: 15,
-  pulseAmplitude: { width: 0.6, height: 0.5 },
+  pulseAmplitude: { width: 0.6, height: 0.7 },
   pulsePeriod: { width: 110, height: 80 },
   defaultSpeed: 160,
   stopDistance: 4,
@@ -63,7 +63,7 @@ export function handleIdle(sprite, time, config = AnimationConfig) {
   sprite.setDisplaySize(width, height);
 }
 
-export function handleWalking(sprite, time, config = AnimationConfig) {
+export function handleWalking(sprite, time, config = AnimationConfig, direction = null) {
   const widthPulse = Math.sin(
     (time + sprite.animOffset) / config.pulsePeriod.width,
   );
@@ -71,9 +71,12 @@ export function handleWalking(sprite, time, config = AnimationConfig) {
     (time + sprite.animOffset) / config.pulsePeriod.height,
   );
 
-  const width = config.walkWidth + widthPulse * config.pulseAmplitude.width;
-  const height = config.walkHeight + heightPulse * config.pulseAmplitude.height;
+  let height = config.walkHeight + heightPulse * config.pulseAmplitude.height;
+  if (direction === "up" || direction === "down") {
+    height += 1;
+  }
 
+  const width = config.walkWidth + widthPulse * config.pulseAmplitude.width;
   sprite.setDisplaySize(width, height);
 }
 
