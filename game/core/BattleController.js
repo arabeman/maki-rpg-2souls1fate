@@ -23,6 +23,10 @@ export class BattleController {
 
     scene.isAttacking = true;
 
+    // Hide the equipped sword on the player
+    const equippedSword = mainHand.sprite;
+    if (equippedSword) equippedSword.setVisible(false);
+
     // Sword starts at player position
     const startX = player.x;
     const startY = player.y;
@@ -66,6 +70,7 @@ export class BattleController {
                 scene.attackTile.destroy();
                 scene.attackTile = null;
               }
+              if (equippedSword) equippedSword.setVisible(true);
               scene.isAttacking = false;
             },
           });
