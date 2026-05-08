@@ -1,6 +1,9 @@
 import { Scene, manager } from "@tialops/maki";
 
 import { Dialog } from "../components/Dialog.js";
+import { Equipment } from "../core/Equipment.js";
+import { GameState } from "../data/dialogs.js";
+import { Inventory } from "../core/Inventory.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
 
@@ -17,6 +20,7 @@ class Act1Scene extends Scene {
   preload() {
     super.preload();
     SpriteLoader.load(this, "player", "player");
+    SpriteLoader.loadImage(this, "sword_pickup", "sword1");
     manager.map(this, "act_1");
     manager.preload(this);
   }
@@ -31,6 +35,13 @@ class Act1Scene extends Scene {
 
     this.physics.add.collider(this.player, manager.getWallGroup(this, "act_1"));
 
+    if (GameState.hasSword) {
+      const swordItem = Inventory.items.find(i => i.id === "sword");
+      if (swordItem) {
+        Equipment.equip(this, this.player, swordItem);
+      }
+    }
+
     this.cameras.main.startFollow(this.player, true, 0.03, 0.03);
     this.cameras.main.setBounds(0, 0, 640, 448);
 
@@ -42,7 +53,7 @@ class Act1Scene extends Scene {
       PlayerController.handleMovement(this.player, this.keys);
       PlayerController.handleAnimation(this.player, this.keys, time);
     }
-    console.log(`Player position: x=${this.player.x.toFixed(1)}, y=${this.player.y.toFixed(1)}`);
+    Equipment.update(this, this.player);
     Dialog.update(time);
   }
 }
