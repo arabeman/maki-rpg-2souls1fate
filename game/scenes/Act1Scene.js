@@ -32,6 +32,7 @@ class Act1Scene extends Scene {
     this.physics.add.collider(this.player, manager.getWallGroup(this, "act_1"));
 
     this.cameras.main.startFollow(this.player, true, 0.03, 0.03);
+    this.cameras.main.setBounds(0, 0, 640, 448);
 
     this.cameras.main.fadeIn(500);
   }
