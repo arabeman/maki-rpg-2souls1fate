@@ -187,15 +187,15 @@ Simple combat:
 
 ## Current Weapons in Game
 
-| Weapon | Status | Location |
-|---|---|---|
-| Sword 1 | ✅ Available | Start (Dad gives it) |
-| Sword 2 | 🔜 Coming soon | - |
-| Sword 3 | 🔜 Coming soon | - |
-| Sword 4 | 🔜 Coming soon | - |
-| Axe | 🔜 Coming soon | - |
-| Dual Axes | 🔜 Coming soon | - |
-| Hammer | 🔜 Coming soon | - |
+| Weapon | Status | Location | Range | Delay | Damage |
+|---|---|---|---|---|---|
+| Sword 1 | ✅ Available | Start (Dad) | 1 tile | 0.15s | Low |
+| Sword 2 | 🔜 Coming soon | - | 1.5 tiles | 0.25s | Medium |
+| Sword 3 | 🔜 Coming soon | - | 2 tiles | 0.45s | High |
+| Sword 4 | 🔜 Coming soon | - | 2 tiles | 0.20s | Medium-High |
+| Axe | 🔜 Coming soon | - | 1.5 tiles | 0.50s | High |
+| Dual Axes | 🔜 Coming soon | - | 1 tile | 0.12s | Medium |
+| Hammer | 🔜 Coming soon | - | 1.5 tiles | 0.80s | Very High |
 
 ## Planned Locations
 

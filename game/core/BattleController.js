@@ -14,16 +14,20 @@ export class BattleController {
   static attack(scene, player, keys) {
     const { left, right, up, down } = scene.attackKeys;
 
-    let dx = 0, dy = 0, angle = 0;
-    if      (right.isDown) { dx =  16; dy =   0; angle =  90; }
-    else if (left.isDown)  { dx = -16; dy =   0; angle = -90; }
-    else if (up.isDown)    { dx =   0; dy = -16; angle =   0; }
-    else if (down.isDown)  { dx =   0; dy =  16; angle = 180; }
-    else return;
-
     const mainHand = Equipment.getMainHand();
     if (!mainHand) return;
     if (scene.isAttacking) return;
+
+    const weapon = mainHand.item;
+    const range = weapon.range || 16;
+    const damage = weapon.damage || 1;
+
+    let dx = 0, dy = 0, angle = 0;
+    if      (right.isDown) { dx = range; dy =   0; angle =  90; }
+    else if (left.isDown)  { dx = -range; dy =   0; angle = -90; }
+    else if (up.isDown)    { dx =   0; dy = -range; angle =   0; }
+    else if (down.isDown)  { dx =   0; dy =  range; angle = 180; }
+    else return;
 
     scene.isAttacking = true;
 
@@ -34,7 +38,7 @@ export class BattleController {
     const progress = { t: 0 };
 
     const swordSprite = scene.add
-      .image(player.x, player.y, mainHand.textureKey ?? "sword")
+      .image(player.x, player.y, weapon.texture ?? "sword")
       .setOrigin(0.5)
       .setAngle(angle)
       .setDepth(player.depth + 2);

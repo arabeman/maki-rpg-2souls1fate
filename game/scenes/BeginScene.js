@@ -4,6 +4,7 @@ import {
   dadDialogNoSword,
   dadDialogUnlock,
 } from "../data/dialogs.js";
+import { WEAPONS } from "../data/weapons.js";
 import { Scene, manager } from "@tialops/maki";
 
 import { Dialog } from "../components/Dialog.js";
@@ -61,7 +62,7 @@ class BeginScene extends Scene {
 
     // Create pickable objects
     this.pickables = [];
-    this.createPickable(208 + 8, 192 + 8, "sword_pickup", { id: "sword", name: "Sword" });
+    this.createPickable(208 + 8, 192 + 8, "sword_pickup", WEAPONS.sword);
   }
 
   createPickable(x, y, sprite, data) {

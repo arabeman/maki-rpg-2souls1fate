@@ -52,6 +52,12 @@ export default {
     { name: "anger", file: "emotes_kenney/emote_anger.png" },
     { name: "dots", file: "emotes_kenney/emote_dots1.png" },
     { name: "sword1", file: "tiles_kenney/sword1.png" },
+    { name: "sword2", file: "tiles_kenney/sword2.png" },
+    { name: "sword3", file: "tiles_kenney/sword3.png" },
+    { name: "sword4", file: "tiles_kenney/sword4.png" },
+    { name: "dual_axes", file: "tiles_kenney/dual_axes.png" },
+    { name: "axe", file: "tiles_kenney/axe.png" },
+    { name: "hammer", file: "tiles_kenney/hammer.png" },
     { name: "attack", file: "tiles_kenney/tile_0060.png" },
   ],
 };
