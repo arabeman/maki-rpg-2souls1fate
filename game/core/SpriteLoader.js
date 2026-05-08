@@ -47,8 +47,10 @@ export class SpriteLoader {
     if (!spriteConfig) return;
 
     Object.entries(spriteConfig.directions).forEach(([dir, { start, end }]) => {
+      const animKey = `${name}-${dir}`;
+      if (scene.anims.exists(animKey)) return;
       scene.anims.create({
-        key: `${name}-${dir}`,
+        key: animKey,
         frames: scene.anims.generateFrameNumbers(name, { start, end }),
         frameRate: 8,
         repeat: -1,
