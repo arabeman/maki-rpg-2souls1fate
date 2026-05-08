@@ -180,3 +180,28 @@ Simple combat:
 - responsive attacks
 - different weapon feeling
 - exploration reward
+
+---
+
+# Weapon Progression
+
+## Current Weapons in Game
+
+| Weapon | Status | Location |
+|---|---|---|
+| Sword 1 | ✅ Available | Start (Dad gives it) |
+| Sword 2 | 🔜 Coming soon | - |
+| Sword 3 | 🔜 Coming soon | - |
+| Sword 4 | 🔜 Coming soon | - |
+| Axe | 🔜 Coming soon | - |
+| Dual Axes | 🔜 Coming soon | - |
+| Hammer | 🔜 Coming soon | - |
+
+## Planned Locations
+
+- Sword 2: Found in early cave
+- Sword 3: Reward for first quest
+- Sword 4: Hidden secret area
+- Axe: Defeat first enemy
+- Dual Axes: Complete forest challenge
+- Hammer: Endgame reward
