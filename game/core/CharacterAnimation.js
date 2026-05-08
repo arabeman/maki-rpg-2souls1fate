@@ -38,7 +38,7 @@ export function createCharacter(
   const hitbox = scene.add.image(x, y, name);
   hitbox.setVisible(false);
   scene.physics.add.existing(hitbox);
-  hitbox.body.setSize(14, 14);
+  hitbox.body.setSize(12.5, 12.5);
   hitbox.body.setOffset(1, 1);
   hitbox.body.syncBoundingBox = false;
 
