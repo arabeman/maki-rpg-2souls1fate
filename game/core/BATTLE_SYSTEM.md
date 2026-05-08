@@ -4,14 +4,14 @@
 
 | Action | Key |
 |---|---|
-| Move Up | W |
-| Move Down | S |
-| Move Left | A |
-| Move Right | D |
-| Attack Up | ↑ |
-| Attack Down | ↓ |
-| Attack Left | ← |
-| Attack Right | → |
+| Move Up | ↑ |
+| Move Down | ↓ |
+| Move Left | ← |
+| Move Right | → |
+| Attack Up | W |
+| Attack Left | A |
+| Attack Down | S |
+| Attack Right | D |
 
 The player can:
 - move with WASD

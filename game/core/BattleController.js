@@ -1,9 +1,8 @@
 import Phaser from "phaser";
+import { Equipment } from "./Equipment.js";
 
 export class BattleController {
   static setup(scene, player) {
-    scene.attackSprite = null;
-
     scene.attackKeys = {
       left: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
       right: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
@@ -13,42 +12,50 @@ export class BattleController {
   }
 
   static attack(scene, player, keys) {
-    const isLeft = scene.attackKeys.left.isDown;
     const isRight = scene.attackKeys.right.isDown;
-    const isUp = scene.attackKeys.up.isDown;
-    const isDown = scene.attackKeys.down.isDown;
 
-    if (!isLeft && !isRight && !isUp && !isDown) {
+    if (!isRight) {
       return;
     }
 
-    if (scene.attackSprite) {
+    const mainHand = Equipment.getMainHand();
+    if (!mainHand) {
       return;
     }
 
-    let offsetX = 0;
-    let offsetY = 0;
+    const swordSprite = mainHand.sprite;
 
-    if (isLeft) {
-      offsetX = -16;
-    } else if (isRight) {
-      offsetX = 16;
-    } else if (isUp) {
-      offsetY = -16;
-    } else if (isDown) {
-      offsetY = 16;
+    if (scene.isAttacking) {
+      return;
     }
 
-    scene.attackSprite = scene.add
-      .image(player.x + offsetX, player.y + offsetY, "attack")
+    scene.isAttacking = true;
+
+    scene.attackTile = scene.add
+      .image(player.x + 16, player.y, "attack")
       .setOrigin(0.5)
-      .setDepth(100);
+      .setDepth(99);
 
-    scene.time.delayedCall(200, () => {
-      if (scene.attackSprite) {
-        scene.attackSprite.destroy();
-        scene.attackSprite = null;
-      }
+    scene.tweens.add({
+      targets: swordSprite,
+      angle: 90,
+      duration: 100,
+      onComplete: () => {
+        scene.time.delayedCall(100, () => {
+          scene.tweens.add({
+            targets: swordSprite,
+            angle: 0,
+            duration: 100,
+            onComplete: () => {
+              if (scene.attackTile) {
+                scene.attackTile.destroy();
+                scene.attackTile = null;
+              }
+              scene.isAttacking = false;
+            },
+          });
+        });
+      },
     });
   }
 }

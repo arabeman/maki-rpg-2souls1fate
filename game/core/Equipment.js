@@ -49,4 +49,8 @@ export class Equipment {
       slot => slot && slot.item.id === itemId
     );
   }
+
+  static getMainHand() {
+    return this.slots.mainHand;
+  }
 }

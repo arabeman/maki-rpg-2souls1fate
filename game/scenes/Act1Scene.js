@@ -21,6 +21,7 @@ class Act1Scene extends Scene {
   preload() {
     super.preload();
     SpriteLoader.load(this, "player", "player");
+    SpriteLoader.load(this, "sword", "sword");
     SpriteLoader.loadImage(this, "sword_pickup", "sword1");
     SpriteLoader.loadImage(this, "attack", "attack");
     manager.map(this, "act_1");
