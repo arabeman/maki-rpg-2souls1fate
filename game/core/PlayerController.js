@@ -16,21 +16,16 @@ export class PlayerController {
       Phaser.Input.Keyboard.KeyCodes.SPACE,
     );
 
-    keys.a = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-    keys.d = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-    keys.w = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-    keys.s = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-
     return keys;
   }
 
   static handleMovement(player, keys, speed = PlayerConfig.defaultSpeed) {
     player.setVelocity(0);
 
-    const isLeft = keys.left.isDown || keys.a.isDown;
-    const isRight = keys.right.isDown || keys.d.isDown;
-    const isUp = keys.up.isDown || keys.w.isDown;
-    const isDown = keys.down.isDown || keys.s.isDown;
+    const isLeft = keys.left.isDown;
+    const isRight = keys.right.isDown;
+    const isUp = keys.up.isDown;
+    const isDown = keys.down.isDown;
 
     if (isLeft) {
       player.setVelocity(-speed, 0);
@@ -59,10 +54,10 @@ export class PlayerController {
   }
 
   static handleAnimation(player, keys, time) {
-    const isLeft = keys.left.isDown || keys.a.isDown;
-    const isRight = keys.right.isDown || keys.d.isDown;
-    const isUp = keys.up.isDown || keys.w.isDown;
-    const isDown = keys.down.isDown || keys.s.isDown;
+    const isLeft = keys.left.isDown;
+    const isRight = keys.right.isDown;
+    const isUp = keys.up.isDown;
+    const isDown = keys.down.isDown;
 
     if (isLeft || isRight || isUp || isDown) {
       this.handleWalking(player, time);
