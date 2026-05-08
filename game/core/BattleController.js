@@ -1,5 +1,5 @@
-import Phaser from "phaser";
 import { Equipment } from "./Equipment.js";
+import Phaser from "phaser";
 
 export class BattleController {
   static setup(scene, player) {
@@ -14,39 +14,54 @@ export class BattleController {
   static attack(scene, player, keys) {
     const isRight = scene.attackKeys.right.isDown;
 
-    if (!isRight) {
-      return;
-    }
+    if (!isRight) return;
 
     const mainHand = Equipment.getMainHand();
-    if (!mainHand) {
-      return;
-    }
+    if (!mainHand) return;
 
-    const swordSprite = mainHand.sprite;
-
-    if (scene.isAttacking) {
-      return;
-    }
+    if (scene.isAttacking) return;
 
     scene.isAttacking = true;
 
-    scene.attackTile = scene.add
-      .image(player.x + 16, player.y, "attack")
-      .setOrigin(0.5)
-      .setDepth(99);
+    // Sword starts at player position
+    const startX = player.x;
+    const startY = player.y;
 
+    // Target position: 16px to the right (where the attack tile used to appear)
+    const targetX = player.x + 16;
+    const targetY = player.y;
+
+    // Create the sword sprite at the player's position, rotated 90° and above the player
+    const swordSprite = scene.add
+      .image(startX, startY, mainHand.textureKey ?? "sword")
+      .setOrigin(0.5)
+      .setAngle(90)
+      .setDepth(player.depth + 2);
+
+    // Attack tile visual at the hit position
+    scene.attackTile = scene.add
+      .image(targetX, targetY, "attack")
+      .setOrigin(0.5)
+      .setDepth(player.depth + 1);
+
+    // Slide the sword outward to the attack position
     scene.tweens.add({
       targets: swordSprite,
-      angle: 90,
+      x: targetX,
+      y: targetY,
       duration: 100,
+      ease: "Linear",
       onComplete: () => {
-        scene.time.delayedCall(100, () => {
+        // Brief pause at the hit position, then retract
+        scene.time.delayedCall(80, () => {
           scene.tweens.add({
             targets: swordSprite,
-            angle: 0,
+            x: startX,
+            y: startY,
             duration: 100,
+            ease: "Linear",
             onComplete: () => {
+              swordSprite.destroy();
               if (scene.attackTile) {
                 scene.attackTile.destroy();
                 scene.attackTile = null;
