@@ -1,4 +1,5 @@
-import { BeginScene, Act1Scene } from "./scenes/index.js";
+import { Act1Scene, BeginScene } from "./scenes/index.js";
+
 import Phaser from "phaser";
 
 new Phaser.Game({
@@ -8,7 +9,7 @@ new Phaser.Game({
   scale: {
     zoom: 2,
   },
-  backgroundColor: "#1a1a2e",
+  backgroundColor: "#000000",
   physics: {
     default: "arcade",
     arcade: { debug: false },

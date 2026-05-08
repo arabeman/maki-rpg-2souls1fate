@@ -18,6 +18,7 @@ class Act1Scene extends Scene {
   create() {
     super.create();
     manager.create(this);
+    this.cameras.main.fadeIn(500);
   }
 
   update(time) {
