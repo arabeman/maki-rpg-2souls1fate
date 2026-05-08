@@ -5,7 +5,6 @@ import {
   dadDialogUnlock,
 } from "../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
-import Act1Scene from "./Act1Scene.js";
 
 import { Dialog } from "../components/Dialog.js";
 import { Equipment } from "../core/Equipment.js";
@@ -21,10 +20,11 @@ import { showItemPickup } from "../core/ItemPickupEffect.js";
 /**
  * Begin scene - first scene of the game
  */
-export default class BeginScene extends Scene {
-  /**
-   * Load assets (sprites, maps) before scene starts
-   */
+class BeginScene extends Scene {
+  static SceneKey = "BeginScene";
+  constructor() {
+    super({ key: "BeginScene" });
+  }
   preload() {
     super.preload();
     SpriteLoader.load(this, "player", "player");
@@ -89,7 +89,7 @@ export default class BeginScene extends Scene {
       this.sceneTransitioning = true;
       this.cameras.main.fadeOut(500);
       this.cameras.main.once('camerafadeoutcomplete', () => {
-        this.scene.start(Act1Scene);
+        this.scene.start("Act1Scene");
       });
     }
 
@@ -210,3 +210,5 @@ isNearNPC() {
     }, 500);
   }
 }
+
+export { BeginScene };
