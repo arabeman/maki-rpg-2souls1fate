@@ -109,42 +109,51 @@ export class EnemyController {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
-  static updateHealth(enemy, health, maxHealth = 3) {
-    if (!enemy.scene || !enemy.scene.textures.exists("heart_full")) return;
+   static updateHealth(enemy, health, maxHealth) {
+     if (!enemy.scene || !enemy.scene.textures.exists("heart_full")) return;
 
-    if (!enemy.healthHearts) {
-      enemy.healthHearts = [];
-      for (let i = 0; i < maxHealth; i++) {
-        const heart = enemy.scene.add.image(
-          enemy.x,
-          enemy.y - 12,
-          "heart_full"
-        );
-        heart.setScrollFactor(1);
-        heart.setDepth(enemy.depth + 10);
-        heart.setScale(1);
-        heart.setOrigin(0.5, 0.5);
-        heart.setAlpha(0);
-        enemy.healthHearts.push(heart);
-      }
-    }
+     const resolvedMaxHealth = Math.max(
+       1,
+       maxHealth ?? enemy.maxHealth ?? health ?? 1,
+     );
+     enemy.maxHealth = resolvedMaxHealth;
 
-    const gap = 10;
-    const totalWidth = (health - 1) * gap;
-    const startX = enemy.x - totalWidth / 2;
+     const needsRebuild =
+       !enemy.healthHearts || enemy.healthHearts.length !== resolvedMaxHealth;
 
-    for (let i = 0; i < enemy.healthHearts.length; i++) {
-      const heart = enemy.healthHearts[i];
-      if (!heart) continue;
-      if (i >= health) {
-        heart.destroy();
-        enemy.healthHearts[i] = null;
-      } else {
-        heart.x = startX + (i * gap);
-        heart.y = enemy.y - 12;
-      }
-    }
-  }
+     if (needsRebuild) {
+       if (enemy.healthHearts) {
+         enemy.healthHearts.forEach((heart) => heart && heart.destroy());
+       }
+       enemy.healthHearts = [];
+       for (let i = 0; i < resolvedMaxHealth; i++) {
+         const heart = enemy.scene.add.image(
+           enemy.x,
+           enemy.y - 12,
+           "heart_full"
+         );
+         heart.setScrollFactor(1);
+         heart.setDepth(enemy.depth + 10);
+         heart.setScale(1);
+         heart.setOrigin(0.5, 0.5);
+         heart.setAlpha(0);
+         enemy.healthHearts.push(heart);
+       }
+     }
+
+     const clampedHealth = Math.max(0, Math.min(health ?? 0, resolvedMaxHealth));
+     const gap = 10;
+     const totalWidth = (resolvedMaxHealth - 1) * gap;
+     const startX = enemy.x - totalWidth / 2;
+
+     for (let i = 0; i < enemy.healthHearts.length; i++) {
+       const heart = enemy.healthHearts[i];
+       if (!heart) continue;
+       heart.setVisible(i < clampedHealth);
+       heart.x = startX + (i * gap);
+       heart.y = enemy.y - 12;
+     }
+   }
 
   static showHealthBar(enemy) {
     if (!enemy.healthHearts) return;

@@ -79,7 +79,9 @@ class Act1Scene extends Scene {
     this.enemies = [
       { sprite: this.createEnemy(88, 260) },
       { sprite: this.createEnemy(89, 383) },
-    ].map(e => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
+      { sprite: this.createEnemy(373, 114 - 10) },
+      { sprite: this.createEnemy(373, 114 + 16 - 10) },
+    ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     if (GameState.hasWeapon) {
       const weaponItem = Inventory.items[Inventory.items.length - 1];
@@ -104,22 +106,31 @@ class Act1Scene extends Scene {
       delay: 1000,
       loop: true,
       callback: () => {
-        console.log("Player pos:", Math.round(this.player.x), Math.round(this.player.y));
+        console.log(
+          "Player pos:",
+          Math.round(this.player.x),
+          Math.round(this.player.y),
+        );
       },
     });
 
     BattleController.setup(this, this.player);
   }
 
-  createEnemy(x, y) {
+  createEnemy(x, y, health = 5) {
     const enemy = EnemyController.create(this, x, y, "enemy");
-    enemy.health = 3;
+    enemy.health = health;
+    enemy.maxHealth = health;
     enemy.enemyEmote = null;
     enemy.canMove = false;
     this.physics.add.collider(this.player.hitbox, enemy.hitbox);
-    this.physics.add.collider(enemy.hitbox, manager.getWallGroup(this, "act_1"));
+    this.physics.add.collider(
+      enemy.hitbox,
+      manager.getWallGroup(this, "act_1"),
+    );
     enemy.hitbox.body.setImmovable(false);
     enemy.hitbox.body.setCollideWorldBounds(true);
+    EnemyController.updateHealth(enemy, enemy.health);
     return enemy;
   }
 
@@ -143,7 +154,9 @@ class Act1Scene extends Scene {
     };
 
     flash();
-    [80, 160, 240].forEach(delay => this.time.addEvent({ delay, callback: flash }));
+    [80, 160, 240].forEach((delay) =>
+      this.time.addEvent({ delay, callback: flash }),
+    );
     this.time.addEvent({
       delay: 320,
       callback: () => this.destroyEnemyEntry(entry),
@@ -159,9 +172,12 @@ class Act1Scene extends Scene {
       entry.weapon = null;
     }
     if (enemy) {
-      if (enemy.enemyEmote) { enemy.enemyEmote.destroy(); enemy.enemyEmote = null; }
+      if (enemy.enemyEmote) {
+        enemy.enemyEmote.destroy();
+        enemy.enemyEmote = null;
+      }
       if (enemy.healthHearts) {
-        enemy.healthHearts.forEach(h => h && h.destroy());
+        enemy.healthHearts.forEach((h) => h && h.destroy());
         enemy.healthHearts = [];
       }
       if (enemy.hitbox) {
@@ -194,7 +210,9 @@ class Act1Scene extends Scene {
         const emote = showEmote(this, enemy, "exclamations", 0);
         if (emote) {
           enemy.enemyEmote = emote;
-          this.time.delayedCall(200, () => { if (enemy) enemy.canMove = true; });
+          this.time.delayedCall(200, () => {
+            if (enemy) enemy.canMove = true;
+          });
         } else {
           enemy.canMove = true;
         }
@@ -202,7 +220,10 @@ class Act1Scene extends Scene {
 
       if (enemy.canMove) {
         if (dist > EnemyBehavior.attackRange) {
-          if (enemy.enemyEmote) { enemy.enemyEmote.destroy(); enemy.enemyEmote = null; }
+          if (enemy.enemyEmote) {
+            enemy.enemyEmote.destroy();
+            enemy.enemyEmote = null;
+          }
           EnemyController.chase(this, enemy, this.player);
         } else {
           enemy.hitbox.body.setVelocity(0);
@@ -229,7 +250,9 @@ class Act1Scene extends Scene {
       this.playerDied = true;
       GameState.playerHealth = 3;
       this.cameras.main.fadeOut(500);
-      this.cameras.main.once("camerafadeoutcomplete", () => this.scene.restart());
+      this.cameras.main.once("camerafadeoutcomplete", () =>
+        this.scene.restart(),
+      );
       return;
     }
 
@@ -243,7 +266,7 @@ class Act1Scene extends Scene {
         this,
         this.player,
         this.keys,
-        this.enemies.map(e => e.sprite).filter(Boolean),
+        this.enemies.map((e) => e.sprite).filter(Boolean),
       );
     }
 
@@ -257,7 +280,9 @@ class Act1Scene extends Scene {
       GameState.returnedFromAct1 = true;
       GameState.leftBeginScene = false;
       this.cameras.main.fadeOut(500);
-      this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("BeginScene"));
+      this.cameras.main.once("camerafadeoutcomplete", () =>
+        this.scene.start("BeginScene"),
+      );
       return;
     }
 
@@ -298,7 +323,11 @@ class Act1Scene extends Scene {
 
   getNearInteractable() {
     if (this.dad) {
-      const nearNPC = InteractionManager.getNearObject(this.player, [this.dad], 25);
+      const nearNPC = InteractionManager.getNearObject(
+        this.player,
+        [this.dad],
+        25,
+      );
       if (nearNPC) return { type: "npc", target: nearNPC };
     }
     return null;
@@ -312,7 +341,10 @@ class Act1Scene extends Scene {
 
   handleNPCTalk() {
     if (!this.dad) return;
-    if (this.dadEmote) { this.dadEmote.destroy(); this.dadEmote = null; }
+    if (this.dadEmote) {
+      this.dadEmote.destroy();
+      this.dadEmote = null;
+    }
     this.dad.setFlipX(this.player.x >= this.dad.x);
     Dialog.open(this, dadAct1Dialog);
   }

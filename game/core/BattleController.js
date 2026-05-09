@@ -1,4 +1,5 @@
 import { Equipment } from "./Equipment.js";
+import { EnemyController } from "./EnemyController.js";
 import Phaser from "phaser";
 
 export class BattleController {
@@ -86,6 +87,8 @@ export class BattleController {
 
           if (this.checkHit(attackX, attackY, enemy.hitbox || enemy)) {
             enemy.health = Math.max(0, (enemy.health || 3) - damage);
+            EnemyController.updateHealth(enemy, enemy.health);
+            EnemyController.showHealthBar(enemy);
             scene.cameras.main.shake(100, 0.003);
 
             // Impact effect
