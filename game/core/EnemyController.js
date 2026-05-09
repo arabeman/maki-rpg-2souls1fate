@@ -162,8 +162,8 @@ export class EnemyController {
     enemy.scene.tweens.add({
       targets: enemy.healthHearts,
       alpha: 0,
-      duration: 1500,
-      delay: 2000,
+      duration: 700,
+      delay: 500,
     });
   }
 

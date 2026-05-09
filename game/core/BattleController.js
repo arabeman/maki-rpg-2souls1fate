@@ -4,6 +4,13 @@ import Phaser from "phaser";
 
 export class BattleController {
   static setup(scene, player) {
+    // Reset transient combat state so restart/respawn never leaves attack locked.
+    scene.isAttacking = false;
+    if (scene.attackTile) {
+      scene.attackTile.destroy();
+      scene.attackTile = null;
+    }
+
     scene.attackKeys = {
       left:  scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
       right: scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),

@@ -44,6 +44,10 @@ class Act1Scene extends Scene {
     SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
     SpriteLoader.loadImage(this, "emote_exclamations", "exclamations");
     SpriteLoader.loadImage(this, "emote_question", "question");
+    this.load.spritesheet("georges", "assets/tiles_kenney/georges.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
     manager.map(this, "act_1");
     manager.preload(this);
   }
@@ -66,6 +70,12 @@ class Act1Scene extends Scene {
       manager.getWallGroup(this, "act_1"),
     );
 
+    this.georges = NPCController.create(this, 47, 33, "georges");
+    this.georges.hitbox.body.setImmovable(true);
+    this.georges.hitbox.body.setCollideWorldBounds(true);
+    this.physics.add.collider(this.player.hitbox, this.georges.hitbox);
+    this.physics.add.collider(this.georges.hitbox, manager.getWallGroup(this, "act_1"));
+
     if (GameState.leftBeginScene) {
       SpriteLoader.load(this, "dad", "dad");
       this.dad = NPCController.create(this, 48, 118, "dad");
@@ -81,6 +91,11 @@ class Act1Scene extends Scene {
       { sprite: this.createEnemy(89, 383) },
       { sprite: this.createEnemy(373, 114 - 10) },
       { sprite: this.createEnemy(373, 114 + 16 - 10) },
+      { sprite: this.createEnemy(295, 415) },
+      { sprite: this.createEnemy(378, 413) },
+      { sprite: this.createEnemy(578, 240) },
+      { sprite: this.createEnemy(511, 259) },
+      { sprite: this.createEnemy(586, 395, 5) },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     if (GameState.hasWeapon) {
@@ -117,7 +132,7 @@ class Act1Scene extends Scene {
     BattleController.setup(this, this.player);
   }
 
-  createEnemy(x, y, health = 5) {
+  createEnemy(x, y, health = 3) {
     const enemy = EnemyController.create(this, x, y, "enemy");
     enemy.health = health;
     enemy.maxHealth = health;
@@ -273,6 +288,9 @@ class Act1Scene extends Scene {
     if (this.dad) {
       NPCController.handleAnimation(this.dad, time);
     }
+    if (this.georges) {
+      NPCController.handleAnimation(this.georges, time);
+    }
 
     // --- Scene transition ---
     if (!this.sceneTransitioning && this.player.x < 0) {
@@ -348,6 +366,7 @@ class Act1Scene extends Scene {
     this.dad.setFlipX(this.player.x >= this.dad.x);
     Dialog.open(this, dadAct1Dialog);
   }
+
 }
 
 export { Act1Scene };
