@@ -50,6 +50,7 @@ class BeginScene extends Scene {
 
     this.dad = null;
     this.sceneTransitioning = false;
+    this.playerDied = false;
 
     if (GameState.returnedFromAct1) {
       this.player = PlayerController.create(this, 268, 144, "player");
@@ -109,6 +110,16 @@ class BeginScene extends Scene {
    * @param {number} time - Current timestamp in milliseconds
    */
   update(time) {
+    if (GameState.playerHealth <= 0 && !this.playerDied) {
+      this.playerDied = true;
+      GameState.playerHealth = 3;
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once("camerafadeoutcomplete", () => {
+        this.scene.restart();
+      });
+      return;
+    }
+
     if (!Dialog.isOpen()) {
       PlayerController.handleMovement(this.player, this.keys);
       PlayerController.handleAnimation(this.player, this.keys, time);

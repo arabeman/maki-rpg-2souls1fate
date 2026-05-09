@@ -51,6 +51,7 @@ class Act1Scene extends Scene {
 
     this.dad = null;
     this.sceneTransitioning = false;
+    this.playerDied = false;
 
     this.player = PlayerController.create(this, 16, 128, "player");
     this.keys = PlayerController.setupInput(this);
@@ -135,6 +136,16 @@ class Act1Scene extends Scene {
   }
 
   update(time) {
+    if (GameState.playerHealth <= 0 && !this.playerDied) {
+      this.playerDied = true;
+      GameState.playerHealth = 3;
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once("camerafadeoutcomplete", () => {
+        this.scene.restart();
+      });
+      return;
+    }
+
     // --- Player input ---
     if (!Dialog.isOpen()) {
       if (!this.player.isKnockedBack) {
