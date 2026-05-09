@@ -152,6 +152,10 @@ class Act1Scene extends Scene {
     }
 
     EnemyController.handleAnimation(this.enemy, time);
+    if (this.enemy.lastHealth !== this.enemy.health) {
+      this.enemy.lastHealth = this.enemy.health;
+      EnemyController.showHealthBar(this.enemy);
+    }
     EnemyController.updateHealth(this.enemy, this.enemy.health);
     const distToPlayer = EnemyController.getDistanceToTarget(
       this.enemy,

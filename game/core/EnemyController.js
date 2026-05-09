@@ -124,6 +124,7 @@ export class EnemyController {
         heart.setDepth(enemy.depth + 10);
         heart.setScale(1);
         heart.setOrigin(0.5, 0.5);
+        heart.setAlpha(0);
         enemy.healthHearts.push(heart);
       }
     }
@@ -143,6 +144,18 @@ export class EnemyController {
         heart.y = enemy.y - 12;
       }
     }
+  }
+
+  static showHealthBar(enemy) {
+    if (!enemy.healthHearts) return;
+    enemy.scene.tweens.killTweensOf(enemy.healthHearts);
+    enemy.healthHearts.forEach(h => h && h.setAlpha(1));
+    enemy.scene.tweens.add({
+      targets: enemy.healthHearts,
+      alpha: 0,
+      duration: 1500,
+      delay: 2000,
+    });
   }
 
   static applyKnockbackToPlayer(scene, target, dirX, dirY, knockbackStrength = 120, duration = 150) {
