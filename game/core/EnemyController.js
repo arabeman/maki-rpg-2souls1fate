@@ -142,6 +142,54 @@ export class EnemyController {
     }
   }
 
+  static applyKnockbackToPlayer(scene, target, dirX, dirY, knockbackStrength = 120, duration = 150) {
+    if (!target || !target.hitbox || !target.hitbox.body) return;
+
+    target.isKnockedBack = true;
+    target.hitbox.body.setVelocity(dirX * knockbackStrength, dirY * knockbackStrength);
+
+    scene.time.delayedCall(duration, () => {
+      if (target && target.hitbox && target.hitbox.body) {
+        target.hitbox.body.setVelocity(0);
+      }
+      target.isKnockedBack = false;
+    });
+  }
+
+  static spawnSlashEffect(scene, x, y, angle, depth) {
+    const gfx = scene.add.graphics();
+    gfx.setDepth(depth + 5);
+
+    let frame = 0;
+    const totalFrames = 6;
+
+    scene.time.addEvent({
+      delay: 16,
+      repeat: totalFrames - 1,
+      callback: () => {
+        const t = frame / totalFrames;
+        const alpha = 1 - t;
+        const radius = 10 + t * 8;
+
+        gfx.clear();
+        gfx.lineStyle(2, 0xffffff, alpha);
+        gfx.beginPath();
+        gfx.arc(x, y, radius, Phaser.Math.DegToRad(angle - 50), Phaser.Math.DegToRad(angle + 50));
+        gfx.strokePath();
+
+        gfx.lineStyle(1, 0xffddaa, alpha * 0.6);
+        gfx.beginPath();
+        gfx.arc(x, y, radius * 0.6, Phaser.Math.DegToRad(angle - 40), Phaser.Math.DegToRad(angle + 40));
+        gfx.strokePath();
+
+        frame++;
+        if (frame >= totalFrames) {
+          gfx.destroy();
+        }
+      },
+    });
+  }
+
   static attack(scene, enemy, target, equippedWeapon) {
     if (scene.enemyAttacking || enemy.isStunned) return;
 
@@ -194,6 +242,14 @@ export class EnemyController {
       ease: "Linear",
       onUpdate: () => syncPositions(progress.t),
       onComplete: () => {
+        // Slash arc effect at the point of impact
+        const impactX = enemy.x + attackDirX;
+        const impactY = enemy.y + attackDirY;
+        this.spawnSlashEffect(scene, impactX, impactY, angle, enemy.depth);
+
+        // Knock the player away from the enemy
+        this.applyKnockbackToPlayer(scene, target, dirX, dirY);
+
         scene.time.delayedCall(80, () => {
           scene.tweens.add({
             targets: progress,
