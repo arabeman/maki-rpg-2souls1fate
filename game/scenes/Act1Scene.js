@@ -4,6 +4,7 @@ import { Scene, manager } from "@tialops/maki";
 
 import { BattleController } from "../core/BattleController.js";
 import { Dialog } from "../components/Dialog.js";
+import { HealthHUD } from "../components/HealthHUD.js";
 import { Equipment } from "../core/Equipment.js";
 import { InteractionManager } from "../core/InteractionManager.js";
 import { Inventory } from "../core/Inventory.js";
@@ -26,6 +27,9 @@ class Act1Scene extends Scene {
     super.preload();
     SpriteLoader.load(this, "player", "player");
     SpriteLoader.load(this, "enemy", "enemy");
+    SpriteLoader.loadImage(this, "heart_full", "heart_full");
+    SpriteLoader.loadImage(this, "heart_half", "heart_half");
+    SpriteLoader.loadImage(this, "heart_empty", "heart_empty");
     SpriteLoader.loadImage(this, "sword1", "sword1");
     SpriteLoader.loadImage(this, "hammer", "hammer");
     SpriteLoader.loadImage(this, "attack", "attack");
@@ -78,6 +82,8 @@ class Act1Scene extends Scene {
       }
     }
 
+    HealthHUD.init();
+
     this.cameras.main.startFollow(this.player, true, 0.03, 0.03);
     this.cameras.main.setBounds(0, 0, 640, 448);
 
@@ -117,6 +123,7 @@ class Act1Scene extends Scene {
       this.enemyWeapon.setFlipX(this.enemy.flipX);
     }
     Equipment.update(this, this.player);
+    HealthHUD.update();
     Dialog.update(time);
 
     const nearInteractable = this.getNearInteractable();
