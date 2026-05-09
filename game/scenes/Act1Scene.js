@@ -75,11 +75,11 @@ class Act1Scene extends Scene {
       this.dadEmote = showEmote(this, this.dad, "question", 0);
     }
 
-    this.enemy = this.createEnemy(88, 260);
-    this.enemy2 = this.createEnemy(89, 383);
-
-    this.enemyWeapon = this.createEnemyWeapon(this.enemy);
-    this.enemy2Weapon = this.createEnemyWeapon(this.enemy2);
+    // enemies[i] = { sprite, weapon }
+    this.enemies = [
+      { sprite: this.createEnemy(88, 260) },
+      { sprite: this.createEnemy(89, 383) },
+    ].map(e => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     if (GameState.hasWeapon) {
       const weaponItem = Inventory.items[Inventory.items.length - 1];
@@ -130,14 +130,106 @@ class Act1Scene extends Scene {
     return weapon;
   }
 
+  // Triggers the flash-and-destroy death sequence for one enemy entry.
+  triggerEnemyDeath(entry) {
+    const { sprite: enemy } = entry;
+    enemy.isDying = true;
+
+    const flash = () => {
+      if (enemy && enemy.active) {
+        enemy.setVisible(!enemy.visible);
+        if (entry.weapon) entry.weapon.setVisible(enemy.visible);
+      }
+    };
+
+    flash();
+    [80, 160, 240].forEach(delay => this.time.addEvent({ delay, callback: flash }));
+    this.time.addEvent({
+      delay: 320,
+      callback: () => this.destroyEnemyEntry(entry),
+    });
+  }
+
+  // Cleans up all objects belonging to one enemy entry.
+  destroyEnemyEntry(entry) {
+    const { sprite: enemy } = entry;
+
+    if (entry.weapon) {
+      entry.weapon.destroy();
+      entry.weapon = null;
+    }
+    if (enemy) {
+      if (enemy.enemyEmote) { enemy.enemyEmote.destroy(); enemy.enemyEmote = null; }
+      if (enemy.healthHearts) {
+        enemy.healthHearts.forEach(h => h && h.destroy());
+        enemy.healthHearts = [];
+      }
+      if (enemy.hitbox) {
+        enemy.hitbox.body.setVelocity(0);
+        enemy.hitbox.destroy();
+        enemy.hitbox = null;
+      }
+      enemy.destroy();
+    }
+    entry.sprite = null;
+  }
+
+  // Runs the per-frame AI for one enemy entry.
+  updateEnemyAI(entry, time) {
+    const { sprite: enemy } = entry;
+    if (!enemy || !enemy.active || enemy.isDying) return;
+
+    EnemyController.handleAnimation(enemy, time);
+
+    if (enemy.lastHealth !== enemy.health) {
+      enemy.lastHealth = enemy.health;
+      EnemyController.showHealthBar(enemy);
+    }
+    EnemyController.updateHealth(enemy, enemy.health);
+
+    const dist = EnemyController.getDistanceToTarget(enemy, this.player);
+    if (dist < EnemyBehavior.visionRange && !Dialog.isOpen()) {
+      // Show alert emote on first sight
+      if (!enemy.canMove && !enemy.enemyEmote) {
+        const emote = showEmote(this, enemy, "exclamations", 0);
+        if (emote) {
+          enemy.enemyEmote = emote;
+          this.time.delayedCall(400, () => { if (enemy) enemy.canMove = true; });
+        } else {
+          enemy.canMove = true;
+        }
+      }
+
+      if (enemy.canMove) {
+        if (dist > EnemyBehavior.attackRange) {
+          if (enemy.enemyEmote) { enemy.enemyEmote.destroy(); enemy.enemyEmote = null; }
+          EnemyController.chase(this, enemy, this.player);
+        } else {
+          enemy.hitbox.body.setVelocity(0);
+          enemy.anims.stop();
+          EnemyController.attack(this, enemy, this.player, entry.weapon);
+        }
+      } else {
+        enemy.hitbox.body.setVelocity(0);
+        enemy.anims.stop();
+      }
+    } else {
+      enemy.hitbox.body.setVelocity(0);
+      enemy.anims.stop();
+    }
+
+    if (entry.weapon) {
+      entry.weapon.setPosition(enemy.x + 8, enemy.y + 4);
+      entry.weapon.setFlipX(enemy.flipX);
+    }
+  }
+
   update(time) {
     if (GameState.playerHealth <= 0 && !this.playerDied) {
       this.playerDied = true;
       GameState.playerHealth = 3;
       this.cameras.main.fadeOut(500);
-      this.cameras.main.once("camerafadeoutcomplete", () => {
-        this.scene.restart();
-      });
+      this.cameras.main.once("camerafadeoutcomplete", () => this.scene.restart());
       return;
     }
 
@@ -147,8 +239,12 @@ class Act1Scene extends Scene {
         PlayerController.handleMovement(this.player, this.keys);
       }
       PlayerController.handleAnimation(this.player, this.keys, time);
-      // Pass all enemies as an array — one swing, all hit-checks done inside BattleController
-      BattleController.attack(this, this.player, this.keys, [this.enemy, this.enemy2]);
+      BattleController.attack(
+        this,
+        this.player,
+        this.keys,
+        this.enemies.map(e => e.sprite).filter(Boolean),
+      );
     }
 
     if (this.dad) {
@@ -161,187 +257,25 @@ class Act1Scene extends Scene {
       GameState.returnedFromAct1 = true;
       GameState.leftBeginScene = false;
       this.cameras.main.fadeOut(500);
-      this.cameras.main.once("camerafadeoutcomplete", () => {
-        this.scene.start("BeginScene");
-      });
+      this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("BeginScene"));
       return;
     }
 
-    // --- Enemy 1 death ---
-    if (this.enemy && this.enemy.health <= 0 && !this.enemy.isDying) {
-      this.enemy.isDying = true;
-      const flashEnemy = () => {
-        if (this.enemy && this.enemy.active) {
-          this.enemy.setVisible(!this.enemy.visible);
-          if (this.enemyWeapon) this.enemyWeapon.setVisible(this.enemy.visible);
-        }
-      };
-      flashEnemy();
-      this.time.addEvent({ delay: 80, callback: flashEnemy });
-      this.time.addEvent({ delay: 160, callback: flashEnemy });
-      this.time.addEvent({ delay: 240, callback: flashEnemy });
-      this.time.addEvent({ delay: 320, callback: () => {
-        if (this.enemyWeapon) {
-          this.enemyWeapon.destroy();
-          this.enemyWeapon = null;
-        }
-        if (this.enemy && this.enemy.enemyEmote) {
-          this.enemy.enemyEmote.destroy();
-          this.enemy.enemyEmote = null;
-        }
-        if (this.enemy && this.enemy.healthHearts) {
-          this.enemy.healthHearts.forEach(h => h && h.destroy());
-          this.enemy.healthHearts = [];
-        }
-        if (this.enemy) {
-          if (this.enemy.hitbox) {
-            this.enemy.hitbox.body.setVelocity(0);
-            this.enemy.hitbox.destroy();
-            this.enemy.hitbox = null;
-          }
-          this.enemy.destroy();
-          this.enemy = null;
-        }
-      }});
+    // --- Enemy death checks & AI ---
+    for (const entry of this.enemies) {
+      const enemy = entry.sprite;
+      if (enemy && enemy.health <= 0 && !enemy.isDying) {
+        this.triggerEnemyDeath(entry);
+      }
+      this.updateEnemyAI(entry, time);
     }
 
-    // --- Enemy 2 death ---
-    // FIX 2: enemy2 death runs independently, not gated behind enemy1 being dead
-    if (this.enemy2 && this.enemy2.health <= 0 && !this.enemy2.isDying) {
-      this.enemy2.isDying = true;
-      const flashEnemy2 = () => {
-        if (this.enemy2 && this.enemy2.active) {
-          this.enemy2.setVisible(!this.enemy2.visible);
-          if (this.enemy2Weapon) this.enemy2Weapon.setVisible(this.enemy2.visible);
-        }
-      };
-      flashEnemy2();
-      this.time.addEvent({ delay: 80, callback: flashEnemy2 });
-      this.time.addEvent({ delay: 160, callback: flashEnemy2 });
-      this.time.addEvent({ delay: 240, callback: flashEnemy2 });
-      this.time.addEvent({ delay: 320, callback: () => {
-        if (this.enemy2Weapon) {
-          this.enemy2Weapon.destroy();
-          this.enemy2Weapon = null;
-        }
-        if (this.enemy2 && this.enemy2.enemyEmote) {
-          this.enemy2.enemyEmote.destroy();
-          this.enemy2.enemyEmote = null;
-        }
-        if (this.enemy2 && this.enemy2.healthHearts) {
-          this.enemy2.healthHearts.forEach(h => h && h.destroy());
-          this.enemy2.healthHearts = [];
-        }
-        if (this.enemy2) {
-          if (this.enemy2.hitbox) {
-            this.enemy2.hitbox.body.setVelocity(0);
-            this.enemy2.hitbox.destroy();
-            this.enemy2.hitbox = null;
-          }
-          this.enemy2.destroy();
-          this.enemy2 = null;
-        }
-      }});
-    }
-
-    // --- Enemy 1 AI (runs independently every frame while alive) ---
-    // FIX 3: no longer gated behind enemy2 being dead either
-    if (this.enemy && this.enemy.active && !this.enemy.isDying) {
-      EnemyController.handleAnimation(this.enemy, time);
-      if (this.enemy.lastHealth !== this.enemy.health) {
-        this.enemy.lastHealth = this.enemy.health;
-        EnemyController.showHealthBar(this.enemy);
-      }
-      EnemyController.updateHealth(this.enemy, this.enemy.health);
-
-      const distToPlayer = EnemyController.getDistanceToTarget(this.enemy, this.player);
-      if (distToPlayer < EnemyBehavior.visionRange && !Dialog.isOpen()) {
-        if (!this.enemy.canMove && !this.enemy.enemyEmote) {
-          const emote = showEmote(this, this.enemy, "exclamations", 0);
-          if (emote) {
-            this.enemy.enemyEmote = emote;
-            this.time.delayedCall(400, () => {
-              if (this.enemy) this.enemy.canMove = true;
-            });
-          } else {
-            this.enemy.canMove = true;
-          }
-        }
-        if (this.enemy.canMove) {
-          if (distToPlayer > EnemyBehavior.attackRange) {
-            if (this.enemy.enemyEmote) {
-              this.enemy.enemyEmote.destroy();
-              this.enemy.enemyEmote = null;
-            }
-            EnemyController.chase(this, this.enemy, this.player);
-            EnemyController.chase(this, this.enemy, this.player);
-          } else {
-            this.enemy.hitbox.body.setVelocity(0);
-            this.enemy.anims.stop();
-            EnemyController.attack(this, this.enemy, this.player, this.enemyWeapon);
-          }
-        } else {
-          this.enemy.hitbox.body.setVelocity(0);
-          this.enemy.anims.stop();
-        }
-      }
-      if (this.enemyWeapon) {
-        this.enemyWeapon.setPosition(this.enemy.x + 8, this.enemy.y + 4);
-        this.enemyWeapon.setFlipX(this.enemy.flipX);
-      }
-    }
-
-    // --- Enemy 2 AI (runs independently every frame while alive) ---
-    if (this.enemy2 && this.enemy2.active && !this.enemy2.isDying) {
-      EnemyController.handleAnimation(this.enemy2, time);
-      if (this.enemy2.lastHealth !== this.enemy2.health) {
-        this.enemy2.lastHealth = this.enemy2.health;
-        EnemyController.showHealthBar(this.enemy2);
-      }
-      EnemyController.updateHealth(this.enemy2, this.enemy2.health);
-
-const distToPlayer2 = EnemyController.getDistanceToTarget(this.enemy2, this.player);
-      if (distToPlayer2 < EnemyBehavior.visionRange && !Dialog.isOpen()) {
-        if (!this.enemy2.canMove && !this.enemy2.enemyEmote) {
-          this.enemy2.enemyEmote = showEmote(this, this.enemy2, "exclamations", 0);
-          this.time.delayedCall(400, () => {
-            if (this.enemy2) this.enemy2.canMove = true;
-          });
-        }
-        if (this.enemy2.canMove) {
-          if (distToPlayer2 > EnemyBehavior.attackRange) {
-            if (this.enemy2.enemyEmote) {
-              this.enemy2.enemyEmote.destroy();
-              this.enemy2.enemyEmote = null;
-            }
-            EnemyController.chase(this, this.enemy2, this.player);
-            EnemyController.chase(this, this.enemy2, this.player);
-          } else {
-            this.enemy2.hitbox.body.setVelocity(0);
-            this.enemy2.anims.stop();
-            EnemyController.attack(this, this.enemy2, this.player, this.enemy2Weapon);
-          }
-        } else {
-          this.enemy2.hitbox.body.setVelocity(0);
-          this.enemy2.anims.stop();
-        }
-      } else {
-        this.enemy2.hitbox.body.setVelocity(0);
-        this.enemy2.anims.stop();
-      }
-
-      if (this.enemy2Weapon) {
-        this.enemy2Weapon.setPosition(this.enemy2.x + 8, this.enemy2.y + 4);
-        this.enemy2Weapon.setFlipX(this.enemy2.flipX);
-      }
-    }
-
-    // --- HUD, equipment, dialog (always runs once per frame) ---
+    // --- HUD, equipment, dialog ---
     Equipment.update(this, this.player);
     HealthHUD.update();
     Dialog.update(time);
 
-    // --- Interaction prompt & space key (always runs once per frame) ---
+    // --- Interaction prompt & space key ---
     const nearInteractable = this.getNearInteractable();
     if (nearInteractable && !Dialog.isOpen()) {
       Dialog.showInteractPrompt(this, "Space to interact");
@@ -364,14 +298,8 @@ const distToPlayer2 = EnemyController.getDistanceToTarget(this.enemy2, this.play
 
   getNearInteractable() {
     if (this.dad) {
-      const nearNPC = InteractionManager.getNearObject(
-        this.player,
-        [this.dad],
-        25,
-      );
-      if (nearNPC) {
-        return { type: "npc", target: nearNPC };
-      }
+      const nearNPC = InteractionManager.getNearObject(this.player, [this.dad], 25);
+      if (nearNPC) return { type: "npc", target: nearNPC };
     }
     return null;
   }
@@ -379,23 +307,13 @@ const distToPlayer2 = EnemyController.getDistanceToTarget(this.enemy2, this.play
   handleInteraction() {
     const interactable = this.getNearInteractable();
     if (!interactable) return;
-
-    if (interactable.type === "npc") {
-      this.handleNPCTalk();
-    }
+    if (interactable.type === "npc") this.handleNPCTalk();
   }
 
   handleNPCTalk() {
     if (!this.dad) return;
-    if (this.dadEmote) {
-      this.dadEmote.destroy();
-      this.dadEmote = null;
-    }
-    if (this.player.x < this.dad.x) {
-      this.dad.setFlipX(true);
-    } else {
-      this.dad.setFlipX(false);
-    }
+    if (this.dadEmote) { this.dadEmote.destroy(); this.dadEmote = null; }
+    this.dad.setFlipX(this.player.x >= this.dad.x);
     Dialog.open(this, dadAct1Dialog);
   }
 }
