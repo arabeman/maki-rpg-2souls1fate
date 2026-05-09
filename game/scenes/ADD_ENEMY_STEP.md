@@ -1,44 +1,27 @@
 # Adding a New Enemy to Act1Scene
 
-Follow these steps in order. Each step is labelled with where in the file to make the change.
+---
+
+## Using Helper Methods (Recommended)
+
+Now you can add enemies using the helper methods `createEnemy()` and `createEnemyWeapon()`.
 
 ---
 
-## 1. `create()` — Spawn the enemy
+## 1. `create()` — Spawn the enemy and weapon
 
 ```js
-this.enemy3 = EnemyController.create(this, X, Y, "enemy");
-this.enemy3.health = 3;
-this.physics.add.collider(this.player.hitbox, this.enemy3.hitbox);
-this.physics.add.collider(
-  this.enemy3.hitbox,
-  manager.getWallGroup(this, "act_1"),
-);
-this.enemy3.hitbox.body.setImmovable(false);
-this.enemy3.hitbox.body.setCollideWorldBounds(true);
+this.enemy3 = this.createEnemy(X, Y);
+this.enemy3Weapon = this.createEnemyWeapon(this.enemy3);
 ```
 
 > Change `X, Y` to the desired spawn position. Check the map in Tiled if unsure.
 
 ---
 
-## 2. `create()` — Give it a weapon sprite
+## 2. `update()` — Let the player's attacks hit it
 
-```js
-this.enemy3Weapon = this.add.sprite(
-  this.enemy3.x + 8,
-  this.enemy3.y + 4,
-  "axe", // swap for "sword1", "hammer", etc.
-);
-this.enemy3Weapon.setOrigin(1.5, 0.7);
-this.enemy3Weapon.setDepth(this.enemy3.depth + 1);
-```
-
----
-
-## 3. `update()` — Let the player's attacks hit it
-
-Just add the new enemy to the existing array — one call covers all of them:
+Add the new enemy to the existing array:
 
 ```js
 BattleController.attack(this, this.player, this.keys, [this.enemy, this.enemy2, this.enemy3]);
@@ -46,7 +29,7 @@ BattleController.attack(this, this.player, this.keys, [this.enemy, this.enemy2, 
 
 ---
 
-## 4. `update()` — Death sequence
+## 3. `update()` — Death sequence
 
 Copy the enemy2 death block and rename every `enemy2` / `enemy2Weapon` reference to `enemy3` / `enemy3Weapon`:
 
@@ -84,7 +67,7 @@ if (this.enemy3 && this.enemy3.health <= 0 && !this.enemy3.isDying) {
 
 ---
 
-## 5. `update()` — AI behaviour
+## 4. `update()` — AI behaviour
 
 Copy the enemy2 AI block and rename to `enemy3`. Place it right after the enemy2 AI block:
 
@@ -127,6 +110,6 @@ if (this.enemy3 && this.enemy3.active && !this.enemy3.isDying) {
 | Weapon sprite | `this.enemyNWeapon` |
 | Flash function | `flashEnemyN` |
 | Distance var | `distToPlayerN` |
-| Spawn position | `X, Y` in `EnemyController.create` |
+| Spawn position | `X, Y` in `this.createEnemy(X, Y)` |
 
 > **Rule:** every new enemy is fully independent. No enemy's AI or death should be gated behind another enemy's state. Each block stands alone, guarded only by its own `active && !isDying` check.

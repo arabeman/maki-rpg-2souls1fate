@@ -404,6 +404,35 @@ create() {
 }
 ```
 
+### Enemy Helper Methods
+
+In Act1Scene (and other combat scenes), use these helpers to create enemies:
+
+```javascript
+createEnemy(x, y) {
+  const enemy = EnemyController.create(this, x, y, "enemy");
+  enemy.health = 3;
+  this.physics.add.collider(this.player.hitbox, enemy.hitbox);
+  this.physics.add.collider(enemy.hitbox, manager.getWallGroup(this, "act_1"));
+  enemy.hitbox.body.setImmovable(false);
+  enemy.hitbox.body.setCollideWorldBounds(true);
+  return enemy;
+}
+
+createEnemyWeapon(enemy) {
+  const weapon = this.add.sprite(enemy.x + 8, enemy.y + 4, "axe");
+  weapon.setOrigin(1.5, 0.7);
+  weapon.setDepth(enemy.depth + 1);
+  return weapon;
+}
+```
+
+Then in `create()`:
+```javascript
+this.enemy = this.createEnemy(88, 260);
+this.enemyWeapon = this.createEnemyWeapon(this.enemy);
+```
+
 ## File Structure
 
 ```
