@@ -194,7 +194,7 @@ class Act1Scene extends Scene {
         const emote = showEmote(this, enemy, "exclamations", 0);
         if (emote) {
           enemy.enemyEmote = emote;
-          this.time.delayedCall(400, () => { if (enemy) enemy.canMove = true; });
+          this.time.delayedCall(200, () => { if (enemy) enemy.canMove = true; });
         } else {
           enemy.canMove = true;
         }
