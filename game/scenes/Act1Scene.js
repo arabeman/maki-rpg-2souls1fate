@@ -71,48 +71,26 @@ class Act1Scene extends Scene {
       SpriteLoader.createAnims(this, "dad", "dad");
     }
 
-    this.enemy = EnemyController.create(this, 88, 260, "enemy");
-    this.enemy.health = 3;
-    this.physics.add.collider(this.player.hitbox, this.enemy.hitbox);
-    this.physics.add.collider(
-      this.enemy.hitbox,
-      manager.getWallGroup(this, "act_1"),
-    );
-    this.enemy.hitbox.body.setImmovable(false);
+    this.enemy = this.createEnemy(88, 260);
+    this.enemy2 = this.createEnemy(89, 383);
+  }
 
-    this.enemy2 = EnemyController.create(this, 89, 383, "enemy");
-    this.enemy2.health = 3;
-    this.physics.add.collider(this.player.hitbox, this.enemy2.hitbox);
-    this.physics.add.collider(
-      this.enemy2.hitbox,
-      manager.getWallGroup(this, "act_1"),
-    );
-    this.enemy2.hitbox.body.setImmovable(false);
+  createEnemy(x, y) {
+    const enemy = EnemyController.create(this, x, y, "enemy");
+    enemy.health = 3;
+    this.physics.add.collider(this.player.hitbox, enemy.hitbox);
+    this.physics.add.collider(enemy.hitbox, manager.getWallGroup(this, "act_1"));
+    enemy.hitbox.body.setImmovable(false);
+    enemy.hitbox.body.setCollideWorldBounds(true);
+    return enemy;
+  }
 
-    this.enemyWeapon = this.add.sprite(
-      this.enemy.x + 8,
-      this.enemy.y + 4,
-      "axe",
-    );
-    this.enemyWeapon.setOrigin(1.5, 0.7);
-    this.enemyWeapon.setDepth(this.enemy.depth + 1);
-
-    this.enemy2Weapon = this.add.sprite(
-      this.enemy2.x + 8,
-      this.enemy2.y + 4,
-      "axe",
-    );
-    this.enemy2Weapon.setOrigin(1.5, 0.7);
-    this.enemy2Weapon.setDepth(this.enemy2.depth + 1);
-
-    if (GameState.hasWeapon) {
-      const weaponItem = Inventory.items[Inventory.items.length - 1];
-      if (weaponItem) {
-        Equipment.equip(this, this.player, weaponItem);
-      }
-    }
-
-    HealthHUD.init();
+  createEnemyWeapon(enemy) {
+    const weapon = this.add.sprite(enemy.x + 8, enemy.y + 4, "axe");
+    weapon.setOrigin(1.5, 0.7);
+    weapon.setDepth(enemy.depth + 1);
+    return weapon;
+  }
 
     // Physics world bounds must match the actual map size in world coordinates.
     // Without this, Phaser defaults to the canvas pixel size (640×448 before zoom).
