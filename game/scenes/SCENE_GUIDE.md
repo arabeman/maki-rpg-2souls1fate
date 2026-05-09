@@ -250,6 +250,136 @@ GameState.exitUnlocked = true;
 if (GameState.hasWeapon) { ... }
 ```
 
+### Traveling Between Scenes
+
+When a player can travel between multiple scenes (e.g., BeginScene ↔ Act1Scene), use GameState flags to track the player's journey and persist state.
+
+**GameState flags:**
+```javascript
+export const GameState = {
+  hasWeapon: false,
+  exitUnlocked: false,
+  playerHealth: 3,
+  returnedFromAct1: false,  // true when returning from Act1 to Begin
+  leftBeginScene: false,    // true when player exits Begin to another scene
+  dadPosition: { x: 0, y: 0 },  // store NPC position when they disappear
+};
+```
+
+**In the leaving scene (BeginScene):**
+```javascript
+create() {
+  this.dad = null;
+  this.sceneTransitioning = false;  // Reset flag on each scene load
+
+  if (GameState.returnedFromAct1) {
+    this.player = PlayerController.create(this, 268, 144, "player");
+    this.player.setFlipX(true);
+    // Re-equip weapon if player has one
+    if (GameState.hasWeapon && Inventory.items.length > 0) {
+      const weaponItem = Inventory.items[Inventory.items.length - 1];
+      if (weaponItem) {
+        Equipment.equip(this, this.player, weaponItem);
+      }
+    }
+  } else {
+    this.player = PlayerController.create(this, 152, 152, "player");
+    this.dad = NPCController.create(this, 16 * 16.5, 16 * 9, "dad");
+  }
+}
+
+// Only create pickables on fresh start
+this.pickables = [];
+if (!GameState.returnedFromAct1) {
+  this.createPickable(208 + 8, 192 + 8, "sword1", WEAPONS.sword1);
+}
+```
+
+```javascript
+update(time) {
+  // Don't forget to check this.dad exists before interacting
+  if (this.dad) {
+    NPCController.handleAnimation(this.dad, time);
+  }
+
+  // Transition when player exits bounds
+  if (!this.sceneTransitioning && (this.player.x < 0 || this.player.x > 288 || this.player.y < 0 || this.player.y > 288)) {
+    this.sceneTransitioning = true;
+    GameState.leftBeginScene = true;
+    if (this.dad) {
+      GameState.dadPosition = { x: this.dad.x, y: this.dad.y };
+      this.dad.destroy();
+    }
+    this.cameras.main.fadeOut(500);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start("Act1Scene");
+    });
+  }
+}
+```
+
+**In the arriving scene (Act1Scene):**
+```javascript
+create() {
+  this.dad = null;  // Initialize to null first
+  this.sceneTransitioning = false;
+
+  this.player = PlayerController.create(this, 16, 144, "player");
+  this.keys = PlayerController.setupInput(this);
+
+  // Only show dad when entering from Begin (not when returning)
+  if (GameState.leftBeginScene) {
+    SpriteLoader.load(this, "dad", "dad");
+    this.dad = NPCController.create(this, 48, 118, "dad");
+    this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
+    this.dad.hitbox.body.setImmovable(true);
+    SpriteLoader.createAnims(this, "dad", "dad");
+  }
+
+  // Re-equip weapon
+  if (GameState.hasWeapon) {
+    const weaponItem = Inventory.items[Inventory.items.length - 1];
+    if (weaponItem) {
+      Equipment.equip(this, this.player, weaponItem);
+    }
+  }
+
+  this.cameras.main.fadeIn(500);
+}
+```
+
+```javascript
+update(time) {
+  // Check if dad exists before animating
+  if (this.dad) {
+    NPCController.handleAnimation(this.dad, time);
+  }
+
+  // Transition back when player walks to edge
+  if (!this.sceneTransitioning && this.player.x < 0) {
+    this.sceneTransitioning = true;
+    GameState.returnedFromAct1 = true;  // Mark as returning
+    GameState.leftBeginScene = false;
+    this.cameras.main.fadeOut(500);
+    this.cameras.main.once("camerafadeoutcomplete", () => {
+      this.scene.start("BeginScene");
+    });
+  }
+}
+```
+
+**Return transitions (going back):**
+```javascript
+// In BeginScene update - go back to Act1
+if (!this.sceneTransitioning && this.player.x < 0) {
+  this.sceneTransitioning = true;
+  this.cameras.main.fadeOut(500);
+  this.cameras.main.once("camerafadeoutcomplete", () => {
+    this.scene.start("Act1Scene");
+  });
+}
+```
+
 ### Scene Transitions
 
 **Fade out and transition:**
