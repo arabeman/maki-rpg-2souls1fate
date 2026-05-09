@@ -73,24 +73,18 @@ class Act1Scene extends Scene {
 
     this.enemy = this.createEnemy(88, 260);
     this.enemy2 = this.createEnemy(89, 383);
-  }
 
-  createEnemy(x, y) {
-    const enemy = EnemyController.create(this, x, y, "enemy");
-    enemy.health = 3;
-    this.physics.add.collider(this.player.hitbox, enemy.hitbox);
-    this.physics.add.collider(enemy.hitbox, manager.getWallGroup(this, "act_1"));
-    enemy.hitbox.body.setImmovable(false);
-    enemy.hitbox.body.setCollideWorldBounds(true);
-    return enemy;
-  }
+    this.enemyWeapon = this.createEnemyWeapon(this.enemy);
+    this.enemy2Weapon = this.createEnemyWeapon(this.enemy2);
 
-  createEnemyWeapon(enemy) {
-    const weapon = this.add.sprite(enemy.x + 8, enemy.y + 4, "axe");
-    weapon.setOrigin(1.5, 0.7);
-    weapon.setDepth(enemy.depth + 1);
-    return weapon;
-  }
+    if (GameState.hasWeapon) {
+      const weaponItem = Inventory.items[Inventory.items.length - 1];
+      if (weaponItem) {
+        Equipment.equip(this, this.player, weaponItem);
+      }
+    }
+
+    HealthHUD.init();
 
     // Physics world bounds must match the actual map size in world coordinates.
     // Without this, Phaser defaults to the canvas pixel size (640×448 before zoom).
@@ -111,6 +105,23 @@ class Act1Scene extends Scene {
     });
 
     BattleController.setup(this, this.player);
+  }
+
+  createEnemy(x, y) {
+    const enemy = EnemyController.create(this, x, y, "enemy");
+    enemy.health = 3;
+    this.physics.add.collider(this.player.hitbox, enemy.hitbox);
+    this.physics.add.collider(enemy.hitbox, manager.getWallGroup(this, "act_1"));
+    enemy.hitbox.body.setImmovable(false);
+    enemy.hitbox.body.setCollideWorldBounds(true);
+    return enemy;
+  }
+
+  createEnemyWeapon(enemy) {
+    const weapon = this.add.sprite(enemy.x + 8, enemy.y + 4, "axe");
+    weapon.setOrigin(1.5, 0.7);
+    weapon.setDepth(enemy.depth + 1);
+    return weapon;
   }
 
   update(time) {
