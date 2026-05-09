@@ -11,7 +11,15 @@ export class BattleController {
     };
   }
 
-  static attack(scene, player, keys) {
+  static checkHit(attackX, attackY, target, range = 20) {
+    if (!target) return false;
+    const dx = attackX - target.x;
+    const dy = attackY - target.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    return dist < range;
+  }
+
+  static attack(scene, player, keys, enemy = null) {
     const { left, right, up, down } = scene.attackKeys;
 
     const mainHand = Equipment.getMainHand();
@@ -57,6 +65,8 @@ export class BattleController {
     };
 
     // Thrust outward
+    const attackX = player.x + dx;
+    const attackY = player.y + dy;
     scene.tweens.add({
       targets: progress,
       t: 1,
@@ -64,6 +74,9 @@ export class BattleController {
       ease: "Linear",
       onUpdate: () => syncPositions(progress.t),
       onComplete: () => {
+        if (enemy && this.checkHit(attackX, attackY, enemy.hitbox || enemy, 20)) {
+          enemy.health = Math.max(0, (enemy.health || 3) - (weapon.damage || 1));
+        }
         scene.time.delayedCall(80, () => {
           // Retract back
           scene.tweens.add({

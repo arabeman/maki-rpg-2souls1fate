@@ -97,7 +97,7 @@ class Act1Scene extends Scene {
     if (!Dialog.isOpen()) {
       PlayerController.handleMovement(this.player, this.keys);
       PlayerController.handleAnimation(this.player, this.keys, time);
-      BattleController.attack(this, this.player, this.keys);
+      BattleController.attack(this, this.player, this.keys, this.enemy);
     }
     NPCController.handleAnimation(this.dad, time);
     EnemyController.handleAnimation(this.enemy, time);
