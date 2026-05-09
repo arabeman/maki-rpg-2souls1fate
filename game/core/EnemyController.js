@@ -112,26 +112,33 @@ export class EnemyController {
       enemy.healthHearts = [];
       for (let i = 0; i < maxHealth; i++) {
         const heart = enemy.scene.add.image(
-          enemy.x - 1 + (i * 1),
-          enemy.y - 24,
-          "heart_empty"
+          enemy.x,
+          enemy.y - 12,
+          "heart_full"
         );
         heart.setScrollFactor(1);
         heart.setDepth(enemy.depth + 10);
         heart.setScale(1);
+        heart.setOrigin(0.5, 0.5);
         enemy.healthHearts.push(heart);
       }
     }
 
-    enemy.healthHearts.forEach((heart, i) => {
-      heart.x = enemy.x - 10 + (i * 9);
-      heart.y = enemy.y - 12;
-      if (i < health) {
-        heart.setTexture("heart_full");
+    const gap = 10;
+    const totalWidth = (health - 1) * gap;
+    const startX = enemy.x - totalWidth / 2;
+
+    for (let i = 0; i < enemy.healthHearts.length; i++) {
+      const heart = enemy.healthHearts[i];
+      if (!heart) continue;
+      if (i >= health) {
+        heart.destroy();
+        enemy.healthHearts[i] = null;
       } else {
-        heart.setTexture("heart_empty");
+        heart.x = startX + (i * gap);
+        heart.y = enemy.y - 12;
       }
-    });
+    }
   }
 
   static attack(scene, enemy, target, equippedWeapon) {
