@@ -13,6 +13,11 @@ const ENEMY_AXE = {
   texture: "axe",
 };
 
+export const EnemyBehavior = {
+  visionRange: 100,
+  attackRange: 25,
+};
+
 export class EnemyController {
   static create(scene, x, y, name) {
     return createCharacter(scene, x, y, name);
@@ -64,6 +69,40 @@ export class EnemyController {
 
   static handleWalking(enemy, time) {
     handleWalking(enemy, time, EnemyConfig);
+  }
+
+  static chase(scene, enemy, target, speed = EnemyConfig.defaultSpeed * 0.5, stopDistance = 15) {
+    const dx = target.x - enemy.x;
+    const dy = target.y - enemy.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < stopDistance) {
+      enemy.hitbox.body.setVelocity(0);
+      enemy.anims.stop();
+      return false;
+    }
+
+    const moveX = (dx / dist) * speed;
+    const moveY = (dy / dist) * speed;
+    enemy.hitbox.body.setVelocity(moveX, moveY);
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      enemy.setFlipX(dx < 0);
+      enemy.anims.play(
+        `${EnemyConfig.animPrefix}${dx < 0 ? "left" : "right"}`,
+        true,
+      );
+    } else {
+      enemy.anims.play(`${EnemyConfig.animPrefix}${dy < 0 ? "up" : "down"}`, true);
+    }
+
+    return true;
+  }
+
+  static getDistanceToTarget(enemy, target) {
+    const dx = target.x - enemy.x;
+    const dy = target.y - enemy.y;
+    return Math.sqrt(dx * dx + dy * dy);
   }
 
   static attack(scene, enemy, target, equippedWeapon) {

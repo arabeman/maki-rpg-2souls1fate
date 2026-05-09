@@ -1,3 +1,4 @@
+import { EnemyController, EnemyBehavior } from "../core/EnemyController.js";
 import { GameState, dadAct1Dialog } from "../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
 
@@ -7,7 +8,6 @@ import { Equipment } from "../core/Equipment.js";
 import { InteractionManager } from "../core/InteractionManager.js";
 import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
-import { EnemyController } from "../core/EnemyController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
 import { showEmote } from "../core/EmoteController.js";
@@ -38,13 +38,16 @@ class Act1Scene extends Scene {
     super.create();
     manager.create(this);
 
-this.player = PlayerController.create(this, 16, 128, "player");
+    this.player = PlayerController.create(this, 16, 128, "player");
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "enemy", "enemy");
     SpriteLoader.load(this, "dad", "dad");
 
-    this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "act_1"));
+    this.physics.add.collider(
+      this.player.hitbox,
+      manager.getWallGroup(this, "act_1"),
+    );
 
     this.dad = NPCController.create(this, 48, 118, "dad");
     this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
@@ -53,9 +56,18 @@ this.player = PlayerController.create(this, 16, 128, "player");
 
     this.enemy = EnemyController.create(this, 88, 260, "enemy");
     this.physics.add.collider(this.player.hitbox, this.enemy.hitbox);
+    this.physics.add.collider(
+      this.enemy.hitbox,
+      manager.getWallGroup(this, "act_1"),
+    );
     this.enemy.hitbox.body.setImmovable(true);
+    this.enemy.hitbox.body.setCollideWorldBounds(true);
 
-    this.enemyWeapon = this.add.sprite(this.enemy.x + 8, this.enemy.y + 4, "axe");
+    this.enemyWeapon = this.add.sprite(
+      this.enemy.x + 8,
+      this.enemy.y + 4,
+      "axe",
+    );
     this.enemyWeapon.setOrigin(1.5, 0.7);
     this.enemyWeapon.setDepth(this.enemy.depth + 1);
 
@@ -82,12 +94,23 @@ this.player = PlayerController.create(this, 16, 128, "player");
     }
     NPCController.handleAnimation(this.dad, time);
     EnemyController.handleAnimation(this.enemy, time);
-    const distToPlayer = Math.sqrt(
-      Math.pow(this.player.x - this.enemy.x, 2) +
-      Math.pow(this.player.y - this.enemy.y, 2)
+    const distToPlayer = EnemyController.getDistanceToTarget(
+      this.enemy,
+      this.player,
     );
-    if (distToPlayer < 60 && !Dialog.isOpen()) {
-      EnemyController.attack(this, this.enemy, this.player, this.enemyWeapon);
+
+    if (distToPlayer < EnemyBehavior.visionRange && !Dialog.isOpen()) {
+      if (distToPlayer > EnemyBehavior.attackRange) {
+        EnemyController.chase(this, this.enemy, this.player);
+        this.enemy.hitbox.body.setImmovable(true);
+      } else {
+        this.enemy.hitbox.body.setVelocity(0);
+        this.enemy.anims.stop();
+        EnemyController.attack(this, this.enemy, this.player, this.enemyWeapon);
+      }
+    } else {
+      this.enemy.hitbox.body.setVelocity(0);
+      this.enemy.anims.stop();
     }
     if (this.enemyWeapon) {
       this.enemyWeapon.setPosition(this.enemy.x + 8, this.enemy.y + 4);
@@ -117,7 +140,11 @@ this.player = PlayerController.create(this, 16, 128, "player");
   }
 
   getNearInteractable() {
-    const nearNPC = InteractionManager.getNearObject(this.player, [this.dad], 25);
+    const nearNPC = InteractionManager.getNearObject(
+      this.player,
+      [this.dad],
+      25,
+    );
     if (nearNPC) {
       return { type: "npc", target: nearNPC };
     }
