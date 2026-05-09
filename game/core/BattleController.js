@@ -1,5 +1,5 @@
-import { Equipment } from "./Equipment.js";
 import { EnemyController } from "./EnemyController.js";
+import { Equipment } from "./Equipment.js";
 import Phaser from "phaser";
 
 export class BattleController {
@@ -37,7 +37,13 @@ export class BattleController {
 
     const weapon = mainHand.item;
     const range = weapon.range || 16;
-    const damage = weapon.damage || 1;
+    const damage = Number.isFinite(weapon.damage) ? weapon.damage : 1;
+    const weaponDelay = Number.isFinite(weapon.delay) ? weapon.delay : 100;
+    const attackAnimDuration = weaponDelay;
+
+    const now = scene.time.now;
+    const lastAttackTime = scene.lastPlayerAttackTime || 0;
+    if (now - lastAttackTime < weaponDelay) return;
 
     let dx = 0, dy = 0, angle = 0;
     if      (right.isDown) { dx =  range; dy =      0; angle =  90; }
@@ -46,6 +52,7 @@ export class BattleController {
     else if (down.isDown)  { dx =      0; dy =  range; angle = 180; }
     else return;
 
+    scene.lastPlayerAttackTime = now;
     scene.isAttacking = true;
 
     const equippedSword = mainHand.sprite;
@@ -83,7 +90,7 @@ export class BattleController {
     scene.tweens.add({
       targets: progress,
       t: 1,
-      duration: 100,
+      duration: attackAnimDuration,
       ease: "Linear",
       onUpdate: () => syncPositions(progress.t),
       onComplete: () => {
@@ -93,7 +100,7 @@ export class BattleController {
           if (!enemy || !enemy.active || enemy.isDying) continue;
 
           if (this.checkHit(attackX, attackY, enemy.hitbox || enemy)) {
-            enemy.health = Math.max(0, (enemy.health || 3) - damage);
+            enemy.health = Math.max(0, (enemy.health ?? 3) - damage);
             EnemyController.updateHealth(enemy, enemy.health);
             EnemyController.showHealthBar(enemy);
             scene.cameras.main.shake(100, 0.003);
@@ -166,11 +173,11 @@ export class BattleController {
           }
         }
 
-        scene.time.delayedCall(80, () => {
+        scene.time.delayedCall(Math.max(30, Math.round(weaponDelay * 0.25)), () => {
           scene.tweens.add({
             targets: progress,
             t: 0,
-            duration: 100,
+            duration: attackAnimDuration,
             ease: "Linear",
             onUpdate: () => syncPositions(progress.t),
             onComplete: () => {

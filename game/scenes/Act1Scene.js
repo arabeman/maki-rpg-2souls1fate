@@ -144,7 +144,7 @@ class Act1Scene extends Scene {
       { sprite: this.createEnemy(378, 413) },
       { sprite: this.createEnemy(578, 240) },
       { sprite: this.createEnemy(511, 259) },
-      { sprite: this.createEnemy(586, 395, 5) },
+      { sprite: this.createEnemy(586, 395, 6) },
       { sprite: this.createEnemy(73 + 32, 33, 4, "left") },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
