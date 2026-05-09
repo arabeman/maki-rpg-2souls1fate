@@ -74,5 +74,11 @@ export default {
     { name: "heart_full", file: "heart_kenney/heart_full.png" },
     { name: "heart_half", file: "heart_kenney/heart_half.png" },
     { name: "heart_empty", file: "heart_kenney/heart_empty.png" },
+    { name: "impact0", file: "impact/0.png" },
+    { name: "impact1", file: "impact/1.png" },
+    { name: "impact2", file: "impact/2.png" },
+    { name: "impact3", file: "impact/3.png" },
+    { name: "impact4", file: "impact/4.png" },
+    { name: "impact5", file: "impact/5.png" },
   ],
 };

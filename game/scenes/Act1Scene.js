@@ -1,11 +1,11 @@
-import { EnemyController, EnemyBehavior } from "../core/EnemyController.js";
+import { EnemyBehavior, EnemyController } from "../core/EnemyController.js";
 import { GameState, dadAct1Dialog } from "../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
 
 import { BattleController } from "../core/BattleController.js";
 import { Dialog } from "../components/Dialog.js";
-import { HealthHUD } from "../components/HealthHUD.js";
 import { Equipment } from "../core/Equipment.js";
+import { HealthHUD } from "../components/HealthHUD.js";
 import { InteractionManager } from "../core/InteractionManager.js";
 import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
@@ -27,6 +27,13 @@ class Act1Scene extends Scene {
     super.preload();
     SpriteLoader.load(this, "player", "player");
     SpriteLoader.load(this, "enemy", "enemy");
+    SpriteLoader.load(this, "impact", "impact");
+    SpriteLoader.loadImage(this, "impact0", "impact0");
+    SpriteLoader.loadImage(this, "impact1", "impact1");
+    SpriteLoader.loadImage(this, "impact2", "impact2");
+    SpriteLoader.loadImage(this, "impact3", "impact3");
+    SpriteLoader.loadImage(this, "impact4", "impact4");
+    SpriteLoader.loadImage(this, "impact5", "impact5");
     SpriteLoader.loadImage(this, "heart_full", "heart_full");
     SpriteLoader.loadImage(this, "heart_half", "heart_half");
     SpriteLoader.loadImage(this, "heart_empty", "heart_empty");
@@ -100,6 +107,41 @@ class Act1Scene extends Scene {
       BattleController.attack(this, this.player, this.keys, this.enemy);
     }
     NPCController.handleAnimation(this.dad, time);
+
+    if (this.enemy && this.enemy.health <= 0 && !this.enemy.isDying) {
+      this.enemy.isDying = true;
+      const flashEnemy = () => {
+        if (this.enemy && this.enemy.active) {
+          this.enemy.setVisible(!this.enemy.visible);
+          if (this.enemyWeapon) this.enemyWeapon.setVisible(this.enemy.visible);
+        }
+      };
+      flashEnemy();
+      this.time.addEvent({ delay: 80, callback: flashEnemy });
+      this.time.addEvent({ delay: 160, callback: flashEnemy });
+      this.time.addEvent({ delay: 240, callback: flashEnemy });
+      this.time.addEvent({ delay: 320, callback: () => {
+        if (this.enemyWeapon) {
+          this.enemyWeapon.destroy();
+          this.enemyWeapon = null;
+        }
+        if (this.enemy && this.enemy.healthHearts) {
+          this.enemy.healthHearts.forEach(h => h && h.destroy());
+        }
+        if (this.enemy) {
+          this.enemy.destroy();
+          this.enemy = null;
+        }
+      }});
+    }
+
+    if (!this.enemy || !this.enemy.active) {
+      Equipment.update(this, this.player);
+      HealthHUD.update();
+      Dialog.update(time);
+      return;
+    }
+
     EnemyController.handleAnimation(this.enemy, time);
     EnemyController.updateHealth(this.enemy, this.enemy.health);
     const distToPlayer = EnemyController.getDistanceToTarget(

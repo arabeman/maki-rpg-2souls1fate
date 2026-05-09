@@ -11,12 +11,12 @@ export class BattleController {
     };
   }
 
-  static checkHit(attackX, attackY, target, range = 20) {
+  static checkHit(attackX, attackY, target) {
     if (!target) return false;
-    const dx = attackX - target.x;
-    const dy = attackY - target.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    return dist < range;
+    const hitSize = 24;
+    const dx = Math.abs(attackX - target.x);
+    const dy = Math.abs(attackY - target.y);
+    return dx < hitSize && dy < hitSize;
   }
 
   static attack(scene, player, keys, enemy = null) {
@@ -74,8 +74,84 @@ export class BattleController {
       ease: "Linear",
       onUpdate: () => syncPositions(progress.t),
       onComplete: () => {
-        if (enemy && this.checkHit(attackX, attackY, enemy.hitbox || enemy, 20)) {
+        if (enemy && this.checkHit(attackX, attackY, enemy.hitbox || enemy)) {
           enemy.health = Math.max(0, (enemy.health || 3) - (weapon.damage || 1));
+
+          // Impact effect
+          const impactFrames = ["impact0", "impact1", "impact2", "impact3", "impact4", "impact5"];
+          let frameIndex = 0;
+          const impact = scene.add.image(attackX, attackY, "impact0");
+          impact.setOrigin(0.5);
+          impact.setDepth(enemy.depth + 5);
+          impact.setScale(0.2);
+          scene.time.addEvent({
+            delay: 50,
+            repeat: 5,
+            callback: () => {
+              if (frameIndex < impactFrames.length) {
+                impact.setTexture(impactFrames[frameIndex]);
+                frameIndex++;
+              }
+              if (frameIndex >= impactFrames.length) {
+                impact.destroy();
+              }
+            },
+          });
+
+          if (enemy.hitbox) {
+            const knockDirX = dx / range;
+            const knockDirY = dy / range;
+            const knockSpeed = 400;
+            const knockDuration = 180; // ms until velocity fades
+
+            // Unlock physics, apply a strong initial burst
+            enemy.hitbox.body.setImmovable(false);
+            enemy.hitbox.body.setVelocity(knockDirX * knockSpeed, knockDirY * knockSpeed);
+
+            // Smoothly decelerate the knockback over time
+            const knockStart = scene.time.now;
+            const knockUpdate = scene.time.addEvent({
+              delay: 16,
+              repeat: Math.ceil(knockDuration / 16),
+              callback: () => {
+                if (!enemy.hitbox) return;
+                const elapsed = scene.time.now - knockStart;
+                const factor = Math.max(0, 1 - elapsed / knockDuration);
+                // Ease-out: decelerate quickly, then settle
+                enemy.hitbox.body.setVelocity(
+                  knockDirX * knockSpeed * factor * factor,
+                  knockDirY * knockSpeed * factor * factor
+                );
+                if (factor <= 0) {
+                  enemy.hitbox.body.setVelocity(0, 0);
+                  enemy.hitbox.body.setImmovable(true);
+                  knockUpdate.remove();
+                }
+              },
+            });
+
+            // Hit-flash: rapidly blink the enemy sprite white
+            const flashEnemy = () => {
+              if (enemy && enemy.active) enemy.setTint(0xffffff);
+            };
+            const clearFlash = () => {
+              if (enemy && enemy.active) enemy.clearTint();
+            };
+            flashEnemy();
+            scene.time.delayedCall(80, clearFlash);
+            scene.time.delayedCall(160, flashEnemy);
+            scene.time.delayedCall(240, clearFlash);
+            scene.time.delayedCall(320, () => {
+              if (enemy && enemy.active) enemy.clearTint();
+            });
+
+            // Stop enemy attack if hit
+            enemy.isStunned = true;
+            scene.enemyAttacking = false;
+            setTimeout(() => {
+              if (enemy) enemy.isStunned = false;
+            }, 500);
+          }
         }
         scene.time.delayedCall(80, () => {
           // Retract back

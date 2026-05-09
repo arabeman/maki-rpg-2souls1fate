@@ -142,7 +142,7 @@ export class EnemyController {
   }
 
   static attack(scene, enemy, target, equippedWeapon) {
-    if (scene.enemyAttacking) return;
+    if (scene.enemyAttacking || enemy.isStunned) return;
 
     const now = scene.time.now;
     const lastAttack = enemy.lastAttackTime || 0;
