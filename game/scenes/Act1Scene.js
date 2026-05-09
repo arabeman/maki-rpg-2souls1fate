@@ -260,7 +260,7 @@ class Act1Scene extends Scene {
           const emote = showEmote(this, this.enemy, "exclamations", 0);
           if (emote) {
             this.enemy.enemyEmote = emote;
-            this.time.delayedCall(800, () => {
+            this.time.delayedCall(400, () => {
               if (this.enemy) this.enemy.canMove = true;
             });
           } else {
@@ -304,7 +304,7 @@ const distToPlayer2 = EnemyController.getDistanceToTarget(this.enemy2, this.play
       if (distToPlayer2 < EnemyBehavior.visionRange && !Dialog.isOpen()) {
         if (!this.enemy2.canMove && !this.enemy2.enemyEmote) {
           this.enemy2.enemyEmote = showEmote(this, this.enemy2, "exclamations", 0);
-          this.time.delayedCall(800, () => {
+          this.time.delayedCall(400, () => {
             if (this.enemy2) this.enemy2.canMove = true;
           });
         }

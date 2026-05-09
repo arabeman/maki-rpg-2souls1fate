@@ -85,7 +85,7 @@ if (this.enemy3 && this.enemy3.active && !this.enemy3.isDying) {
     // Show emote and wait before moving
     if (!this.enemy3.canMove && !this.enemy3.enemyEmote) {
       this.enemy3.enemyEmote = showEmote(this, this.enemy3, "exclamations", 0);
-      this.time.delayedCall(800, () => {
+      this.time.delayedCall(400, () => {
         if (this.enemy3) this.enemy3.canMove = true;
       });
     }
@@ -117,7 +117,7 @@ if (this.enemy3 && this.enemy3.active && !this.enemy3.isDying) {
 }
 ```
 
-Note: The enemy shows an emote when it sees the player, waits 800ms, then moves. The emote disappears when the enemy starts chasing.
+Note: The enemy shows an emote when it sees the player, waits 400ms, then moves. The emote disappears when the enemy starts chasing.
 
 ---
 
