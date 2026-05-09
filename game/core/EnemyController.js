@@ -152,6 +152,7 @@ export class EnemyController {
     target.hitbox.body.setVelocity(dirX * knockbackStrength, dirY * knockbackStrength);
 
     scene.cameras.main.shake(150, 0.004);
+    scene.cameras.main.flash(100, 255, 0, 0, 0.15);
 
     scene.time.delayedCall(duration, () => {
       if (target && target.hitbox && target.hitbox.body) {
