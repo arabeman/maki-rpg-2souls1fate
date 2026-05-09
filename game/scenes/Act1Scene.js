@@ -4,6 +4,7 @@ import {
   dadAct1Dialog,
   georgesNpcDialog,
   georgesNpcDialog2,
+  georgesNpcDialog3,
 } from "../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
 
@@ -15,8 +16,10 @@ import { InteractionManager } from "../core/InteractionManager.js";
 import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
 import { PlayerController } from "../core/PlayerController.js";
+import { PotionHUD } from "../components/PotionHUD.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
 import { showEmote } from "../core/EmoteController.js";
+import { showItemPickup } from "../core/ItemPickupEffect.js";
 
 class Act1Scene extends Scene {
   constructor() {
@@ -53,6 +56,7 @@ class Act1Scene extends Scene {
       frameWidth: 16,
       frameHeight: 16,
     });
+    this.load.image("potion", "assets/tiles_kenney/potion.png");
     manager.map(this, "act_1");
     manager.preload(this);
   }
@@ -64,6 +68,8 @@ class Act1Scene extends Scene {
     this.dad = null;
     this.sceneTransitioning = false;
     this.playerDied = false;
+    this.pendingGeorgesPotionReward = false;
+    this.ePressed = false;
 
     this.player = PlayerController.create(this, 16, 128, "player");
     this.keys = PlayerController.setupInput(this);
@@ -101,17 +107,18 @@ class Act1Scene extends Scene {
       { sprite: this.createEnemy(578, 240) },
       { sprite: this.createEnemy(511, 259) },
       { sprite: this.createEnemy(586, 395, 5) },
-      { sprite: this.createEnemy(73, 33, 4, "left") },
+      { sprite: this.createEnemy(73 + 32, 33, 4, "left") },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     if (GameState.hasWeapon) {
-      const weaponItem = Inventory.items[Inventory.items.length - 1];
+      const weaponItem = Inventory.getLastBySlot("mainHand");
       if (weaponItem) {
         Equipment.equip(this, this.player, weaponItem);
       }
     }
 
     HealthHUD.init();
+    PotionHUD.init();
 
     // Physics world bounds must match the actual map size in world coordinates.
     // Without this, Phaser defaults to the canvas pixel size (640×448 before zoom).
@@ -323,7 +330,9 @@ class Act1Scene extends Scene {
     // --- HUD, equipment, dialog ---
     Equipment.update(this, this.player);
     HealthHUD.update();
+    PotionHUD.update();
     Dialog.update(time);
+    this.tryGrantGeorgesPotionReward();
 
     // --- Interaction prompt & space key ---
     const nearInteractable = this.getNearInteractable();
@@ -343,6 +352,13 @@ class Act1Scene extends Scene {
     }
     if (this.keys.space.isUp) {
       this.spacePressed = false;
+    }
+    if (!this.ePressed && this.keys.e.isDown) {
+      this.ePressed = true;
+      this.tryUsePotion();
+    }
+    if (this.keys.e.isUp) {
+      this.ePressed = false;
     }
   }
 
@@ -385,9 +401,12 @@ class Act1Scene extends Scene {
 
     if (npc === this.georges) {
       const dialogToOpen = GameState.georgesTalked
-        ? georgesNpcDialog2
+        ? this.getNextGeorgesRepeatDialog()
         : georgesNpcDialog;
       Dialog.open(this, dialogToOpen);
+      if (!GameState.georgesTalked && !GameState.georgesPotionReceived) {
+        this.pendingGeorgesPotionReward = true;
+      }
       GameState.georgesTalked = true;
       return;
     }
@@ -395,6 +414,43 @@ class Act1Scene extends Scene {
     if (npc === this.dad) {
       Dialog.open(this, dadAct1Dialog);
     }
+  }
+
+  tryGrantGeorgesPotionReward() {
+    if (!this.pendingGeorgesPotionReward) return;
+    if (Dialog.isOpen()) return;
+
+    this.pendingGeorgesPotionReward = false;
+    if (GameState.georgesPotionReceived || !this.georges) return;
+
+    Inventory.add({
+      id: "potion",
+      name: "Potion",
+      texture: "potion",
+      type: "consumable",
+    });
+    showItemPickup(this, this.georges, "potion", 0);
+    GameState.georgesPotionReceived = true;
+  }
+
+  tryUsePotion() {
+    if (Dialog.isOpen()) return;
+    const maxHealth = 3;
+    if ((GameState.playerHealth || 0) >= maxHealth) return;
+    if (!Inventory.removeOne("potion")) {
+      PotionHUD.shake();
+      return;
+    }
+
+    GameState.playerHealth = Math.min(maxHealth, (GameState.playerHealth || 0) + 1);
+  }
+
+  getNextGeorgesRepeatDialog() {
+    const nextDialog = GameState.georgesUseDialog3Next
+      ? georgesNpcDialog3
+      : georgesNpcDialog2;
+    GameState.georgesUseDialog3Next = !GameState.georgesUseDialog3Next;
+    return nextDialog;
   }
 
 }

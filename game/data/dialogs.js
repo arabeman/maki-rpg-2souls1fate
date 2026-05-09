@@ -16,6 +16,8 @@ export const GameState = {
   leftBeginScene: false,
   dadPosition: { x: 0, y: 0 },
   georgesTalked: false,
+  georgesPotionReceived: false,
+  georgesUseDialog3Next: false,
 };
 
 export const dadDialogNoSword = [
@@ -139,6 +141,14 @@ export const georgesNpcDialog2 = [
   },
 ];
 
+export const georgesNpcDialog3 = [
+  {
+    speaker: "Georges",
+    text: "Press E to drink your potion when you need health.",
+    isEndOfDialog: true,
+  },
+];
+
 export default {
   dadDialogNoSword,
   dadDialogHasSword,
@@ -146,4 +156,5 @@ export default {
   dadAct1Dialog,
   georgesNpcDialog,
   georgesNpcDialog2,
+  georgesNpcDialog3,
 };

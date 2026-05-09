@@ -16,6 +16,9 @@ export class PlayerController {
     keys.space = scene.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE,
     );
+    keys.e = scene.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.E,
+    );
 
     return keys;
   }

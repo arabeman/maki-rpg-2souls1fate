@@ -5,6 +5,7 @@ export class Equipment {
   };
 
   static equip(scene, player, item) {
+    if (!item || item.type === "consumable") return null;
     const slot = item.slot || "mainHand";
 
     if (this.slots[slot]) {

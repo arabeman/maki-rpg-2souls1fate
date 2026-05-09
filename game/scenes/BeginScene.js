@@ -12,6 +12,7 @@ import { EquipmentHUD } from "../components/EquipmentHUD.js";
 import { InteractionManager } from "../core/InteractionManager.js";
 import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
+import { PotionHUD } from "../components/PotionHUD.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
 import { WEAPONS } from "../data/weapons.js";
@@ -56,7 +57,7 @@ class BeginScene extends Scene {
       this.player = PlayerController.create(this, 268, 144, "player");
       this.player.setFlipX(true);
       if (GameState.hasWeapon && Inventory.items.length > 0) {
-        const weaponItem = Inventory.items[Inventory.items.length - 1];
+        const weaponItem = Inventory.getLastBySlot("mainHand");
         if (weaponItem) {
           Equipment.equip(this, this.player, weaponItem);
         }
@@ -90,6 +91,7 @@ class BeginScene extends Scene {
     });
 
     EquipmentHUD.init();
+    PotionHUD.init();
 
     // Create pickable objects
     this.pickables = [];
@@ -155,6 +157,7 @@ class BeginScene extends Scene {
     }
 
     EquipmentHUD.update();
+    PotionHUD.update();
 
     // Update interact prompt
     const nearInteractable = this.getNearInteractable();
