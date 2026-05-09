@@ -52,10 +52,6 @@ export default {
         up: { start: 0, end: 0 },
       },
     },
-    { name: "heart_full", file: "heart_kenney/heart_full.png", frameWidth: 8, frameHeight: 8 },
-    { name: "heart_half", file: "heart_kenney/heart_half.png", frameWidth: 8, frameHeight: 8 },
-    { name: "heart_empty", file: "heart_kenney/heart_empty.png", frameWidth: 8, frameHeight: 8 },
-    { name: "health", file: "heath/health.png", frameWidth: 24, frameHeight: 8 },
     "tilemap_packed",
   ],
   emotes: [
@@ -75,5 +71,8 @@ export default {
     { name: "axe", file: "tiles_kenney/axe.png" },
     { name: "hammer", file: "tiles_kenney/hammer.png" },
     { name: "attack", file: "tiles_kenney/tile_0060.png" },
+    { name: "heart_full", file: "heart_kenney/heart_full.png" },
+    { name: "heart_half", file: "heart_kenney/heart_half.png" },
+    { name: "heart_empty", file: "heart_kenney/heart_empty.png" },
   ],
 };

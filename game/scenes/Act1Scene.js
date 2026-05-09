@@ -59,6 +59,7 @@ class Act1Scene extends Scene {
     SpriteLoader.createAnims(this, "dad", "dad");
 
     this.enemy = EnemyController.create(this, 88, 260, "enemy");
+    this.enemy.health = 3;
     this.physics.add.collider(this.player.hitbox, this.enemy.hitbox);
     this.physics.add.collider(
       this.enemy.hitbox,
@@ -100,6 +101,7 @@ class Act1Scene extends Scene {
     }
     NPCController.handleAnimation(this.dad, time);
     EnemyController.handleAnimation(this.enemy, time);
+    EnemyController.updateHealth(this.enemy, this.enemy.health);
     const distToPlayer = EnemyController.getDistanceToTarget(
       this.enemy,
       this.player,

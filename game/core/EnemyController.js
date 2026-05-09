@@ -105,6 +105,35 @@ export class EnemyController {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
+  static updateHealth(enemy, health, maxHealth = 3) {
+    if (!enemy.scene || !enemy.scene.textures.exists("heart_full")) return;
+
+    if (!enemy.healthHearts) {
+      enemy.healthHearts = [];
+      for (let i = 0; i < maxHealth; i++) {
+        const heart = enemy.scene.add.image(
+          enemy.x - 1 + (i * 1),
+          enemy.y - 24,
+          "heart_empty"
+        );
+        heart.setScrollFactor(1);
+        heart.setDepth(enemy.depth + 10);
+        heart.setScale(1);
+        enemy.healthHearts.push(heart);
+      }
+    }
+
+    enemy.healthHearts.forEach((heart, i) => {
+      heart.x = enemy.x - 10 + (i * 9);
+      heart.y = enemy.y - 12;
+      if (i < health) {
+        heart.setTexture("heart_full");
+      } else {
+        heart.setTexture("heart_empty");
+      }
+    });
+  }
+
   static attack(scene, enemy, target, equippedWeapon) {
     if (scene.enemyAttacking) return;
 
