@@ -85,13 +85,6 @@ export class EnemyController {
     const moveX = (dx / dist) * speed;
     const moveY = (dy / dist) * speed;
 
-    if (enemy.hitbox.body.blocked.left || enemy.hitbox.body.blocked.right) {
-      enemy.hitbox.body.setVelocityX(0);
-    }
-    if (enemy.hitbox.body.blocked.up || enemy.hitbox.body.blocked.down) {
-      enemy.hitbox.body.setVelocityY(0);
-    }
-
     enemy.hitbox.body.setVelocity(moveX, moveY);
 
     if (Math.abs(dx) > Math.abs(dy)) {

@@ -72,7 +72,7 @@ class Act1Scene extends Scene {
       this.enemy.hitbox,
       manager.getWallGroup(this, "act_1"),
     );
-    this.enemy.hitbox.body.setImmovable(true);
+    this.enemy.hitbox.body.setImmovable(false);
     this.enemy.hitbox.body.setCollideWorldBounds(true);
 
     this.enemyWeapon = this.add.sprite(
@@ -127,8 +127,15 @@ class Act1Scene extends Scene {
         }
         if (this.enemy && this.enemy.healthHearts) {
           this.enemy.healthHearts.forEach(h => h && h.destroy());
+          this.enemy.healthHearts = [];
         }
         if (this.enemy) {
+          // Destroy hitbox separately — it's a distinct physics body
+          if (this.enemy.hitbox) {
+            this.enemy.hitbox.body.setVelocity(0);
+            this.enemy.hitbox.destroy();
+            this.enemy.hitbox = null;
+          }
           this.enemy.destroy();
           this.enemy = null;
         }
@@ -152,7 +159,6 @@ class Act1Scene extends Scene {
     if (distToPlayer < EnemyBehavior.visionRange && !Dialog.isOpen()) {
       if (distToPlayer > EnemyBehavior.attackRange) {
         EnemyController.chase(this, this.enemy, this.player);
-        this.enemy.hitbox.body.setImmovable(true);
       } else {
         this.enemy.hitbox.body.setVelocity(0);
         this.enemy.anims.stop();
