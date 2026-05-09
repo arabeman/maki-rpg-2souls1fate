@@ -41,6 +41,9 @@ class Act1Scene extends Scene {
     SpriteLoader.loadImage(this, "hammer", "hammer");
     SpriteLoader.loadImage(this, "attack", "attack");
     SpriteLoader.loadImage(this, "axe", "axe");
+    SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
+    SpriteLoader.loadImage(this, "emote_exclamations", "exclamations");
+    SpriteLoader.loadImage(this, "emote_question", "question");
     manager.map(this, "act_1");
     manager.preload(this);
   }
@@ -69,6 +72,7 @@ class Act1Scene extends Scene {
       this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
       this.dad.hitbox.body.setImmovable(true);
       SpriteLoader.createAnims(this, "dad", "dad");
+      this.dadEmote = showEmote(this, this.dad, "question", 0);
     }
 
     this.enemy = this.createEnemy(88, 260);
@@ -110,6 +114,8 @@ class Act1Scene extends Scene {
   createEnemy(x, y) {
     const enemy = EnemyController.create(this, x, y, "enemy");
     enemy.health = 3;
+    enemy.enemyEmote = null;
+    enemy.canMove = false;
     this.physics.add.collider(this.player.hitbox, enemy.hitbox);
     this.physics.add.collider(enemy.hitbox, manager.getWallGroup(this, "act_1"));
     enemy.hitbox.body.setImmovable(false);
@@ -179,6 +185,10 @@ class Act1Scene extends Scene {
           this.enemyWeapon.destroy();
           this.enemyWeapon = null;
         }
+        if (this.enemy && this.enemy.enemyEmote) {
+          this.enemy.enemyEmote.destroy();
+          this.enemy.enemyEmote = null;
+        }
         if (this.enemy && this.enemy.healthHearts) {
           this.enemy.healthHearts.forEach(h => h && h.destroy());
           this.enemy.healthHearts = [];
@@ -214,6 +224,10 @@ class Act1Scene extends Scene {
           this.enemy2Weapon.destroy();
           this.enemy2Weapon = null;
         }
+        if (this.enemy2 && this.enemy2.enemyEmote) {
+          this.enemy2.enemyEmote.destroy();
+          this.enemy2.enemyEmote = null;
+        }
         if (this.enemy2 && this.enemy2.healthHearts) {
           this.enemy2.healthHearts.forEach(h => h && h.destroy());
           this.enemy2.healthHearts = [];
@@ -242,16 +256,34 @@ class Act1Scene extends Scene {
 
       const distToPlayer = EnemyController.getDistanceToTarget(this.enemy, this.player);
       if (distToPlayer < EnemyBehavior.visionRange && !Dialog.isOpen()) {
-        if (distToPlayer > EnemyBehavior.attackRange) {
-          EnemyController.chase(this, this.enemy, this.player);
+        if (!this.enemy.canMove && !this.enemy.enemyEmote) {
+          const emote = showEmote(this, this.enemy, "exclamations", 0);
+          if (emote) {
+            this.enemy.enemyEmote = emote;
+            this.time.delayedCall(800, () => {
+              if (this.enemy) this.enemy.canMove = true;
+            });
+          } else {
+            this.enemy.canMove = true;
+          }
+        }
+        if (this.enemy.canMove) {
+          if (distToPlayer > EnemyBehavior.attackRange) {
+            if (this.enemy.enemyEmote) {
+              this.enemy.enemyEmote.destroy();
+              this.enemy.enemyEmote = null;
+            }
+            EnemyController.chase(this, this.enemy, this.player);
+            EnemyController.chase(this, this.enemy, this.player);
+          } else {
+            this.enemy.hitbox.body.setVelocity(0);
+            this.enemy.anims.stop();
+            EnemyController.attack(this, this.enemy, this.player, this.enemyWeapon);
+          }
         } else {
           this.enemy.hitbox.body.setVelocity(0);
           this.enemy.anims.stop();
-          EnemyController.attack(this, this.enemy, this.player, this.enemyWeapon);
         }
-      } else {
-        this.enemy.hitbox.body.setVelocity(0);
-        this.enemy.anims.stop();
       }
       if (this.enemyWeapon) {
         this.enemyWeapon.setPosition(this.enemy.x + 8, this.enemy.y + 4);
@@ -268,19 +300,36 @@ class Act1Scene extends Scene {
       }
       EnemyController.updateHealth(this.enemy2, this.enemy2.health);
 
-      const distToPlayer2 = EnemyController.getDistanceToTarget(this.enemy2, this.player);
+const distToPlayer2 = EnemyController.getDistanceToTarget(this.enemy2, this.player);
       if (distToPlayer2 < EnemyBehavior.visionRange && !Dialog.isOpen()) {
-        if (distToPlayer2 > EnemyBehavior.attackRange) {
-          EnemyController.chase(this, this.enemy2, this.player);
+        if (!this.enemy2.canMove && !this.enemy2.enemyEmote) {
+          this.enemy2.enemyEmote = showEmote(this, this.enemy2, "exclamations", 0);
+          this.time.delayedCall(800, () => {
+            if (this.enemy2) this.enemy2.canMove = true;
+          });
+        }
+        if (this.enemy2.canMove) {
+          if (distToPlayer2 > EnemyBehavior.attackRange) {
+            if (this.enemy2.enemyEmote) {
+              this.enemy2.enemyEmote.destroy();
+              this.enemy2.enemyEmote = null;
+            }
+            EnemyController.chase(this, this.enemy2, this.player);
+            EnemyController.chase(this, this.enemy2, this.player);
+          } else {
+            this.enemy2.hitbox.body.setVelocity(0);
+            this.enemy2.anims.stop();
+            EnemyController.attack(this, this.enemy2, this.player, this.enemy2Weapon);
+          }
         } else {
           this.enemy2.hitbox.body.setVelocity(0);
           this.enemy2.anims.stop();
-          EnemyController.attack(this, this.enemy2, this.player, this.enemy2Weapon);
         }
       } else {
         this.enemy2.hitbox.body.setVelocity(0);
         this.enemy2.anims.stop();
       }
+
       if (this.enemy2Weapon) {
         this.enemy2Weapon.setPosition(this.enemy2.x + 8, this.enemy2.y + 4);
         this.enemy2Weapon.setFlipX(this.enemy2.flipX);
@@ -338,6 +387,10 @@ class Act1Scene extends Scene {
 
   handleNPCTalk() {
     if (!this.dad) return;
+    if (this.dadEmote) {
+      this.dadEmote.destroy();
+      this.dadEmote = null;
+    }
     if (this.player.x < this.dad.x) {
       this.dad.setFlipX(true);
     } else {

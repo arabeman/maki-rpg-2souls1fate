@@ -78,6 +78,7 @@ class BeginScene extends Scene {
       this.physics.add.collider(this.dad.hitbox, manager.getWallGroup(this, "begin"));
       this.dad.hitbox.body.setImmovable(true);
       this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
+      this.dadEmote = showEmote(this, this.dad, "exclamation", 0);
     }
 
     this.time.addEvent({
@@ -136,6 +137,10 @@ class BeginScene extends Scene {
       if (this.dad) {
         GameState.dadPosition = { x: this.dad.x, y: this.dad.y };
         this.dad.destroy();
+      }
+      if (this.dadEmote) {
+        this.dadEmote.destroy();
+        this.dadEmote = null;
       }
       this.cameras.main.fadeOut(500);
       this.cameras.main.once('camerafadeoutcomplete', () => {

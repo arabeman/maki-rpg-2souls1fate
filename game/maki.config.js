@@ -56,6 +56,7 @@ export default {
   ],
   emotes: [
     { name: "exclamation", file: "emotes_kenney/emote_exclamation.png" },
+    { name: "exclamations", file: "emotes_kenney/emote_exclamations.png" },
     { name: "question", file: "emotes_kenney/emote_question.png" },
     { name: "heart", file: "emotes_kenney/emote_heart.png" },
     { name: "stars", file: "emotes_kenney/emote_stars.png" },
