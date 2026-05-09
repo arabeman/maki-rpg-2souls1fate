@@ -1,6 +1,8 @@
 import { GameState } from "../data/dialogs.js";
 
 export class HealthHUD {
+  static lastHealth = null;
+
   static init() {
     this._injectStyles();
     this._buildDOM();
@@ -40,6 +42,7 @@ export class HealthHUD {
       <img src="assets/heart_kenney/heart_full.png" />
       <img src="assets/heart_kenney/heart_full.png" />
     `;
+    this.heartImgs = Array.from(this.container.querySelectorAll("img"));
     document.body.appendChild(this.container);
   }
 
@@ -47,8 +50,11 @@ export class HealthHUD {
     if (!this.container) return;
 
     const currentHealth = GameState.playerHealth || 3;
+    if (currentHealth === this.lastHealth) return;
+
+    this.lastHealth = currentHealth;
     const maxHealth = 3;
-    const imgs = this.container.querySelectorAll("img");
+    const imgs = this.heartImgs || [];
 
     imgs.forEach((img, i) => {
       const reversedI = maxHealth - 1 - i;

@@ -2,6 +2,8 @@ import { Inventory } from "../core/Inventory.js";
 
 export class PotionHUD {
   static unlocked = false;
+  static lastCountText = null;
+  static wasVisible = false;
 
   static init() {
     this._injectStyles();
@@ -120,17 +122,25 @@ export class PotionHUD {
     if (!this.container) return;
 
     const potionCount = Inventory.count("potion");
+    let shouldBeVisible = false;
+    let countText = "x0";
+
     if (potionCount > 0) {
       this.unlocked = true;
-      this.container.classList.add("visible");
-      this.count.textContent = `x${potionCount}`;
+      shouldBeVisible = true;
+      countText = `x${potionCount}`;
     } else {
-      if (this.unlocked) {
-        this.container.classList.add("visible");
-      } else {
-        this.container.classList.remove("visible");
-      }
-      this.count.textContent = "x0";
+      shouldBeVisible = this.unlocked;
+    }
+
+    if (shouldBeVisible !== this.wasVisible) {
+      this.container.classList.toggle("visible", shouldBeVisible);
+      this.wasVisible = shouldBeVisible;
+    }
+
+    if (countText !== this.lastCountText) {
+      this.count.textContent = countText;
+      this.lastCountText = countText;
     }
   }
 

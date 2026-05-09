@@ -1,6 +1,9 @@
 import { Equipment } from "../core/Equipment.js";
 
 export class EquipmentHUD {
+  static lastTexture = null;
+  static wasVisible = false;
+
   static init() {
     this._injectStyles();
     this._buildDOM();
@@ -82,6 +85,7 @@ static _injectStyles() {
 
     this.slot = document.createElement("div");
     this.slot.className = "equipment-hud-empty";
+    this.img = document.createElement("img");
     this.container.appendChild(this.slot);
     document.body.appendChild(this.container);
   }
@@ -93,18 +97,25 @@ static _injectStyles() {
   static update() {
     if (!this.slot) return;
 
-    if (Equipment.slots.mainHand) {
-      const item = Equipment.slots.mainHand.item;
-      this.container.classList.add("visible");
-      this.slot.className = "equipment-hud-img";
-      this.slot.innerHTML = "";
-      const img = document.createElement("img");
-      img.src = `assets/tiles_kenney/${item.texture}.png`;
-      this.slot.appendChild(img);
-    } else {
-      this.container.classList.remove("visible");
-      this.slot.className = "equipment-hud-empty";
-      this.slot.innerHTML = "";
+    const mainHand = Equipment.slots.mainHand;
+    const isVisible = Boolean(mainHand);
+    const texture = mainHand?.item?.texture || null;
+
+    if (isVisible !== this.wasVisible) {
+      this.container.classList.toggle("visible", isVisible);
+      this.slot.className = isVisible ? "equipment-hud-img" : "equipment-hud-empty";
+      this.wasVisible = isVisible;
+    }
+
+    if (isVisible && texture !== this.lastTexture) {
+      this.img.src = `assets/tiles_kenney/${texture}.png`;
+      if (!this.img.parentNode) this.slot.appendChild(this.img);
+      this.lastTexture = texture;
+    }
+
+    if (!isVisible) {
+      this.lastTexture = null;
+      if (this.img.parentNode) this.img.remove();
     }
   }
 }

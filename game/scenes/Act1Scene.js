@@ -52,6 +52,8 @@ class Act1Scene extends Scene {
     SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
     SpriteLoader.loadImage(this, "emote_exclamations", "exclamations");
     SpriteLoader.loadImage(this, "emote_question", "question");
+    this.load.image("chest_closed", "assets/tiles_kenney/chest_closed.png");
+    this.load.image("chest_opened", "assets/tiles_kenney/chest_opened.png");
     this.load.spritesheet("georges", "assets/tiles_kenney/georges.png", {
       frameWidth: 16,
       frameHeight: 16,
@@ -86,6 +88,42 @@ class Act1Scene extends Scene {
     this.georges.hitbox.body.setCollideWorldBounds(true);
     this.physics.add.collider(this.player.hitbox, this.georges.hitbox);
     this.physics.add.collider(this.georges.hitbox, manager.getWallGroup(this, "act_1"));
+
+    this.chests = [
+      {
+        stateKey: "act1ChestPotionTaken",
+        sprite: this.physics.add.sprite(
+          8,
+          422,
+          GameState.act1ChestPotionTaken ? "chest_opened" : "chest_closed",
+        ),
+      },
+      {
+        stateKey: "act1ChestPotionTaken2",
+        sprite: this.physics.add.sprite(
+          424,
+          376,
+          GameState.act1ChestPotionTaken2 ? "chest_opened" : "chest_closed",
+        ),
+      },
+      {
+        stateKey: "act1ChestPotionTaken3",
+        sprite: this.physics.add.sprite(
+          472,
+          24,
+          GameState.act1ChestPotionTaken3 ? "chest_opened" : "chest_closed",
+        ),
+      },
+    ];
+
+    for (const chestEntry of this.chests) {
+      const chest = chestEntry.sprite;
+      chest.potionStateKey = chestEntry.stateKey;
+      chest.body.setImmovable(true);
+      chest.body.setCollideWorldBounds(true);
+      this.physics.add.collider(this.player.hitbox, chest);
+      this.physics.add.collider(chest, manager.getWallGroup(this, "act_1"));
+    }
 
     if (GameState.leftBeginScene) {
       SpriteLoader.load(this, "dad", "dad");
@@ -363,6 +401,15 @@ class Act1Scene extends Scene {
   }
 
   getNearInteractable() {
+    if (this.chests?.length) {
+      const nearChest = InteractionManager.getNearObject(
+        this.player,
+        this.chests.map((entry) => entry.sprite),
+        20,
+      );
+      if (nearChest) return { type: "chest", target: nearChest };
+    }
+
     if (this.georges) {
       const nearGeorges = InteractionManager.getNearObject(
         this.player,
@@ -386,7 +433,25 @@ class Act1Scene extends Scene {
   handleInteraction() {
     const interactable = this.getNearInteractable();
     if (!interactable) return;
+    if (interactable.type === "chest") {
+      this.handleChestInteraction(interactable.target);
+      return;
+    }
     if (interactable.type === "npc") this.handleNPCTalk(interactable.target);
+  }
+
+  handleChestInteraction(chest) {
+    if (!chest || !chest.potionStateKey || GameState[chest.potionStateKey]) return;
+
+    chest.setTexture("chest_opened");
+    Inventory.add({
+      id: "potion",
+      name: "Potion",
+      texture: "potion",
+      type: "consumable",
+    });
+    showItemPickup(this, chest, "potion", 0);
+    GameState[chest.potionStateKey] = true;
   }
 
   handleNPCTalk(npc) {

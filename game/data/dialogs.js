@@ -18,6 +18,9 @@ export const GameState = {
   georgesTalked: false,
   georgesPotionReceived: false,
   georgesUseDialog3Next: false,
+  act1ChestPotionTaken: false,
+  act1ChestPotionTaken2: false,
+  act1ChestPotionTaken3: false,
 };
 
 export const dadDialogNoSword = [
