@@ -78,7 +78,15 @@ class Act1Scene extends Scene {
       manager.getWallGroup(this, "act_1"),
     );
     this.enemy.hitbox.body.setImmovable(false);
-    this.enemy.hitbox.body.setCollideWorldBounds(true);
+
+    this.enemy2 = EnemyController.create(this, 89, 383, "enemy");
+    this.enemy2.health = 3;
+    this.physics.add.collider(this.player.hitbox, this.enemy2.hitbox);
+    this.physics.add.collider(
+      this.enemy2.hitbox,
+      manager.getWallGroup(this, "act_1"),
+    );
+    this.enemy2.hitbox.body.setImmovable(false);
 
     this.enemyWeapon = this.add.sprite(
       this.enemy.x + 8,
@@ -87,6 +95,14 @@ class Act1Scene extends Scene {
     );
     this.enemyWeapon.setOrigin(1.5, 0.7);
     this.enemyWeapon.setDepth(this.enemy.depth + 1);
+
+    this.enemy2Weapon = this.add.sprite(
+      this.enemy2.x + 8,
+      this.enemy2.y + 4,
+      "axe",
+    );
+    this.enemy2Weapon.setOrigin(1.5, 0.7);
+    this.enemy2Weapon.setDepth(this.enemy2.depth + 1);
 
     if (GameState.hasWeapon) {
       const weaponItem = Inventory.items[Inventory.items.length - 1];
@@ -97,26 +113,43 @@ class Act1Scene extends Scene {
 
     HealthHUD.init();
 
+    // Physics world bounds must match the actual map size in world coordinates.
+    // Without this, Phaser defaults to the canvas pixel size (640×448 before zoom).
+    // At zoom 1.4 that creates an invisible hard wall at ~320px on Y — that was the bug.
+    this.physics.world.setBounds(0, 0, 640, 448);
+
     this.cameras.main.startFollow(this.player, true, 0.03, 0.03);
     this.cameras.main.setBounds(0, 0, 640, 448);
 
     this.cameras.main.fadeIn(500);
 
+    this.time.addEvent({
+      delay: 1000,
+      loop: true,
+      callback: () => {
+        console.log("Player pos:", Math.round(this.player.x), Math.round(this.player.y));
+      },
+    });
+
     BattleController.setup(this, this.player);
   }
 
   update(time) {
+    // --- Player input ---
     if (!Dialog.isOpen()) {
       if (!this.player.isKnockedBack) {
         PlayerController.handleMovement(this.player, this.keys);
       }
       PlayerController.handleAnimation(this.player, this.keys, time);
-      BattleController.attack(this, this.player, this.keys, this.enemy);
+      // Pass all enemies as an array — one swing, all hit-checks done inside BattleController
+      BattleController.attack(this, this.player, this.keys, [this.enemy, this.enemy2]);
     }
+
     if (this.dad) {
       NPCController.handleAnimation(this.dad, time);
     }
 
+    // --- Scene transition ---
     if (!this.sceneTransitioning && this.player.x < 0) {
       this.sceneTransitioning = true;
       GameState.returnedFromAct1 = true;
@@ -128,6 +161,7 @@ class Act1Scene extends Scene {
       return;
     }
 
+    // --- Enemy 1 death ---
     if (this.enemy && this.enemy.health <= 0 && !this.enemy.isDying) {
       this.enemy.isDying = true;
       const flashEnemy = () => {
@@ -150,7 +184,6 @@ class Act1Scene extends Scene {
           this.enemy.healthHearts = [];
         }
         if (this.enemy) {
-          // Destroy hitbox separately — it's a distinct physics body
           if (this.enemy.hitbox) {
             this.enemy.hitbox.body.setVelocity(0);
             this.enemy.hitbox.destroy();
@@ -162,44 +195,104 @@ class Act1Scene extends Scene {
       }});
     }
 
-    if (!this.enemy || !this.enemy.active) {
-      Equipment.update(this, this.player);
-      HealthHUD.update();
-      Dialog.update(time);
-      return;
+    // --- Enemy 2 death ---
+    // FIX 2: enemy2 death runs independently, not gated behind enemy1 being dead
+    if (this.enemy2 && this.enemy2.health <= 0 && !this.enemy2.isDying) {
+      this.enemy2.isDying = true;
+      const flashEnemy2 = () => {
+        if (this.enemy2 && this.enemy2.active) {
+          this.enemy2.setVisible(!this.enemy2.visible);
+          if (this.enemy2Weapon) this.enemy2Weapon.setVisible(this.enemy2.visible);
+        }
+      };
+      flashEnemy2();
+      this.time.addEvent({ delay: 80, callback: flashEnemy2 });
+      this.time.addEvent({ delay: 160, callback: flashEnemy2 });
+      this.time.addEvent({ delay: 240, callback: flashEnemy2 });
+      this.time.addEvent({ delay: 320, callback: () => {
+        if (this.enemy2Weapon) {
+          this.enemy2Weapon.destroy();
+          this.enemy2Weapon = null;
+        }
+        if (this.enemy2 && this.enemy2.healthHearts) {
+          this.enemy2.healthHearts.forEach(h => h && h.destroy());
+          this.enemy2.healthHearts = [];
+        }
+        if (this.enemy2) {
+          if (this.enemy2.hitbox) {
+            this.enemy2.hitbox.body.setVelocity(0);
+            this.enemy2.hitbox.destroy();
+            this.enemy2.hitbox = null;
+          }
+          this.enemy2.destroy();
+          this.enemy2 = null;
+        }
+      }});
     }
 
-    EnemyController.handleAnimation(this.enemy, time);
-    if (this.enemy.lastHealth !== this.enemy.health) {
-      this.enemy.lastHealth = this.enemy.health;
-      EnemyController.showHealthBar(this.enemy);
-    }
-    EnemyController.updateHealth(this.enemy, this.enemy.health);
-    const distToPlayer = EnemyController.getDistanceToTarget(
-      this.enemy,
-      this.player,
-    );
+    // --- Enemy 1 AI (runs independently every frame while alive) ---
+    // FIX 3: no longer gated behind enemy2 being dead either
+    if (this.enemy && this.enemy.active && !this.enemy.isDying) {
+      EnemyController.handleAnimation(this.enemy, time);
+      if (this.enemy.lastHealth !== this.enemy.health) {
+        this.enemy.lastHealth = this.enemy.health;
+        EnemyController.showHealthBar(this.enemy);
+      }
+      EnemyController.updateHealth(this.enemy, this.enemy.health);
 
-    if (distToPlayer < EnemyBehavior.visionRange && !Dialog.isOpen()) {
-      if (distToPlayer > EnemyBehavior.attackRange) {
-        EnemyController.chase(this, this.enemy, this.player);
+      const distToPlayer = EnemyController.getDistanceToTarget(this.enemy, this.player);
+      if (distToPlayer < EnemyBehavior.visionRange && !Dialog.isOpen()) {
+        if (distToPlayer > EnemyBehavior.attackRange) {
+          EnemyController.chase(this, this.enemy, this.player);
+        } else {
+          this.enemy.hitbox.body.setVelocity(0);
+          this.enemy.anims.stop();
+          EnemyController.attack(this, this.enemy, this.player, this.enemyWeapon);
+        }
       } else {
         this.enemy.hitbox.body.setVelocity(0);
         this.enemy.anims.stop();
-        EnemyController.attack(this, this.enemy, this.player, this.enemyWeapon);
       }
-    } else {
-      this.enemy.hitbox.body.setVelocity(0);
-      this.enemy.anims.stop();
+      if (this.enemyWeapon) {
+        this.enemyWeapon.setPosition(this.enemy.x + 8, this.enemy.y + 4);
+        this.enemyWeapon.setFlipX(this.enemy.flipX);
+      }
     }
-    if (this.enemyWeapon) {
-      this.enemyWeapon.setPosition(this.enemy.x + 8, this.enemy.y + 4);
-      this.enemyWeapon.setFlipX(this.enemy.flipX);
+
+    // --- Enemy 2 AI (runs independently every frame while alive) ---
+    if (this.enemy2 && this.enemy2.active && !this.enemy2.isDying) {
+      EnemyController.handleAnimation(this.enemy2, time);
+      if (this.enemy2.lastHealth !== this.enemy2.health) {
+        this.enemy2.lastHealth = this.enemy2.health;
+        EnemyController.showHealthBar(this.enemy2);
+      }
+      EnemyController.updateHealth(this.enemy2, this.enemy2.health);
+
+      const distToPlayer2 = EnemyController.getDistanceToTarget(this.enemy2, this.player);
+      if (distToPlayer2 < EnemyBehavior.visionRange && !Dialog.isOpen()) {
+        if (distToPlayer2 > EnemyBehavior.attackRange) {
+          EnemyController.chase(this, this.enemy2, this.player);
+        } else {
+          this.enemy2.hitbox.body.setVelocity(0);
+          this.enemy2.anims.stop();
+          EnemyController.attack(this, this.enemy2, this.player, this.enemy2Weapon);
+        }
+      } else {
+        this.enemy2.hitbox.body.setVelocity(0);
+        this.enemy2.anims.stop();
+      }
+      if (this.enemy2Weapon) {
+        this.enemy2Weapon.setPosition(this.enemy2.x + 8, this.enemy2.y + 4);
+        this.enemy2Weapon.setFlipX(this.enemy2.flipX);
+      }
     }
+
+    // --- HUD, equipment, dialog (always runs once per frame) ---
     Equipment.update(this, this.player);
     HealthHUD.update();
     Dialog.update(time);
 
+    // --- Interaction prompt & space key (always runs once per frame) ---
     const nearInteractable = this.getNearInteractable();
     if (nearInteractable && !Dialog.isOpen()) {
       Dialog.showInteractPrompt(this, "Space to interact");

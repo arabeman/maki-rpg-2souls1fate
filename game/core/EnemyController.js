@@ -210,7 +210,7 @@ export class EnemyController {
   }
 
   static attack(scene, enemy, target, equippedWeapon) {
-    if (scene.enemyAttacking || enemy.isStunned) return;
+    if (enemy.isAttacking || enemy.isStunned) return;
 
     const now = scene.time.now;
     const lastAttack = enemy.lastAttackTime || 0;
@@ -219,7 +219,7 @@ export class EnemyController {
     if (now - lastAttack < delay) return;
 
     enemy.lastAttackTime = now;
-    scene.enemyAttacking = true;
+    enemy.isAttacking = true;
     const weapon = ENEMY_AXE;
     const range = 8;
     const dx = target.x - enemy.x;
@@ -283,7 +283,7 @@ export class EnemyController {
             onComplete: () => {
               attackSprite.destroy();
               if (equippedWeapon) equippedWeapon.setVisible(true);
-              scene.enemyAttacking = false;
+              enemy.isAttacking = false;
             },
           });
         });

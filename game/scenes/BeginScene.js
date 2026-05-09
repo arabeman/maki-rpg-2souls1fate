@@ -79,6 +79,14 @@ class BeginScene extends Scene {
       this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
     }
 
+    this.time.addEvent({
+      delay: 1000,
+      loop: true,
+      callback: () => {
+        console.log("Player pos:", Math.round(this.player.x), Math.round(this.player.y));
+      },
+    });
+
     EquipmentHUD.init();
 
     // Create pickable objects
