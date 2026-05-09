@@ -82,12 +82,29 @@ if (this.enemy3 && this.enemy3.active && !this.enemy3.isDying) {
 
   const distToPlayer3 = EnemyController.getDistanceToTarget(this.enemy3, this.player);
   if (distToPlayer3 < EnemyBehavior.visionRange && !Dialog.isOpen()) {
-    if (distToPlayer3 > EnemyBehavior.attackRange) {
-      EnemyController.chase(this, this.enemy3, this.player);
+    // Show emote and wait before moving
+    if (!this.enemy3.canMove && !this.enemy3.enemyEmote) {
+      this.enemy3.enemyEmote = showEmote(this, this.enemy3, "exclamations", 0);
+      this.time.delayedCall(800, () => {
+        if (this.enemy3) this.enemy3.canMove = true;
+      });
+    }
+    if (this.enemy3.canMove) {
+      if (distToPlayer3 > EnemyBehavior.attackRange) {
+        // Remove emote when starting to move
+        if (this.enemy3.enemyEmote) {
+          this.enemy3.enemyEmote.destroy();
+          this.enemy3.enemyEmote = null;
+        }
+        EnemyController.chase(this, this.enemy3, this.player);
+      } else {
+        this.enemy3.hitbox.body.setVelocity(0);
+        this.enemy3.anims.stop();
+        EnemyController.attack(this, this.enemy3, this.player, this.enemy3Weapon);
+      }
     } else {
       this.enemy3.hitbox.body.setVelocity(0);
       this.enemy3.anims.stop();
-      EnemyController.attack(this, this.enemy3, this.player, this.enemy3Weapon);
     }
   } else {
     this.enemy3.hitbox.body.setVelocity(0);
@@ -99,6 +116,8 @@ if (this.enemy3 && this.enemy3.active && !this.enemy3.isDying) {
   }
 }
 ```
+
+Note: The enemy shows an emote when it sees the player, waits 800ms, then moves. The emote disappears when the enemy starts chasing.
 
 ---
 
