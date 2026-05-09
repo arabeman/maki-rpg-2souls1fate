@@ -12,6 +12,9 @@ export const GameState = {
   hasWeapon: false,
   exitUnlocked: false,
   playerHealth: 3,
+  returnedFromAct1: false,
+  leftBeginScene: false,
+  dadPosition: { x: 0, y: 0 },
 };
 
 export const dadDialogNoSword = [

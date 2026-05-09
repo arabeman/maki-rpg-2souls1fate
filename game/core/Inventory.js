@@ -11,6 +11,5 @@ export class Inventory {
   }
 
   static _updateUI() {
-    console.log("Inventory:", this.items);
   }
 }

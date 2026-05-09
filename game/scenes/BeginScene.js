@@ -26,6 +26,10 @@ class BeginScene extends Scene {
   constructor() {
     super({ key: "BeginScene" });
   }
+  init() {
+    this.scale.resize(288, 288);
+    this.cameras.main.setZoom(1);
+  }
   preload() {
     super.preload();
     SpriteLoader.load(this, "player", "player");
@@ -44,26 +48,35 @@ class BeginScene extends Scene {
     super.create();
     manager.create(this);
 
-    this.player = PlayerController.create(this, 152, 152, "player");
-    this.dad = NPCController.create(this, 16 * 16.5, 16 * 9, "dad");
+    this.dad = null;
+    this.sceneTransitioning = false;
+
+    if (GameState.returnedFromAct1) {
+      this.player = PlayerController.create(this, 268, 144, "player");
+      this.player.setFlipX(true);
+      if (GameState.hasWeapon && Inventory.items.length > 0) {
+        const weaponItem = Inventory.items[Inventory.items.length - 1];
+        if (weaponItem) {
+          Equipment.equip(this, this.player, weaponItem);
+        }
+      }
+    } else {
+      this.player = PlayerController.create(this, 152, 152, "player");
+      this.dad = NPCController.create(this, 16 * 16.5, 16 * 9, "dad");
+    }
     this.keys = PlayerController.setupInput(this);
 
     SpriteLoader.createAnims(this, "player", "player");
-    SpriteLoader.createAnims(this, "dad", "dad");
+    if (this.dad) {
+      SpriteLoader.createAnims(this, "dad", "dad");
+    }
     EquipmentHUD.init();
-
-    // Wall collisions
-    this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "begin"));
-    this.physics.add.collider(this.dad.hitbox, manager.getWallGroup(this, "begin"));
-    this.dad.hitbox.body.setImmovable(true);
-    this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
-
-    // Show emote over dad when scene appears
-    this.dadEmote = showEmote(this, this.dad, "exclamation", 0); // 0 = infinite, no auto-hide
 
     // Create pickable objects
     this.pickables = [];
-    this.createPickable(208 + 8, 192 + 8, "sword1", WEAPONS.sword1);
+    if (!GameState.returnedFromAct1) {
+      this.createPickable(208 + 8, 192 + 8, "sword1", WEAPONS.sword1);
+    }
   }
 
   createPickable(x, y, sprite, data) {
@@ -84,11 +97,18 @@ class BeginScene extends Scene {
       PlayerController.handleAnimation(this.player, this.keys, time);
     }
     Equipment.update(this, this.player);
-    NPCController.handleAnimation(this.dad, time);
+    if (this.dad) {
+      NPCController.handleAnimation(this.dad, time);
+    }
     Dialog.update(time);
 
     if (!this.sceneTransitioning && (this.player.x < 0 || this.player.x > 288 || this.player.y < 0 || this.player.y > 288)) {
       this.sceneTransitioning = true;
+      GameState.leftBeginScene = true;
+      if (this.dad) {
+        GameState.dadPosition = { x: this.dad.x, y: this.dad.y };
+        this.dad.destroy();
+      }
       this.cameras.main.fadeOut(500);
       this.cameras.main.once('camerafadeoutcomplete', () => {
         this.scene.start("Act1Scene");
@@ -125,9 +145,11 @@ class BeginScene extends Scene {
   }
 
   getNearInteractable() {
-    const nearNPC = InteractionManager.getNearObject(this.player, [this.dad], 25);
-    if (nearNPC) {
-      return { type: "npc", target: nearNPC };
+    if (this.dad) {
+      const nearNPC = InteractionManager.getNearObject(this.player, [this.dad], 25);
+      if (nearNPC) {
+        return { type: "npc", target: nearNPC };
+      }
     }
 
     const nearPickable = InteractionManager.getNearObject(this.player, this.pickables, 18);
@@ -169,6 +191,7 @@ class BeginScene extends Scene {
   }
 
 isNearNPC() {
+    if (!this.dad) return false;
     return InteractionManager.isNear(this.player, this.dad, 25);
   }
 
@@ -176,6 +199,7 @@ isNearNPC() {
      * Handle NPC interaction when Space is pressed near an NPC
      */
   handleNPCTalk() {
+    if (!this.dad) return;
     if (!InteractionManager.isNear(this.player, this.dad, 25)) return;
     if (Dialog.isOpen()) {
       Dialog.skip();

@@ -49,21 +49,26 @@ class Act1Scene extends Scene {
     super.create();
     manager.create(this);
 
+    this.dad = null;
+    this.sceneTransitioning = false;
+
     this.player = PlayerController.create(this, 16, 128, "player");
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "enemy", "enemy");
-    SpriteLoader.load(this, "dad", "dad");
 
     this.physics.add.collider(
       this.player.hitbox,
       manager.getWallGroup(this, "act_1"),
     );
 
-    this.dad = NPCController.create(this, 48, 118, "dad");
-    this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
-    this.dad.hitbox.body.setImmovable(true);
-    SpriteLoader.createAnims(this, "dad", "dad");
+    if (GameState.leftBeginScene) {
+      SpriteLoader.load(this, "dad", "dad");
+      this.dad = NPCController.create(this, 48, 118, "dad");
+      this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
+      this.dad.hitbox.body.setImmovable(true);
+      SpriteLoader.createAnims(this, "dad", "dad");
+    }
 
     this.enemy = EnemyController.create(this, 88, 260, "enemy");
     this.enemy.health = 3;
@@ -108,7 +113,20 @@ class Act1Scene extends Scene {
       PlayerController.handleAnimation(this.player, this.keys, time);
       BattleController.attack(this, this.player, this.keys, this.enemy);
     }
-    NPCController.handleAnimation(this.dad, time);
+    if (this.dad) {
+      NPCController.handleAnimation(this.dad, time);
+    }
+
+    if (!this.sceneTransitioning && this.player.x < 0) {
+      this.sceneTransitioning = true;
+      GameState.returnedFromAct1 = true;
+      GameState.leftBeginScene = false;
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once("camerafadeoutcomplete", () => {
+        this.scene.start("BeginScene");
+      });
+      return;
+    }
 
     if (this.enemy && this.enemy.health <= 0 && !this.enemy.isDying) {
       this.enemy.isDying = true;
@@ -203,13 +221,15 @@ class Act1Scene extends Scene {
   }
 
   getNearInteractable() {
-    const nearNPC = InteractionManager.getNearObject(
-      this.player,
-      [this.dad],
-      25,
-    );
-    if (nearNPC) {
-      return { type: "npc", target: nearNPC };
+    if (this.dad) {
+      const nearNPC = InteractionManager.getNearObject(
+        this.player,
+        [this.dad],
+        25,
+      );
+      if (nearNPC) {
+        return { type: "npc", target: nearNPC };
+      }
     }
     return null;
   }
@@ -224,6 +244,7 @@ class Act1Scene extends Scene {
   }
 
   handleNPCTalk() {
+    if (!this.dad) return;
     if (this.player.x < this.dad.x) {
       this.dad.setFlipX(true);
     } else {
