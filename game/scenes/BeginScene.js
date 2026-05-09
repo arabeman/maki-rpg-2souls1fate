@@ -70,6 +70,15 @@ class BeginScene extends Scene {
     if (this.dad) {
       SpriteLoader.createAnims(this, "dad", "dad");
     }
+
+    // Wall collisions
+    this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "begin"));
+    if (this.dad) {
+      this.physics.add.collider(this.dad.hitbox, manager.getWallGroup(this, "begin"));
+      this.dad.hitbox.body.setImmovable(true);
+      this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
+    }
+
     EquipmentHUD.init();
 
     // Create pickable objects
