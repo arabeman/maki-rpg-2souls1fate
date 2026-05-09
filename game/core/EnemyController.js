@@ -71,7 +71,7 @@ export class EnemyController {
     handleWalking(enemy, time, EnemyConfig);
   }
 
-  static chase(scene, enemy, target, speed = EnemyConfig.defaultSpeed * 0.5, stopDistance = 15) {
+  static chase(scene, enemy, target, speed = EnemyConfig.defaultSpeed * 0.3, stopDistance = 15) {
     const dx = target.x - enemy.x;
     const dy = target.y - enemy.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -84,6 +84,14 @@ export class EnemyController {
 
     const moveX = (dx / dist) * speed;
     const moveY = (dy / dist) * speed;
+
+    if (enemy.hitbox.body.blocked.left || enemy.hitbox.body.blocked.right) {
+      enemy.hitbox.body.setVelocityX(0);
+    }
+    if (enemy.hitbox.body.blocked.up || enemy.hitbox.body.blocked.down) {
+      enemy.hitbox.body.setVelocityY(0);
+    }
+
     enemy.hitbox.body.setVelocity(moveX, moveY);
 
     if (Math.abs(dx) > Math.abs(dy)) {
