@@ -40,6 +40,18 @@ export default {
         up: { start: 0, end: 0 },
       },
     },
+    {
+      name: "enemy",
+      file: "tiles_kenney/enemy.png",
+      frameWidth: 16,
+      frameHeight: 16,
+      directions: {
+        down: { start: 0, end: 0 },
+        left: { start: 0, end: 0 },
+        right: { start: 0, end: 0 },
+        up: { start: 0, end: 0 },
+      },
+    },
     "tilemap_packed",
   ],
   emotes: [

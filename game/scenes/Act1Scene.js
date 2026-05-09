@@ -7,6 +7,7 @@ import { Equipment } from "../core/Equipment.js";
 import { InteractionManager } from "../core/InteractionManager.js";
 import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
+import { EnemyController } from "../core/EnemyController.js";
 import { PlayerController } from "../core/PlayerController.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
 import { showEmote } from "../core/EmoteController.js";
@@ -24,9 +25,11 @@ class Act1Scene extends Scene {
   preload() {
     super.preload();
     SpriteLoader.load(this, "player", "player");
+    SpriteLoader.load(this, "enemy", "enemy");
     SpriteLoader.loadImage(this, "sword1", "sword1");
     SpriteLoader.loadImage(this, "hammer", "hammer");
     SpriteLoader.loadImage(this, "attack", "attack");
+    SpriteLoader.loadImage(this, "axe", "axe");
     manager.map(this, "act_1");
     manager.preload(this);
   }
@@ -38,6 +41,7 @@ class Act1Scene extends Scene {
 this.player = PlayerController.create(this, 16, 128, "player");
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
+    SpriteLoader.createAnims(this, "enemy", "enemy");
     SpriteLoader.load(this, "dad", "dad");
 
     this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "act_1"));
@@ -46,6 +50,14 @@ this.player = PlayerController.create(this, 16, 128, "player");
     this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
     this.dad.hitbox.body.setImmovable(true);
     SpriteLoader.createAnims(this, "dad", "dad");
+
+    this.enemy = EnemyController.create(this, 88, 260, "enemy");
+    this.physics.add.collider(this.player.hitbox, this.enemy.hitbox);
+    this.enemy.hitbox.body.setImmovable(true);
+
+    this.enemyWeapon = this.add.sprite(this.enemy.x + 8, this.enemy.y + 4, "axe");
+    this.enemyWeapon.setOrigin(1.5, 0.7);
+    this.enemyWeapon.setDepth(this.enemy.depth + 1);
 
     if (GameState.hasWeapon) {
       const weaponItem = Inventory.items[Inventory.items.length - 1];
@@ -69,6 +81,18 @@ this.player = PlayerController.create(this, 16, 128, "player");
       BattleController.attack(this, this.player, this.keys);
     }
     NPCController.handleAnimation(this.dad, time);
+    EnemyController.handleAnimation(this.enemy, time);
+    const distToPlayer = Math.sqrt(
+      Math.pow(this.player.x - this.enemy.x, 2) +
+      Math.pow(this.player.y - this.enemy.y, 2)
+    );
+    if (distToPlayer < 60 && !Dialog.isOpen()) {
+      EnemyController.attack(this, this.enemy, this.player, this.enemyWeapon);
+    }
+    if (this.enemyWeapon) {
+      this.enemyWeapon.setPosition(this.enemy.x + 8, this.enemy.y + 4);
+      this.enemyWeapon.setFlipX(this.enemy.flipX);
+    }
     Equipment.update(this, this.player);
     Dialog.update(time);
 

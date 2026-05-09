@@ -23,6 +23,11 @@ export const NPCConfig = {
   animPrefix: AnimationConfig.npcAnimPrefix,
 };
 
+export const EnemyConfig = {
+  ...AnimationConfig,
+  animPrefix: "enemy-",
+};
+
 export function createCharacter(
   scene,
   x,
