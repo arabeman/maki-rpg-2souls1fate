@@ -15,18 +15,10 @@ export class HealthHUD {
       .health-hud {
         position: absolute;
         top: 18px;
-        left: 50%;
-        transform: translateX(-180%);
-        width: 90px;
-        height: 24px;
+        left: 18px;
         z-index: 9998;
         display: flex;
-        gap: 5px;
-        opacity: 0;
-        transition: opacity 0.2s ease-out;
-      }
-
-      .health-hud.visible {
+        gap: 4px;
         opacity: 1;
       }
 
@@ -42,26 +34,26 @@ export class HealthHUD {
   static _buildDOM() {
     this.container = document.createElement("div");
     this.container.className = "health-hud";
+    this.container.innerHTML = `
+      <img src="assets/heart_kenney/heart_full.png" />
+      <img src="assets/heart_kenney/heart_full.png" />
+      <img src="assets/heart_kenney/heart_full.png" />
+    `;
     document.body.appendChild(this.container);
   }
 
   static update() {
     if (!this.container) return;
 
-    const maxHealth = 3;
-    const currentHealth = GameState.playerHealth || maxHealth;
+    const currentHealth = GameState.playerHealth || 3;
+    const imgs = this.container.querySelectorAll("img");
 
-    this.container.innerHTML = "";
-    for (let i = 0; i < maxHealth; i++) {
-      const heart = document.createElement("img");
+    imgs.forEach((img, i) => {
       if (i < currentHealth) {
-        heart.src = "assets/heart_kenney/heart_full.png";
+        img.src = "assets/heart_kenney/heart_full.png";
       } else {
-        heart.src = "assets/heart_kenney/heart_empty.png";
+        img.src = "assets/heart_kenney/heart_empty.png";
       }
-      this.container.appendChild(heart);
-    }
-
-    this.container.classList.add("visible");
+    });
   }
 }

@@ -55,6 +55,7 @@ export default {
     { name: "heart_full", file: "heart_kenney/heart_full.png", frameWidth: 8, frameHeight: 8 },
     { name: "heart_half", file: "heart_kenney/heart_half.png", frameWidth: 8, frameHeight: 8 },
     { name: "heart_empty", file: "heart_kenney/heart_empty.png", frameWidth: 8, frameHeight: 8 },
+    { name: "health", file: "heath/health.png", frameWidth: 24, frameHeight: 8 },
     "tilemap_packed",
   ],
   emotes: [
