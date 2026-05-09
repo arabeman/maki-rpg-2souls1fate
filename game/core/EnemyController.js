@@ -5,6 +5,7 @@ import {
   handleWalking,
   syncSpriteToHitbox,
 } from "./CharacterAnimation.js";
+
 import { GameState } from "../data/dialogs.js";
 import { HealthHUD } from "../components/HealthHUD.js";
 
@@ -149,6 +150,8 @@ export class EnemyController {
 
     target.isKnockedBack = true;
     target.hitbox.body.setVelocity(dirX * knockbackStrength, dirY * knockbackStrength);
+
+    scene.cameras.main.shake(150, 0.004);
 
     scene.time.delayedCall(duration, () => {
       if (target && target.hitbox && target.hitbox.body) {

@@ -76,6 +76,7 @@ export class BattleController {
       onComplete: () => {
         if (enemy && this.checkHit(attackX, attackY, enemy.hitbox || enemy)) {
           enemy.health = Math.max(0, (enemy.health || 3) - (weapon.damage || 1));
+          scene.cameras.main.shake(100, 0.003);
 
           // Impact effect
           const impactFrames = ["impact0", "impact1", "impact2", "impact3", "impact4", "impact5"];
