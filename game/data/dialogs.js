@@ -15,6 +15,7 @@ export const GameState = {
   returnedFromAct1: false,
   leftBeginScene: false,
   dadPosition: { x: 0, y: 0 },
+  georgesTalked: false,
 };
 
 export const dadDialogNoSword = [
@@ -90,9 +91,59 @@ export const dadAct1Dialog = [
   { speaker: "Dad", text: "Try it a few times." },
 ];
 
+export const georgesNpcDialog = [
+  {
+    speaker: "Georges",
+    text: "You... you actually saved me.",
+  },
+  {
+    speaker: "Georges",
+    text: "I thought that thing was going to kill me.",
+  },
+  {
+    speaker: "Georges",
+    text: "Most people stopped helping each other after the disappearances.",
+  },
+  {
+    speaker: "Georges",
+    text: "But you still fought.",
+  },
+  {
+    speaker: "Georges",
+    text: "...You remind me of a girl. She used to look at people the same way. Like everyone was worth saving.",
+  },
+  {
+    speaker: "Georges",
+    text: "Here. Take this potion.",
+  },
+  {
+    speaker: "Georges",
+    text: "You'll need it more than I do.",
+    isEndOfDialog: true,
+  },
+];
+
+export const georgesNpcDialog2 = [
+  {
+    speaker: "Georges",
+    text: "That girl told me she was heading north.",
+  },
+  {
+    speaker: "Georges",
+    text: "But... nobody comes back from there.",
+  },
+  {
+    speaker: "Georges",
+    text: "Be careful.",
+    isEndOfDialog: true,
+  },
+];
+
 export default {
   dadDialogNoSword,
   dadDialogHasSword,
   dadDialogUnlock,
   dadAct1Dialog,
+  georgesNpcDialog,
+  georgesNpcDialog2,
 };

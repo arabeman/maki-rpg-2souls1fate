@@ -305,6 +305,18 @@ export class Dialog {
   static next() {
     if (!this.isOpen()) return;
 
+    // If current line is marked as end, close only after the player
+    // has already seen it and presses continue.
+    if (this.data?.[this.currentIndex]?.isEndOfDialog) {
+      if (this.debug) {
+        this.currentIndex = 0;
+        this.showCurrentLine();
+      } else {
+        this.close();
+      }
+      return;
+    }
+
     this.currentIndex++;
 
     if (this.currentIndex >= this.data.length) {
@@ -312,15 +324,6 @@ export class Dialog {
         this.currentIndex = 0;
       } else {
         this.close();
-      }
-      return;
-    }
-
-    if (this.data[this.currentIndex].isEndOfDialog) {
-      if (!this.debug) {
-        this.close();
-      } else {
-        this.currentIndex = 0;
       }
       return;
     }

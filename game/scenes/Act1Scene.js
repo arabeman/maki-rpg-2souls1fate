@@ -1,5 +1,10 @@
 import { EnemyBehavior, EnemyController } from "../core/EnemyController.js";
-import { GameState, dadAct1Dialog } from "../data/dialogs.js";
+import {
+  GameState,
+  dadAct1Dialog,
+  georgesNpcDialog,
+  georgesNpcDialog2,
+} from "../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
 
 import { BattleController } from "../core/BattleController.js";
@@ -96,6 +101,7 @@ class Act1Scene extends Scene {
       { sprite: this.createEnemy(578, 240) },
       { sprite: this.createEnemy(511, 259) },
       { sprite: this.createEnemy(586, 395, 5) },
+      { sprite: this.createEnemy(73, 33, 4, "left") },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     if (GameState.hasWeapon) {
@@ -132,10 +138,11 @@ class Act1Scene extends Scene {
     BattleController.setup(this, this.player);
   }
 
-  createEnemy(x, y, health = 3) {
+  createEnemy(x, y, health = 3, facing = "right") {
     const enemy = EnemyController.create(this, x, y, "enemy");
     enemy.health = health;
     enemy.maxHealth = health;
+    enemy.setFlipX(facing === "left");
     enemy.enemyEmote = null;
     enemy.canMove = false;
     this.physics.add.collider(this.player.hitbox, enemy.hitbox);
@@ -340,6 +347,15 @@ class Act1Scene extends Scene {
   }
 
   getNearInteractable() {
+    if (this.georges) {
+      const nearGeorges = InteractionManager.getNearObject(
+        this.player,
+        [this.georges],
+        25,
+      );
+      if (nearGeorges) return { type: "npc", target: nearGeorges };
+    }
+
     if (this.dad) {
       const nearNPC = InteractionManager.getNearObject(
         this.player,
@@ -354,17 +370,31 @@ class Act1Scene extends Scene {
   handleInteraction() {
     const interactable = this.getNearInteractable();
     if (!interactable) return;
-    if (interactable.type === "npc") this.handleNPCTalk();
+    if (interactable.type === "npc") this.handleNPCTalk(interactable.target);
   }
 
-  handleNPCTalk() {
-    if (!this.dad) return;
-    if (this.dadEmote) {
+  handleNPCTalk(npc) {
+    if (!npc) return;
+
+    if (npc === this.dad && this.dadEmote) {
       this.dadEmote.destroy();
       this.dadEmote = null;
     }
-    this.dad.setFlipX(this.player.x >= this.dad.x);
-    Dialog.open(this, dadAct1Dialog);
+
+    npc.setFlipX(this.player.x < npc.x);
+
+    if (npc === this.georges) {
+      const dialogToOpen = GameState.georgesTalked
+        ? georgesNpcDialog2
+        : georgesNpcDialog;
+      Dialog.open(this, dialogToOpen);
+      GameState.georgesTalked = true;
+      return;
+    }
+
+    if (npc === this.dad) {
+      Dialog.open(this, dadAct1Dialog);
+    }
   }
 
 }
