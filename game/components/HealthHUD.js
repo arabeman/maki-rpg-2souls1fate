@@ -34,6 +34,7 @@ export class HealthHUD {
   static _buildDOM() {
     this.container = document.createElement("div");
     this.container.className = "health-hud";
+    this.container.style.flexDirection = "row-reverse";
     this.container.innerHTML = `
       <img src="assets/heart_kenney/heart_full.png" />
       <img src="assets/heart_kenney/heart_full.png" />
@@ -46,11 +47,18 @@ export class HealthHUD {
     if (!this.container) return;
 
     const currentHealth = GameState.playerHealth || 3;
+    const maxHealth = 3;
     const imgs = this.container.querySelectorAll("img");
 
     imgs.forEach((img, i) => {
-      if (i < currentHealth) {
+      const reversedI = maxHealth - 1 - i;
+      const slotValue = (reversedI + 1) * 2;
+      const healthSlots = Math.ceil(currentHealth * 2);
+
+      if (slotValue <= healthSlots) {
         img.src = "assets/heart_kenney/heart_full.png";
+      } else if (slotValue - 1 <= healthSlots) {
+        img.src = "assets/heart_kenney/heart_half.png";
       } else {
         img.src = "assets/heart_kenney/heart_empty.png";
       }

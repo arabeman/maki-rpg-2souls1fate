@@ -5,6 +5,8 @@ import {
   handleWalking,
   syncSpriteToHitbox,
 } from "./CharacterAnimation.js";
+import { GameState } from "../data/dialogs.js";
+import { HealthHUD } from "../components/HealthHUD.js";
 
 const ENEMY_AXE = {
   range: 24,
@@ -71,7 +73,7 @@ export class EnemyController {
     handleWalking(enemy, time, EnemyConfig);
   }
 
-  static chase(scene, enemy, target, speed = EnemyConfig.defaultSpeed * 0.3, stopDistance = 15) {
+  static chase(scene, enemy, target, speed = EnemyConfig.defaultSpeed * 0.48, stopDistance = 15) {
     const dx = target.x - enemy.x;
     const dy = target.y - enemy.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -249,6 +251,10 @@ export class EnemyController {
 
         // Knock the player away from the enemy
         this.applyKnockbackToPlayer(scene, target, dirX, dirY);
+
+        // Apply damage to player
+        GameState.playerHealth = Math.max(0, (GameState.playerHealth || 3) - 0.5);
+        HealthHUD.update();
 
         scene.time.delayedCall(80, () => {
           scene.tweens.add({
