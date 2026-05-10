@@ -1,5 +1,6 @@
 import { GameState } from "../data/dialogs.js";
 import { Inventory } from "./Inventory.js";
+import { Dialog } from "../components/Dialog.js";
 
 const STORAGE_KEY = "maki:save:v1";
 const SAVE_INTERVAL_MS = 300;
@@ -79,6 +80,7 @@ export class Persistence {
 
   static saveSceneState(sceneKey, player) {
     if (!this._hasStorage() || !player || !player.hitbox) return;
+    if (Dialog.isOpen()) return;
 
     const now = Date.now();
     if (now - this._lastSaveAt < SAVE_INTERVAL_MS) return;
