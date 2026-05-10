@@ -204,7 +204,16 @@ class Act3Scene extends Scene {
       this.updateEnemyAI(entry, time);
     }
 
-    if (!this.sceneTransitioning && this.player.y > ACT3_MAP_HEIGHT) {
+    if (!this.sceneTransitioning && this.player.y > ACT3_MAP_HEIGHT && this.player.x < ACT3_MAP_WIDTH / 2) {
+      this.sceneTransitioning = true;
+      GameState.enteredAct2FromAct3 = true;
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once("camerafadeoutcomplete", () =>
+        this.scene.start("Act2Scene"),
+      );
+    }
+
+    if (!this.sceneTransitioning && this.player.x < 0) {
       this.sceneTransitioning = true;
       GameState.enteredAct2FromAct3 = true;
       this.cameras.main.fadeOut(500);
