@@ -1,7 +1,9 @@
 import {
   GameState,
   arthurDialog,
+  arthurDialogGirl,
   arthurDialogHasPotions,
+  arthurDialogMother,
   dadAct1Dialog,
   georgesNpcDialog,
   georgesNpcDialog2,
@@ -66,24 +68,49 @@ export function handleNpcTalk(scene, npc) {
     return;
   }
 
-  if (npc === scene.arthur) {
-    // const dialogToOpen = GameState.totalPotionsReceived >= 3
-    const dialogToOpen = GameState.totalPotionsReceived >= 3
-      ? arthurDialogHasPotions
-      : arthurDialog;
+if (npc === scene.arthur) {
+    let dialogToOpen;
+    if (!GameState.arthurFirstTalkDone) {
+      dialogToOpen = arthurDialog;
+      GameState.arthurFirstTalkDone = true;
+      if (GameState.totalPotionsReceived >= 3 && !GameState.arthurMoved) {
+        GameState.arthurMoved = true;
+        scene.tweens.add({
+          targets: scene.arthur,
+          y: scene.arthur.y - 16,
+          duration: 500,
+          ease: "Linear",
+        });
+        scene.tweens.add({
+          targets: scene.arthur.hitbox,
+          y: scene.arthur.hitbox.y - 16,
+          duration: 500,
+          ease: "Linear",
+        });
+      }
+    } else if (!GameState.arthurMoved && GameState.totalPotionsReceived >= 3) {
+      dialogToOpen = arthurDialogHasPotions;
+      GameState.arthurMoved = true;
+      scene.tweens.add({
+        targets: scene.arthur,
+        y: scene.arthur.y - 16,
+        duration: 500,
+        ease: "Linear",
+      });
+      scene.tweens.add({
+        targets: scene.arthur.hitbox,
+        y: scene.arthur.hitbox.y - 16,
+        duration: 500,
+        ease: "Linear",
+      });
+    } else if (GameState.arthurTalkedAboutGirl) {
+      dialogToOpen = arthurDialogMother;
+      GameState.arthurTalkedAboutGirl = false;
+    } else {
+      dialogToOpen = arthurDialogGirl;
+      GameState.arthurTalkedAboutGirl = true;
+    }
     Dialog.open(scene, dialogToOpen);
-    scene.tweens.add({
-      targets: scene.arthur,
-      y: scene.arthur.y - 16,
-      duration: 500,
-      ease: "Linear",
-    });
-    scene.tweens.add({
-      targets: scene.arthur.hitbox,
-      y: scene.arthur.hitbox.y - 16,
-      duration: 500,
-      ease: "Linear",
-    });
     return;
   }
 

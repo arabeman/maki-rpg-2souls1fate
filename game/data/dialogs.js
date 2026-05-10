@@ -24,6 +24,9 @@ export const GameState = {
   act1ChestPotionTaken2: false,
   act1ChestPotionTaken3: false,
   totalPotionsReceived: 0,
+  arthurTalkedAboutGirl: false,
+  arthurFirstTalkDone: false,
+  arthurMoved: false,
 };
 
 export const dadDialogNoSword = [
@@ -175,6 +178,38 @@ export const arthurDialog = [
   {
     speaker: "Arthur",
     text: "You should carry more potions before going any further.",
+    isEndOfDialog: true,
+  },
+];
+
+export const arthurDialogGirl = [
+  {
+    speaker: "Arthur",
+    text: "The girl...",
+  },
+  {
+    speaker: "Arthur",
+    text: "They took her north. She tried to run, but...",
+  },
+  {
+    speaker: "Arthur",
+    text: "If you find her... tell her I never stopped trying.",
+    isEndOfDialog: true,
+  },
+];
+
+export const arthurDialogMother = [
+  {
+    speaker: "Arthur",
+    text: "Your mom...",
+  },
+  {
+    speaker: "Arthur",
+    text: "I heard she was spotted in the south, a few days ago.",
+  },
+  {
+    speaker: "Arthur",
+    text: "She seemed determined. Must be looking for something.",
     isEndOfDialog: true,
   },
 ];
