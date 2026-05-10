@@ -271,15 +271,15 @@ export const raphaelNeedSwordDialog = [
 export const raphaelHasSwordDialog = [
   {
     speaker: "Raphael",
-    text: "Good. That's a proper sword.",
+    text: "Good. That sword should do the job.",
   },
   {
     speaker: "Raphael",
-    text: "I'll step aside. Keep your guard up from here.",
+    text: "Alright, I’ll let you pass. Stay alert out there.",
   },
   {
     speaker: "Raphael",
-    text: "Pro tip: press TAB to switch between weapons.",
+    text: "Oh, and you can press TAB to switch weapons.",
     isEndOfDialog: true,
   },
 ];
