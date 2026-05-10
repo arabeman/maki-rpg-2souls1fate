@@ -158,15 +158,23 @@ export const georgesNpcDialog3 = [
 export const arthurDialog = [
   {
     speaker: "Arthur",
-    text: "The enemy is everywhere.",
+    text: "Wait...",
   },
   {
     speaker: "Arthur",
-    text: "Passing there is more dangerous.",
+    text: "The enemies there are different... more violent. Most people never come back.",
   },
   {
     speaker: "Arthur",
-    text: "You need more potion before going there.",
+    text: "There was one girl... I saw them take her north, but I couldn't do anything.",
+  },
+  {
+    speaker: "Arthur",
+    text: "And your mom... I heard she was somewhere in the south a few days ago.",
+  },
+  {
+    speaker: "Arthur",
+    text: "You should carry more potions before going any further.",
     isEndOfDialog: true,
   },
 ];
@@ -174,11 +182,11 @@ export const arthurDialog = [
 export const arthurDialogHasPotions = [
   {
     speaker: "Arthur",
-    text: "Alright, you have enough potions.",
+    text: "Alright, you’re set with potions.",
   },
   {
     speaker: "Arthur",
-    text: "Good luck out there.",
+    text: "Good luck out there. Don’t hesitate to come back if you need more info.",
     isEndOfDialog: true,
   },
 ];
