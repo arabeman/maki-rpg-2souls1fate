@@ -25,6 +25,8 @@ export const GameState = {
   act1ChestPotionTaken3: false,
   act2ChestPotionTaken: false,
   totalPotionsReceived: 0,
+  raphaelFirstTalkDone: false,
+  raphaelMoved: false,
   arthurTalkedAboutGirl: false,
   arthurFirstTalkDone: false,
   arthurMoved: false,
@@ -243,6 +245,34 @@ export const arthurDialogFirstHasPotions = [
   },
 ];
 
+export const raphaelNeedSwordDialog = [
+  {
+    speaker: "Raphael",
+    text: "Stop. The road ahead is worse than anything behind you.",
+  },
+  {
+    speaker: "Raphael",
+    text: "That blade won't cut it anymore.",
+  },
+  {
+    speaker: "Raphael",
+    text: "Find a stronger sword before you keep going.",
+    isEndOfDialog: true,
+  },
+];
+
+export const raphaelHasSwordDialog = [
+  {
+    speaker: "Raphael",
+    text: "Good. That's a proper sword.",
+  },
+  {
+    speaker: "Raphael",
+    text: "I'll step aside. Keep your guard up from here.",
+    isEndOfDialog: true,
+  },
+];
+
 export default {
   dadDialogNoSword,
   dadDialogHasSword,
@@ -251,4 +281,6 @@ export default {
   georgesNpcDialog,
   georgesNpcDialog2,
   georgesNpcDialog3,
+  raphaelNeedSwordDialog,
+  raphaelHasSwordDialog,
 };

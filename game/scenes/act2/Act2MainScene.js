@@ -4,9 +4,15 @@ import { Dialog } from "../../components/Dialog.js";
 import { Equipment } from "../../core/Equipment.js";
 import { EquipmentHUD } from "../../components/EquipmentHUD.js";
 import { EnemyController } from "../../core/EnemyController.js";
-import { GameState } from "../../data/dialogs.js";
+import {
+  GameState,
+  raphaelHasSwordDialog,
+  raphaelNeedSwordDialog,
+} from "../../data/dialogs.js";
 import { HealthHUD } from "../../components/HealthHUD.js";
 import { Inventory } from "../../core/Inventory.js";
+import { InteractionManager } from "../../core/InteractionManager.js";
+import { NPCController } from "../../core/NPCController.js";
 import { Persistence } from "../../core/Persistence.js";
 import { PlayerController } from "../../core/PlayerController.js";
 import { PotionHUD } from "../../components/PotionHUD.js";
@@ -53,6 +59,10 @@ class Act2Scene extends Scene {
     SpriteLoader.loadImage(this, "axe", "axe");
     SpriteLoader.loadImage(this, "sword1", "sword1");
     SpriteLoader.loadImage(this, "hammer", "hammer");
+    this.load.spritesheet("georges", "assets/tiles_kenney/georges.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
     this.load.image("chest_closed", "assets/tiles_kenney/chest_closed.png");
     this.load.image("chest_opened", "assets/tiles_kenney/chest_opened.png");
     this.load.image("potion", "assets/tiles_kenney/potion.png");
@@ -66,6 +76,8 @@ class Act2Scene extends Scene {
     this.sceneTransitioning = false;
     this.spacePressed = false;
     this.ePressed = false;
+    this.raphaelPendingMove = false;
+    this.raphaelMoveStartX = null;
     this.isRespawning = false;
 
     this.player = PlayerController.create(
@@ -93,6 +105,16 @@ class Act2Scene extends Scene {
         Equipment.equip(this, this.player, weaponItem);
       }
     }
+
+    this.raphael = NPCController.create(this, 613, 143, "georges");
+    this.raphael.hitbox.body.setImmovable(true);
+    this.raphael.hitbox.body.setCollideWorldBounds(true);
+    if (GameState.raphaelMoved) {
+      this.raphael.x += 16;
+      this.raphael.hitbox.x += 16;
+    }
+    this.physics.add.collider(this.player.hitbox, this.raphael.hitbox);
+    this.physics.add.collider(this.raphael.hitbox, manager.getWallGroup(this, "act_2"));
 
     createPotionChests(this);
 
@@ -161,6 +183,15 @@ class Act2Scene extends Scene {
     HealthHUD.update();
     EquipmentHUD.update();
     PotionHUD.update();
+    Dialog.update(time);
+    if (this.raphael) {
+      NPCController.handleAnimation(this.raphael, time);
+      if (this.raphaelMoveStartX !== null && this.raphael.x >= this.raphaelMoveStartX + 16) {
+        this.raphael.hitbox.body.setVelocity(0, 0);
+        this.raphael.hitbox.body.setImmovable(true);
+        this.raphaelMoveStartX = null;
+      }
+    }
 
     const nearInteractable = this.getNearInteractable();
     if (nearInteractable && !Dialog.isOpen()) {
@@ -324,7 +355,12 @@ class Act2Scene extends Scene {
   }
 
   getNearInteractable() {
-    return getNearChestInteractable(this);
+    const nearChest = getNearChestInteractable(this);
+    if (nearChest) return nearChest;
+
+    if (!this.raphael) return null;
+    const nearRaphael = InteractionManager.getNearObject(this.player, [this.raphael], 25);
+    return nearRaphael ? { type: "npc", target: nearRaphael } : null;
   }
 
   handleInteraction() {
@@ -332,11 +368,49 @@ class Act2Scene extends Scene {
     if (!interactable) return;
     if (interactable.type === "chest") {
       this.handleChestInteraction(interactable.target);
+      return;
+    }
+    if (interactable.type === "npc") {
+      this.handleNpcTalk(interactable.target);
     }
   }
 
   handleChestInteraction(chest) {
     handleAct2ChestInteraction(this, chest);
+  }
+
+  handleNpcTalk(npc) {
+    if (npc !== this.raphael) return;
+    if (Dialog.isOpen()) {
+      Dialog.skip();
+      return;
+    }
+
+    npc.setFlipX(this.player.x < npc.x);
+
+    if (GameState.raphaelMoved) {
+      Dialog.open(this, raphaelHasSwordDialog);
+      return;
+    }
+
+    const weaponItem = Inventory.getLastBySlot("mainHand");
+    const hasStrongerSword = Boolean(weaponItem && weaponItem.id !== "sword1");
+    const dialogToOpen = hasStrongerSword ? raphaelHasSwordDialog : raphaelNeedSwordDialog;
+
+    if (hasStrongerSword && !GameState.raphaelMoved) {
+      this.raphaelPendingMove = true;
+      Dialog.onCloseCallback(() => {
+        if (!this.raphael || !this.raphaelPendingMove || GameState.raphaelMoved) return;
+        this.raphaelPendingMove = false;
+        GameState.raphaelMoved = true;
+        this.raphaelMoveStartX = this.raphael.x;
+        this.raphael.hitbox.body.setImmovable(false);
+        this.raphael.hitbox.body.setVelocity(100, 0);
+      });
+    }
+
+    GameState.raphaelFirstTalkDone = true;
+    Dialog.open(this, dialogToOpen);
   }
 
   tryUsePotion() {

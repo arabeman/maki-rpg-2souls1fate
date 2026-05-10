@@ -138,6 +138,7 @@ class Act3Scene extends Scene {
     HealthHUD.update();
     EquipmentHUD.update();
     PotionHUD.update();
+    Dialog.update(time);
 
     if (!this.ePressed && this.keys.e.isDown) {
       this.ePressed = true;
