@@ -1,21 +1,24 @@
+import { EnemyBehavior, EnemyController } from "../../core/EnemyController.js";
+import {
+  GameState,
+  cyclopsDialogOnHit,
+  cyclopsDialogOnFoundCactusPlace,
+  cyclopsDialogOnAlreadyVisited,
+} from "../../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
+
 import { BattleController } from "../../core/BattleController.js";
 import { Dialog } from "../../components/Dialog.js";
 import { Equipment } from "../../core/Equipment.js";
 import { EquipmentHUD } from "../../components/EquipmentHUD.js";
-import { EnemyController, EnemyBehavior } from "../../core/EnemyController.js";
-import { GameState } from "../../data/dialogs.js";
 import { HealthHUD } from "../../components/HealthHUD.js";
-import { InteractionManager } from "../../core/InteractionManager.js";
 import { Inventory } from "../../core/Inventory.js";
-import { NPCController } from "../../core/NPCController.js";
 import { Persistence } from "../../core/Persistence.js";
 import { PlayerController } from "../../core/PlayerController.js";
 import { PotionHUD } from "../../components/PotionHUD.js";
 import { SpriteLoader } from "../../core/SpriteLoader.js";
 import { showEmote } from "../../core/EmoteController.js";
 import { showItemPickup } from "../../core/ItemPickupEffect.js";
-import { ameliaSisterDialog } from "../../data/dialogs.js";
 
 const ACT3_TILE_SIZE = 16;
 const ACT3_MAP_WIDTH_TILES = 50;
@@ -39,6 +42,7 @@ class Act3Scene extends Scene {
     super.preload();
     SpriteLoader.load(this, "player", "player");
     SpriteLoader.load(this, "enemy", "enemy");
+    SpriteLoader.load(this, "cyclops", "cyclops");
     SpriteLoader.loadImage(this, "impact0", "impact0");
     SpriteLoader.loadImage(this, "impact1", "impact1");
     SpriteLoader.loadImage(this, "impact2", "impact2");
@@ -55,10 +59,6 @@ class Act3Scene extends Scene {
     SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
     SpriteLoader.loadImage(this, "emote_exclamations", "exclamations");
     SpriteLoader.loadImage(this, "hammer", "hammer");
-    this.load.spritesheet("georges", "assets/tiles_kenney/georges.png", {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
     manager.map(this, "act_3");
     manager.preload(this);
   }
@@ -70,6 +70,9 @@ class Act3Scene extends Scene {
     this.spacePressed = false;
     this.ePressed = false;
     this.isRespawning = false;
+    this.cyclopsDialogCompleted = false;
+    this.cyclopsTeleportTriggered = false;
+    this.cyclopsTeleported = false;
 
     this.player = PlayerController.create(
       this,
@@ -82,6 +85,7 @@ class Act3Scene extends Scene {
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "enemy", "enemy");
+    SpriteLoader.createAnims(this, "cyclops", "cyclops");
     this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "act_3"));
     if (GameState.hasWeapon) {
       const weaponItem = Inventory.getLastBySlot("mainHand");
@@ -89,14 +93,7 @@ class Act3Scene extends Scene {
         Equipment.equip(this, this.player, weaponItem);
       }
     }
-    this.ameliaSister = NPCController.create(this, 102, 81, "georges");
-    this.ameliaSister.hitbox.body.setImmovable(true);
-    this.ameliaSister.hitbox.body.setCollideWorldBounds(true);
-    this.physics.add.collider(this.player.hitbox, this.ameliaSister.hitbox);
-    this.physics.add.collider(
-      this.ameliaSister.hitbox,
-      manager.getWallGroup(this, "act_3"),
-    );
+    this.createAct3Cyclops();
 
     this.physics.world.setBounds(0, 0, ACT3_MAP_WIDTH, ACT3_MAP_HEIGHT);
     this.cameras.main.setBounds(0, 0, ACT3_MAP_WIDTH, ACT3_MAP_HEIGHT);
@@ -151,7 +148,10 @@ class Act3Scene extends Scene {
         this,
         this.player,
         this.keys,
-        this.enemies.map((e) => e.sprite).filter(Boolean),
+        [
+          ...this.enemies.map((e) => e.sprite).filter(Boolean),
+          ...(this.cyclops ? [this.cyclops] : []),
+        ],
       );
     }
     Equipment.update(this, this.player);
@@ -159,22 +159,14 @@ class Act3Scene extends Scene {
     EquipmentHUD.update();
     PotionHUD.update();
     Dialog.update(time);
-    if (this.ameliaSister) {
-      NPCController.handleAnimation(this.ameliaSister, time);
-    }
-
-    if (this.getNearNPCInteractable() && !Dialog.isOpen()) {
-      Dialog.showInteractPrompt(this, "Space to interact");
-    } else {
-      Dialog.hideInteractPrompt();
+    if (this.cyclops && this.cyclops.active) {
+      EnemyController.handleAnimation(this.cyclops, time);
     }
 
     if (!this.spacePressed && this.keys.space.isDown) {
       this.spacePressed = true;
       if (Dialog.isOpen()) {
         Dialog.skip();
-      } else {
-        this.handleNpcInteraction();
       }
     }
     if (this.keys.space.isUp) {
@@ -209,18 +201,55 @@ class Act3Scene extends Scene {
     if (!this.isRespawning) {
       Persistence.saveSceneState("Act3Scene", this.player);
     }
+
+    // Check for cyclops teleportation trigger
+    this.checkCyclopsTeleport();
   }
 
-  getNearNPCInteractable() {
-    if (!this.ameliaSister) return null;
-    return InteractionManager.getNearObject(this.player, [this.ameliaSister], 25);
-  }
+  createAct3Cyclops() {
+    const cyclopsTileX = 39.5;
+    const cyclopsTileY = 12.5;
+    const x = cyclopsTileX * ACT3_TILE_SIZE + ACT3_TILE_SIZE / 2;
+    const y = cyclopsTileY * ACT3_TILE_SIZE + ACT3_TILE_SIZE / 2;
+    this.cyclops = EnemyController.create(this, x, y, "cyclops");
+    const hp = 3;
+    this.cyclops.health = hp;
+    this.cyclops.maxHealth = hp;
+    this.cyclops.canMove = false;
+    this.cyclops.enemyEmote = null;
+    this.cyclops.setFlipX(true);
+    this.cyclops.hitInvulnerable = true;
+    this.cyclops.onHitByPlayer = (scene) => {
+      if (Dialog.isOpen()) return;
+      
+      let dialogToShow;
+      if (this.cyclopsTeleported) {
+        // If cyclops has already teleported, show the "already visited" dialog
+        dialogToShow = cyclopsDialogOnAlreadyVisited;
+      } else if (this.cyclopsDialogCompleted) {
+        // If initial dialog was completed but not teleported yet, show "found cactus place" dialog
+        dialogToShow = cyclopsDialogOnFoundCactusPlace;
+      } else {
+        // First time interaction
+        dialogToShow = cyclopsDialogOnHit;
+        this.cyclopsDialogCompleted = true;
+      }
+      
+      Dialog.open(scene, dialogToShow);
+    };
 
-  handleNpcInteraction() {
-    const npc = this.getNearNPCInteractable();
-    if (!npc) return;
-    npc.setFlipX(this.player.x < npc.x);
-    Dialog.open(this, ameliaSisterDialog);
+    this.physics.add.collider(this.player.hitbox, this.cyclops.hitbox);
+    this.physics.add.collider(
+      this.cyclops.hitbox,
+      manager.getWallGroup(this, "act_3"),
+    );
+    this.cyclops.hitbox.body.setImmovable(true);
+    this.cyclops.hitbox.body.setCollideWorldBounds(true);
+    EnemyController.updateHealth(this.cyclops, this.cyclops.health, this.cyclops.maxHealth);
+    for (const heart of this.cyclops.healthHearts || []) {
+      heart?.setAlpha(0);
+      heart?.setVisible(false);
+    }
   }
 
   createEnemy(x, y, health = 3, facing = "right") {
@@ -356,6 +385,55 @@ class Act3Scene extends Scene {
 
     GameState.playerHealth = Math.min(maxHealth, (GameState.playerHealth || 0) + 1);
     showItemPickup(this, this.player, "heart_full", 0);
+  }
+
+  checkCyclopsTeleport() {
+    // Only trigger if dialog is completed and teleport hasn't been triggered yet
+    if (!this.cyclopsDialogCompleted || this.cyclopsTeleportTriggered || !this.cyclops || !this.cyclops.active) {
+      return;
+    }
+
+    // Check if player is at either of the trigger positions
+    const playerTileX = Math.round(this.player.x / ACT3_TILE_SIZE);
+    const playerTileY = Math.round(this.player.y / ACT3_TILE_SIZE);
+    
+    const triggerPositions = [
+      { tileX: 6, tileY: 1, pixelX: 93, pixelY: 22 },
+      { tileX: 93, tileY: 22, pixelX: 1488, pixelY: 352 }
+    ];
+
+    const isAtTriggerPosition = triggerPositions.some(pos => 
+      (playerTileX === pos.tileX && playerTileY === pos.tileY) ||
+      (Math.round(this.player.x) === pos.pixelX && Math.round(this.player.y) === pos.pixelY)
+    );
+
+    if (isAtTriggerPosition) {
+      this.cyclopsTeleportTriggered = true;
+      this.teleportCyclops();
+    }
+  }
+
+  teleportCyclops() {
+    // Fade game to black
+    this.cameras.main.fadeOut(500);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      // Move cyclops to new position during black screen
+      const newTileX = 3;
+      const newTileY = 3;
+      const newX = newTileX * ACT3_TILE_SIZE + ACT3_TILE_SIZE / 2;
+      const newY = newTileY * ACT3_TILE_SIZE + ACT3_TILE_SIZE / 2;
+      
+      this.cyclops.setPosition(newX, newY);
+      if (this.cyclops.hitbox) {
+        this.cyclops.hitbox.setPosition(newX, newY);
+      }
+      
+      // Mark teleportation as complete
+      this.cyclopsTeleported = true;
+      
+      // Fade game back in
+      this.cameras.main.fadeIn(500);
+    });
   }
 }
 

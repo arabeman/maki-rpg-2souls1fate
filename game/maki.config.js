@@ -64,6 +64,18 @@ export default {
         up: { start: 0, end: 0 },
       },
     },
+    {
+      name: "cyclops",
+      file: "tiles_kenney/cyclops.png",
+      frameWidth: 16,
+      frameHeight: 16,
+      directions: {
+        down: { start: 0, end: 0 },
+        left: { start: 0, end: 0 },
+        right: { start: 0, end: 0 },
+        up: { start: 0, end: 0 },
+      },
+    },
     "tilemap_packed",
   ],
   emotes: [

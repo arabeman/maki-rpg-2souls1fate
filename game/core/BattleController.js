@@ -100,10 +100,20 @@ export class BattleController {
           if (!enemy || !enemy.active || enemy.isDying) continue;
 
           if (this.checkHit(attackX, attackY, enemy.hitbox || enemy)) {
-            enemy.health = Math.max(0, (enemy.health ?? 3) - damage);
-            EnemyController.updateHealth(enemy, enemy.health);
+            const invulnerable = Boolean(enemy.hitInvulnerable);
+
+            if (!invulnerable) {
+              enemy.health = Math.max(0, (enemy.health ?? 3) - damage);
+            }
+
+            EnemyController.updateHealth(enemy, enemy.health, enemy.maxHealth);
             EnemyController.showHealthBar(enemy);
+
             scene.cameras.main.shake(100, 0.003);
+
+            if (typeof enemy.onHitByPlayer === "function") {
+              enemy.onHitByPlayer(scene, enemy);
+            }
 
             // Impact effect
             const impactFrames = ["impact0","impact1","impact2","impact3","impact4","impact5"];
@@ -126,7 +136,7 @@ export class BattleController {
               },
             });
 
-            if (enemy.hitbox) {
+            if (!invulnerable && enemy.hitbox) {
               const knockDirX = dx / range;
               const knockDirY = dy / range;
               const knockSpeed = 400;
@@ -169,6 +179,14 @@ export class BattleController {
               scene.time.delayedCall(500, () => {
                 if (enemy) enemy.isStunned = false;
               });
+            } else if (invulnerable && enemy.active) {
+              const flashEnemy = () => { if (enemy?.active) enemy.setTint(0xffffff); };
+              const clearFlash = () => { if (enemy?.active) enemy.clearTint(); };
+              flashEnemy();
+              scene.time.delayedCall(80, clearFlash);
+              scene.time.delayedCall(160, flashEnemy);
+              scene.time.delayedCall(240, clearFlash);
+              scene.time.delayedCall(320, () => { if (enemy?.active) enemy.clearTint(); });
             }
           }
         }

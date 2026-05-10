@@ -316,6 +316,34 @@ export const ameliaSisterDialog = [
   },
 ];
 
+/** Cyclops (Act 3) — dialogs from cyclops narrative; branches for later quests. */
+
+export const cyclopsDialogOnHit = [
+  { speaker: "Cyclops", text: "Why!!" },
+  { speaker: "Cyclops", text: "Nuh uh... Nuh uh..." },
+  { speaker: "Cyclops", text: "Me no hurt anyone!" },
+  { speaker: "Cyclops", text: "I just want quiet place..." },
+  { speaker: "Cyclops", text: "Tree... rock... mountain..." },
+  { speaker: "Cyclops", text: "Me like cactus... they strong... they quiet..." },
+  { speaker: "Cyclops", text: "Beauty of life..." },
+  { speaker: "Cyclops", text: "All beautiful fur Eye to see." },
+  { speaker: "Cyclops", text: "You know place... where cactus grow?" },
+  { speaker: "Cyclops", text: "If yes... I go there.", isEndOfDialog: true },
+];
+
+export const cyclopsDialogOnFoundCactusPlace = [
+  { speaker: "Cyclops", text: "…You found it." },
+  { speaker: "Cyclops", text: "Cactus place..." },
+  { speaker: "Cyclops", text: "Quiet... perfect..." },
+  { speaker: "Cyclops", text: "I stay there.", isEndOfDialog: true },
+];
+
+export const cyclopsDialogOnAlreadyVisited = [
+  { speaker: "Cyclops", text: "You know cactus place..." },
+  { speaker: "Cyclops", text: "Then I don’t block your way." },
+  { speaker: "Cyclops", text: "I go there instead.", isEndOfDialog: true },
+];
+
 export const act2ChestPotionTaken = "act2ChestPotionTaken";
 export const act2ChestPotionTaken2 = "act2ChestPotionTaken2";
 export const act2ChestPotionTaken3 = "act2ChestPotionTaken3";
@@ -339,4 +367,7 @@ export default {
   act2ChestPotionTaken4,
   act2ChestPotionTaken5,
   act2ChestPotionTaken6,
+  cyclopsDialogOnHit,
+  cyclopsDialogOnFoundCactusPlace,
+  cyclopsDialogOnAlreadyVisited,
 };
