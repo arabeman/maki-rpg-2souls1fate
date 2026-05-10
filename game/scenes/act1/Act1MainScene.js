@@ -31,6 +31,7 @@ import { PlayerController } from "../../core/PlayerController.js";
 import { PotionHUD } from "../../components/PotionHUD.js";
 import { SpriteLoader } from "../../core/SpriteLoader.js";
 import { showEmote } from "../../core/EmoteController.js";
+import { showItemPickup } from "../../core/ItemPickupEffect.js";
 
 class Act1Scene extends Scene {
   constructor() {
@@ -343,6 +344,7 @@ class Act1Scene extends Scene {
     }
 
     GameState.playerHealth = Math.min(maxHealth, (GameState.playerHealth || 0) + 1);
+    showItemPickup(this, this.player, "heart_full", 0);
   }
 }
 
