@@ -83,7 +83,12 @@ class Act1Scene extends Scene {
     this.pendingGeorgesPotionReward = false;
     this.ePressed = false;
 
-    this.player = PlayerController.create(this, 16, 128, "player");
+    const spawnFromAct2 = GameState.enteredAct1FromAct2;
+    const act1SpawnX = spawnFromAct2 ? 625 : 16;
+    const act1SpawnY = spawnFromAct2 ? 414 : 128;
+    this.player = PlayerController.create(this, act1SpawnX, act1SpawnY, "player");
+    this.player.setFlipX(spawnFromAct2);
+    GameState.enteredAct1FromAct2 = false;
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "enemy", "enemy");
@@ -149,7 +154,10 @@ class Act1Scene extends Scene {
       loop: true,
       callback: () => {
         console.log(
-          "Player pos:",
+          "Player tile/pixel:",
+          Math.round(this.player.x / 16),
+          Math.round(this.player.y / 16),
+          "|",
           Math.round(this.player.x),
           Math.round(this.player.y),
         );

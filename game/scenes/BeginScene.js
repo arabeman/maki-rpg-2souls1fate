@@ -86,7 +86,14 @@ class BeginScene extends Scene {
       delay: 1000,
       loop: true,
       callback: () => {
-        console.log("Player pos:", Math.round(this.player.x), Math.round(this.player.y));
+        console.log(
+          "Player tile/pixel:",
+          Math.round(this.player.x / 16),
+          Math.round(this.player.y / 16),
+          "|",
+          Math.round(this.player.x),
+          Math.round(this.player.y),
+        );
       },
     });
 
