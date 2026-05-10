@@ -56,6 +56,14 @@ class Act2Scene extends Scene {
       448,
       "player",
     );
+    if (GameState.enteredAct2FromAct3) {
+      this.player.x = 522;
+      this.player.y = 18;
+      this.player.hitbox.x = 522;
+      this.player.hitbox.y = 18;
+      this.player.setFlipX(true);
+      GameState.enteredAct2FromAct3 = false;
+    }
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "enemy", "enemy");

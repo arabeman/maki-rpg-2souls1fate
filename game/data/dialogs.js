@@ -14,6 +14,7 @@ export const GameState = {
   playerHealth: 3,
   returnedFromAct1: false,
   enteredAct1FromAct2: false,
+  enteredAct2FromAct3: false,
   leftBeginScene: false,
   dadPosition: { x: 0, y: 0 },
   georgesTalked: false,
