@@ -134,6 +134,13 @@ class Act2Scene extends Scene {
       { sprite: this.createEnemy(426, 143) },
       { sprite: this.createEnemy(426, 118) },
       { sprite: this.createEnemy(426, 94) },
+      { sprite: this.createEnemy(654, 286) },
+      { sprite: this.createEnemy(683, 257) },
+      { sprite: this.createEnemy(590, 410) },
+      { sprite: this.createEnemy(673, 359) },
+      { sprite: this.createEnemy(454, 383) },
+      { sprite: this.createEnemy(203, 426) },
+      { sprite: this.createEnemy(251, 479) },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     BattleController.setup(this, this.player);
