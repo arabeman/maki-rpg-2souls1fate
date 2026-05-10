@@ -1,6 +1,6 @@
 # Two Souls One Fate
 
-A 2D game built with [Maki](https://www.npmjs.com/package/@tialops/maki).
+Two Souls, One Fate is a story-driven 2D pixel RPG where every choice matters. Explore dangerous lands, fight powerful enemies, and decide who to save when fate forces you to choose between the people you love most.
 
 ## Setup
 
