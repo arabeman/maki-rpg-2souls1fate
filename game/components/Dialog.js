@@ -18,6 +18,7 @@ const KENNEY_UI_PATH = "../assets/ui_kenney/PNG/Default/Border";
 
 export class Dialog {
   static _onCloseCallback = null;
+  static _savedPlayerPosition = null;
 
   /**
    * Open dialog with given data
@@ -29,6 +30,16 @@ export class Dialog {
     if (!dialogData || !dialogData.length) return;
 
     if (this.isActive && !this.debug) this.close();
+
+    // Save player position before dialog starts
+    if (scene.player && scene.player.hitbox) {
+      this._savedPlayerPosition = {
+        x: scene.player.x,
+        y: scene.player.y,
+        hitboxX: scene.player.hitbox.x,
+        hitboxY: scene.player.hitbox.y
+      };
+    }
 
     this.scene = scene;
     this.data = dialogData;
@@ -341,6 +352,15 @@ export class Dialog {
     this._onCloseCallback = null;
     if (onClose) {
       onClose();
+    }
+
+    // Restore player position when dialog closes
+    if (this._savedPlayerPosition && this.scene && this.scene.player && this.scene.player.hitbox) {
+      this.scene.player.x = this._savedPlayerPosition.x;
+      this.scene.player.y = this._savedPlayerPosition.y;
+      this.scene.player.hitbox.x = this._savedPlayerPosition.hitboxX;
+      this.scene.player.hitbox.y = this._savedPlayerPosition.hitboxY;
+      this._savedPlayerPosition = null;
     }
 
     if (this.bg && this.bg.parentNode) {
