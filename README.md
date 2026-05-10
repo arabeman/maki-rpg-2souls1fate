@@ -1,4 +1,4 @@
-# Maki H
+# Two Souls One Fate
 
 A 2D game built with [Maki](https://www.npmjs.com/package/@tialops/maki).
 
