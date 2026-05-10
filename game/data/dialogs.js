@@ -23,6 +23,7 @@ export const GameState = {
   act1ChestPotionTaken: false,
   act1ChestPotionTaken2: false,
   act1ChestPotionTaken3: false,
+  act2ChestPotionTaken: false,
   totalPotionsReceived: 0,
   arthurTalkedAboutGirl: false,
   arthurFirstTalkDone: false,
@@ -217,11 +218,27 @@ export const arthurDialogMother = [
 export const arthurDialogHasPotions = [
   {
     speaker: "Arthur",
-    text: "Alright, you’re set with potions.",
+    text: "Alright, you're set with potions.",
   },
   {
     speaker: "Arthur",
-    text: "Good luck out there. Don’t hesitate to come back if you need more info.",
+    text: "Good luck out there. Don't hesitate to come back if you need more info.",
+    isEndOfDialog: true,
+  },
+];
+
+export const arthurDialogFirstHasPotions = [
+  {
+    speaker: "Arthur",
+    text: "Wait... you can't pass without having potions, but...",
+  },
+  {
+    speaker: "Arthur",
+    text: "Oh, you already have them! That's great.",
+  },
+  {
+    speaker: "Arthur",
+    text: "Alright, you're set. Good luck out there.",
     isEndOfDialog: true,
   },
 ];

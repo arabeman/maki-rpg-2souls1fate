@@ -7,6 +7,11 @@ import { GameState } from "../../data/dialogs.js";
 import { Inventory } from "../../core/Inventory.js";
 import { PlayerController } from "../../core/PlayerController.js";
 import { SpriteLoader } from "../../core/SpriteLoader.js";
+import {
+  createPotionChests,
+  getNearChestInteractable,
+  handleChestInteraction as handleAct2ChestInteraction,
+} from "./ChestPotionSystem.js";
 
 const ACT2_TILE_SIZE = 16;
 const ACT2_MAP_WIDTH_TILES = 45;
@@ -41,6 +46,9 @@ class Act2Scene extends Scene {
     SpriteLoader.loadImage(this, "heart_empty", "heart_empty");
     SpriteLoader.loadImage(this, "attack", "attack");
     SpriteLoader.loadImage(this, "axe", "axe");
+    this.load.image("chest_closed", "assets/tiles_kenney/chest_closed.png");
+    this.load.image("chest_opened", "assets/tiles_kenney/chest_opened.png");
+    this.load.image("potion", "assets/tiles_kenney/potion.png");
     manager.map(this, "act_2");
     manager.preload(this);
   }
@@ -49,6 +57,7 @@ class Act2Scene extends Scene {
     super.create();
     manager.create(this);
     this.sceneTransitioning = false;
+    this.spacePressed = false;
 
     this.player = PlayerController.create(
       this,
@@ -74,6 +83,8 @@ class Act2Scene extends Scene {
         Equipment.equip(this, this.player, weaponItem);
       }
     }
+
+    createPotionChests(this);
 
     this.physics.world.setBounds(0, 0, ACT2_MAP_WIDTH, ACT2_MAP_HEIGHT);
     this.cameras.main.setBounds(0, 0, ACT2_MAP_WIDTH, ACT2_MAP_HEIGHT);
@@ -132,6 +143,25 @@ class Act2Scene extends Scene {
       );
     }
     Equipment.update(this, this.player);
+
+    const nearInteractable = this.getNearInteractable();
+    if (nearInteractable && !Dialog.isOpen()) {
+      Dialog.showInteractPrompt(this, "Space to interact");
+    } else {
+      Dialog.hideInteractPrompt();
+    }
+
+    if (!this.spacePressed && this.keys.space.isDown) {
+      this.spacePressed = true;
+      if (Dialog.isOpen()) {
+        Dialog.skip();
+      } else {
+        this.handleInteraction();
+      }
+    }
+    if (this.keys.space.isUp) {
+      this.spacePressed = false;
+    }
 
     for (const entry of this.enemies) {
       const enemy = entry.sprite;
@@ -262,6 +292,22 @@ class Act2Scene extends Scene {
       entry.weapon.setPosition(enemy.x + 8, enemy.y + 4);
       entry.weapon.setFlipX(enemy.flipX);
     }
+  }
+
+  getNearInteractable() {
+    return getNearChestInteractable(this);
+  }
+
+  handleInteraction() {
+    const interactable = this.getNearInteractable();
+    if (!interactable) return;
+    if (interactable.type === "chest") {
+      this.handleChestInteraction(interactable.target);
+    }
+  }
+
+  handleChestInteraction(chest) {
+    handleAct2ChestInteraction(this, chest);
   }
 }
 
