@@ -2,7 +2,7 @@
 export default {
   width: 800, // game canvas width in px — editor canvas matches this
   height: 600, // game canvas height in px — editor canvas matches this
-  maps: ["begin", "act_1", "act_2"],
+  maps: ["begin", "act_1", "act_2", "act_3"],
   sprites: [
     {
       name: "player",

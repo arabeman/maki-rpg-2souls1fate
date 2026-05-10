@@ -1,4 +1,4 @@
-import { Act1Scene, Act2Scene, BeginScene } from "./scenes/index.js";
+import { Act1Scene, Act2Scene, Act3Scene, BeginScene } from "./scenes/index.js";
 
 import Phaser from "phaser";
 
@@ -14,7 +14,7 @@ new Phaser.Game({
     default: "arcade",
     arcade: { debug: false },
   },
-  scene: [BeginScene, Act1Scene, Act2Scene],
+  scene: [BeginScene, Act1Scene, Act2Scene, Act3Scene],
   render: {
     pixelArt: true,
   },

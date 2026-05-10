@@ -8,21 +8,21 @@ import { Inventory } from "../../core/Inventory.js";
 import { PlayerController } from "../../core/PlayerController.js";
 import { SpriteLoader } from "../../core/SpriteLoader.js";
 
-const ACT2_TILE_SIZE = 16;
-const ACT2_MAP_WIDTH_TILES = 45;
-const ACT2_MAP_HEIGHT_TILES = 34;
-const ACT2_MAP_WIDTH = ACT2_MAP_WIDTH_TILES * ACT2_TILE_SIZE;
-const ACT2_MAP_HEIGHT = ACT2_MAP_HEIGHT_TILES * ACT2_TILE_SIZE;
-const ACT2_VIEWPORT_WIDTH = 640;
-const ACT2_VIEWPORT_HEIGHT = 448;
+const ACT3_TILE_SIZE = 16;
+const ACT3_MAP_WIDTH_TILES = 50;
+const ACT3_MAP_HEIGHT_TILES = 26;
+const ACT3_MAP_WIDTH = ACT3_MAP_WIDTH_TILES * ACT3_TILE_SIZE;
+const ACT3_MAP_HEIGHT = ACT3_MAP_HEIGHT_TILES * ACT3_TILE_SIZE;
+const ACT3_VIEWPORT_WIDTH = 640;
+const ACT3_VIEWPORT_HEIGHT = 448;
 
-class Act2Scene extends Scene {
+class Act3Scene extends Scene {
   constructor() {
-    super({ key: "Act2Scene" });
+    super({ key: "Act3Scene" });
   }
 
   init() {
-    this.scale.resize(ACT2_VIEWPORT_WIDTH, ACT2_VIEWPORT_HEIGHT);
+    this.scale.resize(ACT3_VIEWPORT_WIDTH, ACT3_VIEWPORT_HEIGHT);
     this.cameras.main.setZoom(1.4);
   }
 
@@ -41,7 +41,7 @@ class Act2Scene extends Scene {
     SpriteLoader.loadImage(this, "heart_empty", "heart_empty");
     SpriteLoader.loadImage(this, "attack", "attack");
     SpriteLoader.loadImage(this, "axe", "axe");
-    manager.map(this, "act_2");
+    manager.map(this, "act_3");
     manager.preload(this);
   }
 
@@ -52,14 +52,15 @@ class Act2Scene extends Scene {
 
     this.player = PlayerController.create(
       this,
-      16,
-      448,
+      56,
+      395,
       "player",
     );
+    this.player.setFlipX(true);
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "enemy", "enemy");
-    this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "act_2"));
+    this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "act_3"));
     if (GameState.hasWeapon) {
       const weaponItem = Inventory.getLastBySlot("mainHand");
       if (weaponItem) {
@@ -67,23 +68,12 @@ class Act2Scene extends Scene {
       }
     }
 
-    this.physics.world.setBounds(0, 0, ACT2_MAP_WIDTH, ACT2_MAP_HEIGHT);
-    this.cameras.main.setBounds(0, 0, ACT2_MAP_WIDTH, ACT2_MAP_HEIGHT);
+    this.physics.world.setBounds(0, 0, ACT3_MAP_WIDTH, ACT3_MAP_HEIGHT);
+    this.cameras.main.setBounds(0, 0, ACT3_MAP_WIDTH, ACT3_MAP_HEIGHT);
     this.cameras.main.startFollow(this.player, true, 0.03, 0.03);
     this.cameras.main.fadeIn(500);
 
-    this.enemies = [
-      { sprite: this.createEnemy(282, 191) },
-      { sprite: this.createEnemy(282, 167) },
-      { sprite: this.createEnemy(282, 143) },
-      { sprite: this.createEnemy(282, 118) },
-      { sprite: this.createEnemy(282, 94) },
-      { sprite: this.createEnemy(426, 191) },
-      { sprite: this.createEnemy(426, 167) },
-      { sprite: this.createEnemy(426, 143) },
-      { sprite: this.createEnemy(426, 118) },
-      { sprite: this.createEnemy(426, 94) },
-    ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
+    this.enemies = [];
 
     BattleController.setup(this, this.player);
 
@@ -135,18 +125,9 @@ class Act2Scene extends Scene {
 
     if (!this.sceneTransitioning && this.player.x < 0) {
       this.sceneTransitioning = true;
-      GameState.enteredAct1FromAct2 = true;
       this.cameras.main.fadeOut(500);
       this.cameras.main.once("camerafadeoutcomplete", () =>
-        this.scene.start("Act1Scene"),
-      );
-    }
-
-    if (!this.sceneTransitioning && this.player.y < 0) {
-      this.sceneTransitioning = true;
-      this.cameras.main.fadeOut(500);
-      this.cameras.main.once("camerafadeoutcomplete", () =>
-        this.scene.start("Act3Scene"),
+        this.scene.start("Act2Scene"),
       );
     }
   }
@@ -159,7 +140,7 @@ class Act2Scene extends Scene {
     enemy.enemyEmote = null;
     enemy.canMove = false;
     this.physics.add.collider(this.player.hitbox, enemy.hitbox);
-    this.physics.add.collider(enemy.hitbox, manager.getWallGroup(this, "act_2"));
+    this.physics.add.collider(enemy.hitbox, manager.getWallGroup(this, "act_3"));
     enemy.hitbox.body.setImmovable(false);
     enemy.hitbox.body.setCollideWorldBounds(true);
     EnemyController.updateHealth(enemy, enemy.health);
@@ -257,4 +238,4 @@ class Act2Scene extends Scene {
   }
 }
 
-export { Act2Scene };
+export { Act3Scene };
