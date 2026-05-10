@@ -192,21 +192,6 @@ class Act1Scene extends Scene {
     };
     Dialog.onCloseCallback(this.arthurMoveCallback);
 
-    this.time.addEvent({
-      delay: 1000,
-      loop: true,
-      callback: () => {
-        console.log(
-          "Player tile/pixel:",
-          Math.round(this.player.x / 16),
-          Math.round(this.player.y / 16),
-          "|",
-          Math.round(this.player.x),
-          Math.round(this.player.y),
-        );
-      },
-    });
-
     BattleController.setup(this, this.player);
   }
 
