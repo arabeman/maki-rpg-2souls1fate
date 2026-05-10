@@ -5,6 +5,7 @@ import { Equipment } from "../../core/Equipment.js";
 import { EnemyController } from "../../core/EnemyController.js";
 import { GameState } from "../../data/dialogs.js";
 import { Inventory } from "../../core/Inventory.js";
+import { Persistence } from "../../core/Persistence.js";
 import { PlayerController } from "../../core/PlayerController.js";
 import { SpriteLoader } from "../../core/SpriteLoader.js";
 
@@ -41,6 +42,8 @@ class Act3Scene extends Scene {
     SpriteLoader.loadImage(this, "heart_empty", "heart_empty");
     SpriteLoader.loadImage(this, "attack", "attack");
     SpriteLoader.loadImage(this, "axe", "axe");
+    SpriteLoader.loadImage(this, "sword1", "sword1");
+    SpriteLoader.loadImage(this, "hammer", "hammer");
     manager.map(this, "act_3");
     manager.preload(this);
   }
@@ -49,6 +52,7 @@ class Act3Scene extends Scene {
     super.create();
     manager.create(this);
     this.sceneTransitioning = false;
+    this.isRespawning = false;
 
     this.player = PlayerController.create(
       this,
@@ -57,6 +61,7 @@ class Act3Scene extends Scene {
       "player",
     );
     this.player.setFlipX(true);
+    Persistence.applySavedPlayerState("Act3Scene", this.player);
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "enemy", "enemy");
@@ -95,7 +100,9 @@ class Act3Scene extends Scene {
 
   update(time) {
     if (GameState.playerHealth <= 0) {
+      this.isRespawning = true;
       GameState.playerHealth = 3;
+      Persistence.clearSceneState("Act3Scene");
       this.cameras.main.fadeOut(500);
       this.cameras.main.once("camerafadeoutcomplete", () =>
         this.scene.restart(),
@@ -130,6 +137,10 @@ class Act3Scene extends Scene {
       this.cameras.main.once("camerafadeoutcomplete", () =>
         this.scene.start("Act2Scene"),
       );
+    }
+
+    if (!this.isRespawning) {
+      Persistence.saveSceneState("Act3Scene", this.player);
     }
   }
 

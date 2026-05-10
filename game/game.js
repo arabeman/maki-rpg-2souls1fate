@@ -1,6 +1,22 @@
 import { Act1Scene, Act2Scene, Act3Scene, BeginScene } from "./scenes/index.js";
+import { Persistence } from "./core/Persistence.js";
 
 import Phaser from "phaser";
+
+Persistence.hydrateRuntimeState();
+
+const sceneByKey = {
+  BeginScene,
+  Act1Scene,
+  Act2Scene,
+  Act3Scene,
+};
+
+const savedSceneKey = Persistence.getSavedSceneKey();
+const initialScene = sceneByKey[savedSceneKey] || BeginScene;
+const sceneOrder = [initialScene, BeginScene, Act1Scene, Act2Scene, Act3Scene].filter(
+  (scene, index, arr) => arr.indexOf(scene) === index,
+);
 
 new Phaser.Game({
   type: Phaser.AUTO,
@@ -14,7 +30,7 @@ new Phaser.Game({
     default: "arcade",
     arcade: { debug: false },
   },
-  scene: [BeginScene, Act1Scene, Act2Scene, Act3Scene],
+  scene: sceneOrder,
   render: {
     pixelArt: true,
   },

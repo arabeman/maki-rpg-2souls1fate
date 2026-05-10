@@ -5,6 +5,7 @@ import { Equipment } from "../../core/Equipment.js";
 import { EnemyController } from "../../core/EnemyController.js";
 import { GameState } from "../../data/dialogs.js";
 import { Inventory } from "../../core/Inventory.js";
+import { Persistence } from "../../core/Persistence.js";
 import { PlayerController } from "../../core/PlayerController.js";
 import { SpriteLoader } from "../../core/SpriteLoader.js";
 import {
@@ -46,6 +47,8 @@ class Act2Scene extends Scene {
     SpriteLoader.loadImage(this, "heart_empty", "heart_empty");
     SpriteLoader.loadImage(this, "attack", "attack");
     SpriteLoader.loadImage(this, "axe", "axe");
+    SpriteLoader.loadImage(this, "sword1", "sword1");
+    SpriteLoader.loadImage(this, "hammer", "hammer");
     this.load.image("chest_closed", "assets/tiles_kenney/chest_closed.png");
     this.load.image("chest_opened", "assets/tiles_kenney/chest_opened.png");
     this.load.image("potion", "assets/tiles_kenney/potion.png");
@@ -58,6 +61,7 @@ class Act2Scene extends Scene {
     manager.create(this);
     this.sceneTransitioning = false;
     this.spacePressed = false;
+    this.isRespawning = false;
 
     this.player = PlayerController.create(
       this,
@@ -73,6 +77,7 @@ class Act2Scene extends Scene {
       this.player.setFlipX(true);
       GameState.enteredAct2FromAct3 = false;
     }
+    Persistence.applySavedPlayerState("Act2Scene", this.player);
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "enemy", "enemy");
@@ -124,7 +129,9 @@ class Act2Scene extends Scene {
 
   update(time) {
     if (GameState.playerHealth <= 0) {
+      this.isRespawning = true;
       GameState.playerHealth = 3;
+      Persistence.clearSceneState("Act2Scene");
       this.cameras.main.fadeOut(500);
       this.cameras.main.once("camerafadeoutcomplete", () =>
         this.scene.restart(),
@@ -186,6 +193,10 @@ class Act2Scene extends Scene {
       this.cameras.main.once("camerafadeoutcomplete", () =>
         this.scene.start("Act3Scene"),
       );
+    }
+
+    if (!this.isRespawning) {
+      Persistence.saveSceneState("Act2Scene", this.player);
     }
   }
 

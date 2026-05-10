@@ -27,6 +27,7 @@ import {
 import { HealthHUD } from "../../components/HealthHUD.js";
 import { Inventory } from "../../core/Inventory.js";
 import { NPCController } from "../../core/NPCController.js";
+import { Persistence } from "../../core/Persistence.js";
 import { PlayerController } from "../../core/PlayerController.js";
 import { PotionHUD } from "../../components/PotionHUD.js";
 import { SpriteLoader } from "../../core/SpriteLoader.js";
@@ -61,6 +62,7 @@ class Act1Scene extends Scene {
     SpriteLoader.loadImage(this, "hammer", "hammer");
     SpriteLoader.loadImage(this, "attack", "attack");
     SpriteLoader.loadImage(this, "axe", "axe");
+    SpriteLoader.load(this, "dad", "dad");
     SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
     SpriteLoader.loadImage(this, "emote_exclamations", "exclamations");
     SpriteLoader.loadImage(this, "emote_question", "question");
@@ -82,6 +84,7 @@ class Act1Scene extends Scene {
     this.dad = null;
     this.sceneTransitioning = false;
     this.playerDied = false;
+    this.isRespawning = false;
     this.pendingGeorgesPotionReward = false;
     this.ePressed = false;
 
@@ -90,6 +93,7 @@ class Act1Scene extends Scene {
     const act1SpawnY = spawnFromAct2 ? 414 : 128;
     this.player = PlayerController.create(this, act1SpawnX, act1SpawnY, "player");
     this.player.setFlipX(spawnFromAct2);
+    Persistence.applySavedPlayerState("Act1Scene", this.player);
     GameState.enteredAct1FromAct2 = false;
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
@@ -115,7 +119,6 @@ class Act1Scene extends Scene {
     createPotionChests(this);
 
     if (GameState.leftBeginScene) {
-      SpriteLoader.load(this, "dad", "dad");
       this.dad = NPCController.create(this, 48, 118, "dad");
       this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
       this.dad.hitbox.body.setImmovable(true);
@@ -212,7 +215,9 @@ class Act1Scene extends Scene {
   update(time) {
     if (GameState.playerHealth <= 0 && !this.playerDied) {
       this.playerDied = true;
+      this.isRespawning = true;
       GameState.playerHealth = 3;
+      Persistence.clearSceneState("Act1Scene");
       this.cameras.main.fadeOut(500);
       this.cameras.main.once("camerafadeoutcomplete", () =>
         this.scene.restart(),
@@ -305,6 +310,10 @@ class Act1Scene extends Scene {
     }
     if (this.keys.e.isUp) {
       this.ePressed = false;
+    }
+
+    if (!this.isRespawning) {
+      Persistence.saveSceneState("Act1Scene", this.player);
     }
   }
 

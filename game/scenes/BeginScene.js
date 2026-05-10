@@ -14,6 +14,7 @@ import { Inventory } from "../core/Inventory.js";
 import { NPCController } from "../core/NPCController.js";
 import { PotionHUD } from "../components/PotionHUD.js";
 import { PlayerController } from "../core/PlayerController.js";
+import { Persistence } from "../core/Persistence.js";
 import { SpriteLoader } from "../core/SpriteLoader.js";
 import { WEAPONS } from "../data/weapons.js";
 import { showEmote } from "../core/EmoteController.js";
@@ -52,6 +53,7 @@ class BeginScene extends Scene {
     this.dad = null;
     this.sceneTransitioning = false;
     this.playerDied = false;
+    this.isRespawning = false;
 
     if (GameState.returnedFromAct1) {
       this.player = PlayerController.create(this, 268, 144, "player");
@@ -66,6 +68,7 @@ class BeginScene extends Scene {
       this.player = PlayerController.create(this, 152, 152, "player");
       this.dad = NPCController.create(this, 16 * 16.5, 16 * 9, "dad");
     }
+    Persistence.applySavedPlayerState("BeginScene", this.player);
     this.keys = PlayerController.setupInput(this);
 
     SpriteLoader.createAnims(this, "player", "player");
@@ -122,7 +125,9 @@ class BeginScene extends Scene {
   update(time) {
     if (GameState.playerHealth <= 0 && !this.playerDied) {
       this.playerDied = true;
+      this.isRespawning = true;
       GameState.playerHealth = 3;
+      Persistence.clearSceneState("BeginScene");
       this.cameras.main.fadeOut(500);
       this.cameras.main.once("camerafadeoutcomplete", () => {
         this.scene.restart();
@@ -184,6 +189,10 @@ class BeginScene extends Scene {
     }
     if (!this.keys.space.isDown) {
       this.spacePressed = false;
+    }
+
+    if (!this.isRespawning) {
+      Persistence.saveSceneState("BeginScene", this.player);
     }
   }
 
