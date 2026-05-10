@@ -1,28 +1,31 @@
-import { Scene, manager } from "@tialops/maki";
-import { BattleController } from "../../core/BattleController.js";
-import { Dialog } from "../../components/Dialog.js";
-import { Equipment } from "../../core/Equipment.js";
-import { EquipmentHUD } from "../../components/EquipmentHUD.js";
-import { EnemyController } from "../../core/EnemyController.js";
 import {
   GameState,
+  ameliaSisterDialog,
   raphaelHasSwordDialog,
   raphaelNeedSwordDialog,
 } from "../../data/dialogs.js";
-import { HealthHUD } from "../../components/HealthHUD.js";
-import { Inventory } from "../../core/Inventory.js";
-import { InteractionManager } from "../../core/InteractionManager.js";
-import { NPCController } from "../../core/NPCController.js";
-import { Persistence } from "../../core/Persistence.js";
-import { PlayerController } from "../../core/PlayerController.js";
-import { PotionHUD } from "../../components/PotionHUD.js";
-import { showItemPickup } from "../../core/ItemPickupEffect.js";
-import { SpriteLoader } from "../../core/SpriteLoader.js";
+import { Scene, manager } from "@tialops/maki";
 import {
   createPotionChests,
   getNearChestInteractable,
   handleChestInteraction as handleAct2ChestInteraction,
 } from "./ChestPotionSystem.js";
+
+import { BattleController } from "../../core/BattleController.js";
+import { Dialog } from "../../components/Dialog.js";
+import { EnemyController } from "../../core/EnemyController.js";
+import { Equipment } from "../../core/Equipment.js";
+import { EquipmentHUD } from "../../components/EquipmentHUD.js";
+import { HealthHUD } from "../../components/HealthHUD.js";
+import { InteractionManager } from "../../core/InteractionManager.js";
+import { Inventory } from "../../core/Inventory.js";
+import { NPCController } from "../../core/NPCController.js";
+import { Persistence } from "../../core/Persistence.js";
+import { PlayerController } from "../../core/PlayerController.js";
+import { PotionHUD } from "../../components/PotionHUD.js";
+import { SpriteLoader } from "../../core/SpriteLoader.js";
+import { showEmote } from "../../core/EmoteController.js";
+import { showItemPickup } from "../../core/ItemPickupEffect.js";
 
 const ACT2_TILE_SIZE = 16;
 const ACT2_MAP_WIDTH_TILES = 45;
@@ -59,7 +62,12 @@ class Act2Scene extends Scene {
     SpriteLoader.loadImage(this, "axe", "axe");
     SpriteLoader.loadImage(this, "sword1", "sword1");
     SpriteLoader.loadImage(this, "hammer", "hammer");
+    SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
     this.load.spritesheet("georges", "assets/tiles_kenney/georges.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("girl", "assets/tiles_kenney/girl.png", {
       frameWidth: 16,
       frameHeight: 16,
     });
@@ -80,12 +88,7 @@ class Act2Scene extends Scene {
     this.raphaelMoveStartX = null;
     this.isRespawning = false;
 
-    this.player = PlayerController.create(
-      this,
-      16,
-      448,
-      "player",
-    );
+    this.player = PlayerController.create(this, 16, 448, "player");
     if (GameState.enteredAct2FromAct3) {
       this.player.x = 522;
       this.player.y = 18;
@@ -98,7 +101,10 @@ class Act2Scene extends Scene {
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "enemy", "enemy");
-    this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "act_2"));
+    this.physics.add.collider(
+      this.player.hitbox,
+      manager.getWallGroup(this, "act_2"),
+    );
     if (GameState.hasWeapon) {
       const weaponItem = Inventory.getLastBySlot("mainHand");
       if (weaponItem) {
@@ -114,7 +120,20 @@ class Act2Scene extends Scene {
       this.raphael.hitbox.x += 16;
     }
     this.physics.add.collider(this.player.hitbox, this.raphael.hitbox);
-    this.physics.add.collider(this.raphael.hitbox, manager.getWallGroup(this, "act_2"));
+    this.physics.add.collider(
+      this.raphael.hitbox,
+      manager.getWallGroup(this, "act_2"),
+    );
+
+    this.ameliaSister = NPCController.create(this, 102, 78, "girl");
+    this.ameliaSister.hitbox.body.setImmovable(true);
+    this.ameliaSister.hitbox.body.setCollideWorldBounds(true);
+    this.physics.add.collider(this.player.hitbox, this.ameliaSister.hitbox);
+    this.physics.add.collider(
+      this.ameliaSister.hitbox,
+      manager.getWallGroup(this, "act_2"),
+    );
+    this.ameliaSisterEmote = showEmote(this, this.ameliaSister, "exclamation", 0);
 
     createPotionChests(this);
 
@@ -129,16 +148,16 @@ class Act2Scene extends Scene {
       { sprite: this.createEnemy(282, 143) },
       { sprite: this.createEnemy(282, 118) },
       { sprite: this.createEnemy(282, 94) },
-      { sprite: this.createEnemy(426, 191) },
-      { sprite: this.createEnemy(426, 167) },
-      { sprite: this.createEnemy(426, 143) },
-      { sprite: this.createEnemy(426, 118) },
-      { sprite: this.createEnemy(426, 94) },
+      { sprite: this.createEnemy(426, 191, 3, "left") },
+      { sprite: this.createEnemy(426, 167, 3, "left") },
+      { sprite: this.createEnemy(426, 143, 3, "left") },
+      { sprite: this.createEnemy(426, 118, 3, "left") },
+      { sprite: this.createEnemy(426, 94, 3, "left") },
       { sprite: this.createEnemy(654, 286, 4) },
-      { sprite: this.createEnemy(683, 257, 4) },
-      { sprite: this.createEnemy(590, 410) },
-      { sprite: this.createEnemy(673, 359, 4) },
-      { sprite: this.createEnemy(454, 383) },
+      { sprite: this.createEnemy(683, 257, 4, "left") },
+      { sprite: this.createEnemy(590, 445) },
+      { sprite: this.createEnemy(621, 256, 4) },
+      { sprite: this.createEnemy(454, 383, 3, "left") },
       { sprite: this.createEnemy(203, 426) },
       { sprite: this.createEnemy(251, 479) },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
@@ -193,11 +212,17 @@ class Act2Scene extends Scene {
     Dialog.update(time);
     if (this.raphael) {
       NPCController.handleAnimation(this.raphael, time);
-      if (this.raphaelMoveStartX !== null && this.raphael.x >= this.raphaelMoveStartX + 16) {
+      if (
+        this.raphaelMoveStartX !== null &&
+        this.raphael.x >= this.raphaelMoveStartX + 16
+      ) {
         this.raphael.hitbox.body.setVelocity(0, 0);
         this.raphael.hitbox.body.setImmovable(true);
         this.raphaelMoveStartX = null;
       }
+    }
+    if (this.ameliaSister) {
+      NPCController.handleAnimation(this.ameliaSister, time);
     }
 
     const nearInteractable = this.getNearInteractable();
@@ -264,7 +289,10 @@ class Act2Scene extends Scene {
     enemy.enemyEmote = null;
     enemy.canMove = false;
     this.physics.add.collider(this.player.hitbox, enemy.hitbox);
-    this.physics.add.collider(enemy.hitbox, manager.getWallGroup(this, "act_2"));
+    this.physics.add.collider(
+      enemy.hitbox,
+      manager.getWallGroup(this, "act_2"),
+    );
     enemy.hitbox.body.setImmovable(false);
     enemy.hitbox.body.setCollideWorldBounds(true);
     EnemyController.updateHealth(enemy, enemy.health);
@@ -365,8 +393,12 @@ class Act2Scene extends Scene {
     const nearChest = getNearChestInteractable(this);
     if (nearChest) return nearChest;
 
-    if (!this.raphael) return null;
-    const nearRaphael = InteractionManager.getNearObject(this.player, [this.raphael], 25);
+    if (!this.raphael && !this.ameliaSister) return null;
+    const nearRaphael = InteractionManager.getNearObject(
+      this.player,
+      [this.raphael, this.ameliaSister].filter(Boolean),
+      25,
+    );
     return nearRaphael ? { type: "npc", target: nearRaphael } : null;
   }
 
@@ -387,6 +419,15 @@ class Act2Scene extends Scene {
   }
 
   handleNpcTalk(npc) {
+    if (npc === this.ameliaSister) {
+      npc.setFlipX(this.player.x < npc.x);
+      if (this.ameliaSisterEmote) {
+        this.ameliaSisterEmote.destroy();
+        this.ameliaSisterEmote = null;
+      }
+      Dialog.open(this, ameliaSisterDialog);
+      return;
+    }
     if (npc !== this.raphael) return;
     if (Dialog.isOpen()) {
       Dialog.skip();
@@ -402,12 +443,15 @@ class Act2Scene extends Scene {
 
     const weaponItem = Inventory.getLastBySlot("mainHand");
     const hasStrongerSword = Boolean(weaponItem && weaponItem.id !== "sword1");
-    const dialogToOpen = hasStrongerSword ? raphaelHasSwordDialog : raphaelNeedSwordDialog;
+    const dialogToOpen = hasStrongerSword
+      ? raphaelHasSwordDialog
+      : raphaelNeedSwordDialog;
 
     if (hasStrongerSword && !GameState.raphaelMoved) {
       this.raphaelPendingMove = true;
       Dialog.onCloseCallback(() => {
-        if (!this.raphael || !this.raphaelPendingMove || GameState.raphaelMoved) return;
+        if (!this.raphael || !this.raphaelPendingMove || GameState.raphaelMoved)
+          return;
         this.raphaelPendingMove = false;
         GameState.raphaelMoved = true;
         this.raphaelMoveStartX = this.raphael.x;
@@ -429,7 +473,10 @@ class Act2Scene extends Scene {
       return;
     }
 
-    GameState.playerHealth = Math.min(maxHealth, (GameState.playerHealth || 0) + 1);
+    GameState.playerHealth = Math.min(
+      maxHealth,
+      (GameState.playerHealth || 0) + 1,
+    );
     showItemPickup(this, this.player, "heart_full", 0);
   }
 }

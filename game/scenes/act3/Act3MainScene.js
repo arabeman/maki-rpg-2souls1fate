@@ -6,13 +6,16 @@ import { EquipmentHUD } from "../../components/EquipmentHUD.js";
 import { EnemyController, EnemyBehavior } from "../../core/EnemyController.js";
 import { GameState } from "../../data/dialogs.js";
 import { HealthHUD } from "../../components/HealthHUD.js";
+import { InteractionManager } from "../../core/InteractionManager.js";
 import { Inventory } from "../../core/Inventory.js";
+import { NPCController } from "../../core/NPCController.js";
 import { Persistence } from "../../core/Persistence.js";
 import { PlayerController } from "../../core/PlayerController.js";
 import { PotionHUD } from "../../components/PotionHUD.js";
 import { SpriteLoader } from "../../core/SpriteLoader.js";
 import { showEmote } from "../../core/EmoteController.js";
 import { showItemPickup } from "../../core/ItemPickupEffect.js";
+import { ameliaSisterDialog } from "../../data/dialogs.js";
 
 const ACT3_TILE_SIZE = 16;
 const ACT3_MAP_WIDTH_TILES = 50;
@@ -49,6 +52,10 @@ class Act3Scene extends Scene {
     SpriteLoader.loadImage(this, "axe", "axe");
     SpriteLoader.loadImage(this, "sword1", "sword1");
     SpriteLoader.loadImage(this, "hammer", "hammer");
+    this.load.spritesheet("georges", "assets/tiles_kenney/georges.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
     manager.map(this, "act_3");
     manager.preload(this);
   }
@@ -57,6 +64,7 @@ class Act3Scene extends Scene {
     super.create();
     manager.create(this);
     this.sceneTransitioning = false;
+    this.spacePressed = false;
     this.ePressed = false;
     this.isRespawning = false;
 
@@ -78,6 +86,14 @@ class Act3Scene extends Scene {
         Equipment.equip(this, this.player, weaponItem);
       }
     }
+    this.ameliaSister = NPCController.create(this, 102, 81, "georges");
+    this.ameliaSister.hitbox.body.setImmovable(true);
+    this.ameliaSister.hitbox.body.setCollideWorldBounds(true);
+    this.physics.add.collider(this.player.hitbox, this.ameliaSister.hitbox);
+    this.physics.add.collider(
+      this.ameliaSister.hitbox,
+      manager.getWallGroup(this, "act_3"),
+    );
 
     this.physics.world.setBounds(0, 0, ACT3_MAP_WIDTH, ACT3_MAP_HEIGHT);
     this.cameras.main.setBounds(0, 0, ACT3_MAP_WIDTH, ACT3_MAP_HEIGHT);
@@ -139,6 +155,27 @@ class Act3Scene extends Scene {
     EquipmentHUD.update();
     PotionHUD.update();
     Dialog.update(time);
+    if (this.ameliaSister) {
+      NPCController.handleAnimation(this.ameliaSister, time);
+    }
+
+    if (this.getNearNPCInteractable() && !Dialog.isOpen()) {
+      Dialog.showInteractPrompt(this, "Space to interact");
+    } else {
+      Dialog.hideInteractPrompt();
+    }
+
+    if (!this.spacePressed && this.keys.space.isDown) {
+      this.spacePressed = true;
+      if (Dialog.isOpen()) {
+        Dialog.skip();
+      } else {
+        this.handleNpcInteraction();
+      }
+    }
+    if (this.keys.space.isUp) {
+      this.spacePressed = false;
+    }
 
     if (!this.ePressed && this.keys.e.isDown) {
       this.ePressed = true;
@@ -168,6 +205,18 @@ class Act3Scene extends Scene {
     if (!this.isRespawning) {
       Persistence.saveSceneState("Act3Scene", this.player);
     }
+  }
+
+  getNearNPCInteractable() {
+    if (!this.ameliaSister) return null;
+    return InteractionManager.getNearObject(this.player, [this.ameliaSister], 25);
+  }
+
+  handleNpcInteraction() {
+    const npc = this.getNearNPCInteractable();
+    if (!npc) return;
+    npc.setFlipX(this.player.x < npc.x);
+    Dialog.open(this, ameliaSisterDialog);
   }
 
   createEnemy(x, y, health = 3, facing = "right") {

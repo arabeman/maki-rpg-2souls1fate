@@ -274,6 +274,38 @@ export const raphaelHasSwordDialog = [
   },
 ];
 
+export const ameliaSisterDialog = [
+  {
+    speaker: "Amelia’s Sister",
+    text: "So… you finally made it here.",
+  },
+  {
+    speaker: "Amelia’s Sister",
+    text: "This place is hidden for a reason. Out there, things are not safe anymore. I’m staying here to survive… and to wait for news about my sister, Amelia.",
+  },
+  {
+    speaker: "Amelia’s Sister",
+    text: "She went north before everything got worse. I haven’t heard from her since.",
+  },
+  {
+    speaker: "Amelia’s Sister",
+    text: "If you’re going after her… then you’ll need to be prepared.",
+  },
+  {
+    speaker: "Amelia’s Sister",
+    text: "Take what you need from that chest… but promise me you’ll save her.",
+  },
+  {
+    speaker: "Amelia’s Sister",
+    text: "And one more thing… Amelia used to talk about you. More than I expected.",
+  },
+  {
+    speaker: "Amelia’s Sister",
+    text: "If you find her in the north… tell her how you really feel about her.",
+    isEndOfDialog: true,
+  },
+];
+
 export const act2ChestPotionTaken = "act2ChestPotionTaken";
 export const act2ChestPotionTaken2 = "act2ChestPotionTaken2";
 
