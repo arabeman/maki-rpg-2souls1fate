@@ -1,6 +1,6 @@
 import { GameState } from "../../data/dialogs.js";
-import { Inventory } from "../../core/Inventory.js";
 import { InteractionManager } from "../../core/InteractionManager.js";
+import { Inventory } from "../../core/Inventory.js";
 import { manager } from "@tialops/maki";
 import { showItemPickup } from "../../core/ItemPickupEffect.js";
 
@@ -12,6 +12,14 @@ export function createPotionChests(scene) {
         354,
         53,
         GameState.act2ChestPotionTaken ? "chest_opened" : "chest_closed",
+      ),
+    },
+    {
+      stateKey: "act2ChestPotionTaken2",
+      sprite: scene.physics.add.sprite(
+        648,
+        522,
+        GameState.act2ChestPotionTaken2 ? "chest_opened" : "chest_closed",
       ),
     },
   ];

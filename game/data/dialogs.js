@@ -24,6 +24,7 @@ export const GameState = {
   act1ChestPotionTaken2: false,
   act1ChestPotionTaken3: false,
   act2ChestPotionTaken: false,
+  act2ChestPotionTaken2: false,
   totalPotionsReceived: 0,
   raphaelFirstTalkDone: false,
   raphaelMoved: false,
@@ -273,6 +274,9 @@ export const raphaelHasSwordDialog = [
   },
 ];
 
+export const act2ChestPotionTaken = "act2ChestPotionTaken";
+export const act2ChestPotionTaken2 = "act2ChestPotionTaken2";
+
 export default {
   dadDialogNoSword,
   dadDialogHasSword,
@@ -283,4 +287,6 @@ export default {
   georgesNpcDialog3,
   raphaelNeedSwordDialog,
   raphaelHasSwordDialog,
+  act2ChestPotionTaken,
+  act2ChestPotionTaken2,
 };
