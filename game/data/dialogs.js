@@ -276,6 +276,10 @@ export const raphaelHasSwordDialog = [
   {
     speaker: "Raphael",
     text: "I'll step aside. Keep your guard up from here.",
+  },
+  {
+    speaker: "Raphael",
+    text: "Pro tip: press TAB to switch between weapons.",
     isEndOfDialog: true,
   },
 ];
