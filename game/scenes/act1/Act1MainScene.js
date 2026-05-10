@@ -60,6 +60,7 @@ class Act1Scene extends Scene {
     SpriteLoader.loadImage(this, "heart_half", "heart_half");
     SpriteLoader.loadImage(this, "heart_empty", "heart_empty");
     SpriteLoader.loadImage(this, "sword1", "sword1");
+    SpriteLoader.loadImage(this, "sword2", "sword2");
     SpriteLoader.loadImage(this, "hammer", "hammer");
     SpriteLoader.loadImage(this, "attack", "attack");
     SpriteLoader.loadImage(this, "axe", "axe");
@@ -251,6 +252,7 @@ class Act1Scene extends Scene {
         PlayerController.handleMovement(this.player, this.keys);
       }
       PlayerController.handleAnimation(this.player, this.keys, time);
+      PlayerController.handleWeaponSwitch(this, this.player, this.keys);
       BattleController.attack(
         this,
         this.player,

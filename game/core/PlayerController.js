@@ -5,6 +5,8 @@ import {
   handleWalking,
   syncSpriteToHitbox,
 } from "./CharacterAnimation.js";
+import { Equipment } from "./Equipment.js";
+import { Inventory } from "./Inventory.js";
 
 export class PlayerController {
   static create(scene, x, y, name) {
@@ -19,8 +21,24 @@ export class PlayerController {
     keys.e = scene.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.E,
     );
+    keys.tab = scene.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.TAB,
+    );
+    scene.input.keyboard.addCapture(Phaser.Input.Keyboard.KeyCodes.TAB);
 
     return keys;
+  }
+
+  static handleWeaponSwitch(scene, player, keys) {
+    if (!keys?.tab || !Phaser.Input.Keyboard.JustDown(keys.tab)) return;
+
+    const weapons = Inventory.getBySlot("mainHand");
+    if (weapons.length < 2) return;
+
+    const currentWeaponId = Equipment.getMainHand()?.item?.id;
+    const currentIndex = weapons.findIndex((weapon) => weapon.id === currentWeaponId);
+    const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % weapons.length : 0;
+    Equipment.equip(scene, player, weapons[nextIndex]);
   }
 
   static handleMovement(player, keys, speed = PlayerConfig.defaultSpeed) {

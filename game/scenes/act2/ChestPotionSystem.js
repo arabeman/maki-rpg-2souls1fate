@@ -3,11 +3,13 @@ import { InteractionManager } from "../../core/InteractionManager.js";
 import { Inventory } from "../../core/Inventory.js";
 import { manager } from "@tialops/maki";
 import { showItemPickup } from "../../core/ItemPickupEffect.js";
+import { WEAPONS } from "../../data/weapons.js";
 
 export function createPotionChests(scene) {
   scene.chests = [
     {
       stateKey: "act2ChestPotionTaken",
+      requiresAmeliaTalk: true,
       sprite: scene.physics.add.sprite(
         74,
         62,
@@ -16,6 +18,7 @@ export function createPotionChests(scene) {
     },
     {
       stateKey: "act2ChestPotionTaken2",
+      requiresAmeliaTalk: true,
       sprite: scene.physics.add.sprite(
         92,
         59,
@@ -24,6 +27,7 @@ export function createPotionChests(scene) {
     },
     {
       stateKey: "act2ChestPotionTaken3",
+      requiresAmeliaTalk: true,
       sprite: scene.physics.add.sprite(
         110,
         59,
@@ -32,6 +36,7 @@ export function createPotionChests(scene) {
     },
     {
       stateKey: "act2ChestPotionTaken4",
+      requiresAmeliaTalk: true,
       sprite: scene.physics.add.sprite(
         128,
         62,
@@ -40,6 +45,11 @@ export function createPotionChests(scene) {
     },
     {
       stateKey: "act2ChestPotionTaken5",
+      reward: {
+        ...WEAPONS.sword2,
+        type: "weapon",
+        slot: "mainHand",
+      },
       sprite: scene.physics.add.sprite(
         354,
         53,
@@ -59,6 +69,14 @@ export function createPotionChests(scene) {
   for (const chestEntry of scene.chests) {
     const chest = chestEntry.sprite;
     chest.potionStateKey = chestEntry.stateKey;
+    chest.requiresAmeliaTalk = Boolean(chestEntry.requiresAmeliaTalk);
+    chest.reward =
+      chestEntry.reward || {
+        id: "potion",
+        name: "Potion",
+        texture: "potion",
+        type: "consumable",
+      };
     chest.body.setImmovable(true);
     chest.body.setCollideWorldBounds(true);
     scene.physics.add.collider(scene.player.hitbox, chest);
@@ -77,17 +95,22 @@ export function getNearChestInteractable(scene) {
 }
 
 export function handleChestInteraction(scene, chest) {
-  if (!GameState.ameliaSisterTalked) return;
+  if (chest?.requiresAmeliaTalk && !GameState.ameliaSisterTalked) return;
   if (!chest || !chest.potionStateKey || GameState[chest.potionStateKey]) return;
 
   chest.setTexture("chest_opened");
-  Inventory.add({
+  const reward = chest.reward || {
     id: "potion",
     name: "Potion",
     texture: "potion",
     type: "consumable",
-  });
-  showItemPickup(scene, chest, "potion", 0);
+  };
+  Inventory.add(reward);
+  showItemPickup(scene, chest, reward.texture, 0);
   GameState[chest.potionStateKey] = true;
-  GameState.totalPotionsReceived += 1;
+  if (reward.id === "potion") {
+    GameState.totalPotionsReceived += 1;
+  } else if (reward.slot === "mainHand") {
+    GameState.hasWeapon = true;
+  }
 }

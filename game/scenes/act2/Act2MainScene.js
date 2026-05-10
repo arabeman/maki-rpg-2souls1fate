@@ -61,6 +61,7 @@ class Act2Scene extends Scene {
     SpriteLoader.loadImage(this, "attack", "attack");
     SpriteLoader.loadImage(this, "axe", "axe");
     SpriteLoader.loadImage(this, "sword1", "sword1");
+    SpriteLoader.loadImage(this, "sword2", "sword2");
     SpriteLoader.loadImage(this, "hammer", "hammer");
     SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
     this.load.spritesheet("georges", "assets/tiles_kenney/georges.png", {
@@ -198,6 +199,7 @@ class Act2Scene extends Scene {
     if (!Dialog.isOpen()) {
       PlayerController.handleMovement(this.player, this.keys);
       PlayerController.handleAnimation(this.player, this.keys, time);
+      PlayerController.handleWeaponSwitch(this, this.player, this.keys);
       BattleController.attack(
         this,
         this.player,

@@ -29,6 +29,10 @@ export class Inventory {
     return null;
   }
 
+  static getBySlot(slot) {
+    return this.items.filter((item) => item?.slot === slot);
+  }
+
   static _updateUI() {
   }
 }

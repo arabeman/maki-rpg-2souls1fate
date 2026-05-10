@@ -37,6 +37,7 @@ class BeginScene extends Scene {
     SpriteLoader.load(this, "player", "player");
     SpriteLoader.load(this, "dad", "dad");
     SpriteLoader.loadImage(this, "sword1", "sword1");
+    SpriteLoader.loadImage(this, "sword2", "sword2");
     SpriteLoader.loadImage(this, "hammer", "hammer");
     SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
     manager.map(this, "begin");
@@ -138,6 +139,7 @@ class BeginScene extends Scene {
     if (!Dialog.isOpen()) {
       PlayerController.handleMovement(this.player, this.keys);
       PlayerController.handleAnimation(this.player, this.keys, time);
+      PlayerController.handleWeaponSwitch(this, this.player, this.keys);
     }
     Equipment.update(this, this.player);
     if (this.dad) {
