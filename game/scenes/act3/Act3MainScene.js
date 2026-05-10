@@ -76,19 +76,17 @@ class Act3Scene extends Scene {
     this.cyclopsTeleported = GameState.cyclopsTeleported || false;
     this.heroChoiceDialogTriggered = false;
 
-    this.player = PlayerController.create(
-      this,
-      56,
-      395,
-      "player",
-    );
+    this.player = PlayerController.create(this, 56, 395, "player");
     this.player.setFlipX(true);
     Persistence.applySavedPlayerState("Act3Scene", this.player);
     this.keys = PlayerController.setupInput(this);
     SpriteLoader.createAnims(this, "player", "player");
     SpriteLoader.createAnims(this, "enemy", "enemy");
     SpriteLoader.createAnims(this, "cyclops", "cyclops");
-    this.physics.add.collider(this.player.hitbox, manager.getWallGroup(this, "act_3"));
+    this.physics.add.collider(
+      this.player.hitbox,
+      manager.getWallGroup(this, "act_3"),
+    );
     if (GameState.hasWeapon) {
       const weaponItem = Inventory.getLastBySlot("mainHand");
       if (weaponItem) {
@@ -104,9 +102,27 @@ class Act3Scene extends Scene {
 
     this.enemies = [
       // { sprite: this.createEnemy(69, 277, 4) },
-      // { sprite: this.createEnemy(125, 271, 4) },
+      // { sprite: this.createEnemy(125, 271, 4, "left") },
       // { sprite: this.createEnemy(125, 197, 4) },
       // { sprite: this.createEnemy(31, 151, 4) },
+      // { sprite: this.createEnemy(563, 202, 4, "left") },
+      // { sprite: this.createEnemy(545, 247, 3, "left") },
+      // { sprite: this.createEnemy(475, 325, 4) },
+      // { sprite: this.createEnemy(393, 351, 3, "left") },
+      // { sprite: this.createEnemy(302, 282, 4) },
+      // { sprite: this.createEnemy(209, 253, 3, "left") },
+      // { sprite: this.createEnemy(249, 162, 4, "left") },
+      // { sprite: this.createEnemy(225, 172, 4) },
+      // { sprite: this.createEnemy(228, 210, 4) },
+      // { sprite: this.createEnemy(228 + 16, 312, 4) },
+      // { sprite: this.createEnemy(228 + 80, 330, 4) },
+      // { sprite: this.createEnemy(228 + 150, 301, 5, "left") },
+      // { sprite: this.createEnemy(228 + 210, 288, 2, "left") },
+      // { sprite: this.createEnemy(251, 79, 3, "left") },
+      // { sprite: this.createEnemy(339, 93, 4) },
+      // { sprite: this.createEnemy(425, 101, 3, "left") },
+      // { sprite: this.createEnemy(521, 103, 4) },
+      // { sprite: this.createEnemy(550, 194, 3, "left") },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     BattleController.setup(this, this.player);
@@ -146,16 +162,13 @@ class Act3Scene extends Scene {
       PlayerController.handleMovement(this.player, this.keys);
       PlayerController.handleAnimation(this.player, this.keys, time);
       PlayerController.handleWeaponSwitch(this, this.player, this.keys);
-      BattleController.attack(
-        this,
-        this.player,
-        this.keys,
-        [
-          ...this.enemies.map((e) => e.sprite).filter(Boolean),
-          ...(this.cyclops ? [this.cyclops] : []),
-        ],
-      );
     }
+
+    // BattleController should work even during dialog
+    BattleController.attack(this, this.player, this.keys, [
+      ...this.enemies.map((e) => e.sprite).filter(Boolean),
+      ...(this.cyclops ? [this.cyclops] : []),
+    ]);
     Equipment.update(this, this.player);
     HealthHUD.update();
     EquipmentHUD.update();
@@ -206,7 +219,7 @@ class Act3Scene extends Scene {
 
     // Check for cyclops teleportation trigger
     this.checkCyclopsTeleport();
-    
+
     // Check for hero choice dialog trigger
     this.checkHeroChoiceDialog();
   }
@@ -227,7 +240,7 @@ class Act3Scene extends Scene {
     this.cyclops.hitInvulnerable = true;
     this.cyclops.onHitByPlayer = (scene) => {
       if (Dialog.isOpen()) return;
-      
+
       let dialogToShow;
       if (this.cyclopsTeleported) {
         // If cyclops has already teleported, show the "already visited" dialog
@@ -241,7 +254,7 @@ class Act3Scene extends Scene {
         this.cyclopsDialogCompleted = true;
         GameState.cyclopsDialogCompleted = true;
       }
-      
+
       Dialog.open(scene, dialogToShow);
     };
 
@@ -252,7 +265,11 @@ class Act3Scene extends Scene {
     );
     this.cyclops.hitbox.body.setImmovable(true);
     this.cyclops.hitbox.body.setCollideWorldBounds(true);
-    EnemyController.updateHealth(this.cyclops, this.cyclops.health, this.cyclops.maxHealth);
+    EnemyController.updateHealth(
+      this.cyclops,
+      this.cyclops.health,
+      this.cyclops.maxHealth,
+    );
     for (const heart of this.cyclops.healthHearts || []) {
       heart?.setAlpha(0);
       heart?.setVisible(false);
@@ -267,7 +284,10 @@ class Act3Scene extends Scene {
     enemy.enemyEmote = null;
     enemy.canMove = false;
     this.physics.add.collider(this.player.hitbox, enemy.hitbox);
-    this.physics.add.collider(enemy.hitbox, manager.getWallGroup(this, "act_3"));
+    this.physics.add.collider(
+      enemy.hitbox,
+      manager.getWallGroup(this, "act_3"),
+    );
     enemy.hitbox.body.setImmovable(false);
     enemy.hitbox.body.setCollideWorldBounds(true);
     EnemyController.updateHealth(enemy, enemy.health);
@@ -390,28 +410,38 @@ class Act3Scene extends Scene {
       return;
     }
 
-    GameState.playerHealth = Math.min(maxHealth, (GameState.playerHealth || 0) + 1);
+    GameState.playerHealth = Math.min(
+      maxHealth,
+      (GameState.playerHealth || 0) + 1,
+    );
     showItemPickup(this, this.player, "heart_full", 0);
   }
 
   checkCyclopsTeleport() {
     // Only trigger if dialog is completed and teleport hasn't been triggered yet
-    if (!this.cyclopsDialogCompleted || this.cyclopsTeleportTriggered || !this.cyclops || !this.cyclops.active) {
+    if (
+      !this.cyclopsDialogCompleted ||
+      this.cyclopsTeleportTriggered ||
+      !this.cyclops ||
+      !this.cyclops.active
+    ) {
       return;
     }
 
     // Check if player is at either of the trigger positions
     const playerTileX = Math.round(this.player.x / ACT3_TILE_SIZE);
     const playerTileY = Math.round(this.player.y / ACT3_TILE_SIZE);
-    
+
     const triggerPositions = [
       { tileX: 6, tileY: 1, pixelX: 93, pixelY: 22 },
-      { tileX: 93, tileY: 22, pixelX: 1488, pixelY: 352 }
+      { tileX: 93, tileY: 22, pixelX: 1488, pixelY: 352 },
     ];
 
-    const isAtTriggerPosition = triggerPositions.some(pos => 
-      (playerTileX === pos.tileX && playerTileY === pos.tileY) ||
-      (Math.round(this.player.x) === pos.pixelX && Math.round(this.player.y) === pos.pixelY)
+    const isAtTriggerPosition = triggerPositions.some(
+      (pos) =>
+        (playerTileX === pos.tileX && playerTileY === pos.tileY) ||
+        (Math.round(this.player.x) === pos.pixelX &&
+          Math.round(this.player.y) === pos.pixelY),
     );
 
     if (isAtTriggerPosition) {
@@ -423,22 +453,22 @@ class Act3Scene extends Scene {
   teleportCyclops() {
     // Fade game to black
     this.cameras.main.fadeOut(500);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
+    this.cameras.main.once("camerafadeoutcomplete", () => {
       // Move cyclops to new position during black screen
       const newTileX = 3;
       const newTileY = 3;
       const newX = newTileX * ACT3_TILE_SIZE + ACT3_TILE_SIZE / 2;
       const newY = newTileY * ACT3_TILE_SIZE + ACT3_TILE_SIZE / 2;
-      
+
       this.cyclops.setPosition(newX, newY);
       if (this.cyclops.hitbox) {
         this.cyclops.hitbox.setPosition(newX, newY);
       }
-      
+
       // Mark teleportation as complete
       this.cyclopsTeleported = true;
       GameState.cyclopsTeleported = true;
-      
+
       // Fade game back in
       this.cameras.main.fadeIn(500);
     });
@@ -452,7 +482,7 @@ class Act3Scene extends Scene {
 
     // Check if player has passed tile x=41
     const playerTileX = Math.round(this.player.x / ACT3_TILE_SIZE);
-    
+
     if (playerTileX >= 41) {
       this.heroChoiceDialogTriggered = true;
       Dialog.open(this, heroChoiceThoughtDialog);
