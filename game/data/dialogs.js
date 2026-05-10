@@ -36,6 +36,7 @@ export const GameState = {
   act2ChestPotionTaken4: false,
   act2ChestPotionTaken5: false,
   act2ChestPotionTaken6: false,
+  act2HiddenPotionTaken: false,
 };
 
 export const dadDialogNoSword = [

@@ -137,6 +137,14 @@ class Act2Scene extends Scene {
     this.ameliaSisterEmote = showEmote(this, this.ameliaSister, "exclamation", 0);
 
     createPotionChests(this);
+    this.hiddenPickables = [
+      {
+        type: "hiddenPotion",
+        x: 32.5 * 16,
+        y: 14.5 * 16,
+        stateKey: "act2HiddenPotionTaken",
+      },
+    ];
 
     this.physics.world.setBounds(0, 0, ACT2_MAP_WIDTH, ACT2_MAP_HEIGHT);
     this.cameras.main.setBounds(0, 0, ACT2_MAP_WIDTH, ACT2_MAP_HEIGHT);
@@ -395,6 +403,18 @@ class Act2Scene extends Scene {
     const nearChest = getNearChestInteractable(this);
     if (nearChest) return nearChest;
 
+    const availableHiddenPickables = (this.hiddenPickables || []).filter(
+      (pickable) => !GameState[pickable.stateKey],
+    );
+    const nearHiddenPickable = InteractionManager.getNearObject(
+      this.player,
+      availableHiddenPickables,
+      18,
+    );
+    if (nearHiddenPickable) {
+      return { type: "hiddenPotion", target: nearHiddenPickable };
+    }
+
     if (!this.raphael && !this.ameliaSister) return null;
     const nearRaphael = InteractionManager.getNearObject(
       this.player,
@@ -411,6 +431,10 @@ class Act2Scene extends Scene {
       this.handleChestInteraction(interactable.target);
       return;
     }
+    if (interactable.type === "hiddenPotion") {
+      this.handleHiddenPotionInteraction(interactable.target);
+      return;
+    }
     if (interactable.type === "npc") {
       this.handleNpcTalk(interactable.target);
     }
@@ -418,6 +442,19 @@ class Act2Scene extends Scene {
 
   handleChestInteraction(chest) {
     handleAct2ChestInteraction(this, chest);
+  }
+
+  handleHiddenPotionInteraction(hiddenPickable) {
+    if (!hiddenPickable?.stateKey || GameState[hiddenPickable.stateKey]) return;
+    Inventory.add({
+      id: "potion",
+      name: "Potion",
+      texture: "potion",
+      type: "consumable",
+    });
+    showItemPickup(this, this.player, "potion", 0);
+    GameState[hiddenPickable.stateKey] = true;
+    GameState.totalPotionsReceived += 1;
   }
 
   handleNpcTalk(npc) {
