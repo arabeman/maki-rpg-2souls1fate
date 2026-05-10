@@ -1,0 +1,203 @@
+{
+  "name": "thumbnail",
+  "tileset": "assets/rooms/tiny_dungeon.png",
+  "tileSize": 16,
+  "mapWidth": 10,
+  "mapHeight": 7,
+  "layers": {
+    "floor": [
+      [
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49
+      ],
+      [
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49
+      ],
+      [
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49
+      ],
+      [
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49
+      ],
+      [
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49
+      ],
+      [
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49
+      ],
+      [
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49,
+        49
+      ]
+    ],
+    "furniture": [
+      {
+        "src": "tiles_kenney/player.png",
+        "x": 112,
+        "y": 48,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "ui_kenney/PNG/Default/Border/panel-border-008.png",
+        "x": 32,
+        "y": 32,
+        "w": 48,
+        "h": 48
+      },
+      {
+        "src": "tiles_kenney/tile_0049.png",
+        "x": 32,
+        "y": 96,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_kenney/tile_0049.png",
+        "x": 112,
+        "y": 16,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_desert_kenney/tile_0044.png",
+        "x": 96,
+        "y": 80,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_desert_kenney/tile_0044.png",
+        "x": 128,
+        "y": 96,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_desert_kenney/tile_0044.png",
+        "x": 144,
+        "y": 16,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_kenney/chest_closed.png",
+        "x": 48,
+        "y": 48,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_desert_kenney/tile_0080.png",
+        "x": 0,
+        "y": 16,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_desert_kenney/tile_0080.png",
+        "x": 16,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_desert_kenney/tile_0080.png",
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_desert_kenney/tile_0062.png",
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_desert_kenney/tile_0080.png",
+        "x": 32,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_kenney/tile_0042.png",
+        "x": 48,
+        "y": 80,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "src": "tiles_kenney/tile_0042.png",
+        "x": 48,
+        "y": 96,
+        "w": 16,
+        "h": 16
+      }
+    ]
+  },
+  "collisions": []
+}
