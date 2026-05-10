@@ -1,4 +1,5 @@
 import { Equipment } from "../core/Equipment.js";
+import { GameState } from "../data/dialogs.js";
 
 export class EquipmentHUD {
   static lastTexture = null;
@@ -7,6 +8,9 @@ export class EquipmentHUD {
   static init() {
     this._injectStyles();
     this._buildDOM();
+    this.lastTexture = null;
+    this.wasVisible = false;
+    this.update();
   }
 
 static _injectStyles() {
@@ -76,6 +80,14 @@ static _injectStyles() {
   }
 
   static _buildDOM() {
+    const existing = document.querySelector(".equipment-hud");
+    if (existing) {
+      this.container = existing;
+      this.slot = existing.querySelector(".equipment-hud-img, .equipment-hud-empty");
+      this.img = existing.querySelector("img");
+      return;
+    }
+
     this.container = document.createElement("div");
     this.container.className = "equipment-hud";
 
@@ -98,7 +110,7 @@ static _injectStyles() {
     if (!this.slot) return;
 
     const mainHand = Equipment.slots.mainHand;
-    const isVisible = Boolean(mainHand);
+    const isVisible = Boolean(mainHand) || Boolean(GameState.hasWeapon);
     const texture = mainHand?.item?.texture || null;
 
     if (isVisible !== this.wasVisible) {

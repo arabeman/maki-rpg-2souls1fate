@@ -2,11 +2,15 @@ import { Scene, manager } from "@tialops/maki";
 import { BattleController } from "../../core/BattleController.js";
 import { Dialog } from "../../components/Dialog.js";
 import { Equipment } from "../../core/Equipment.js";
+import { EquipmentHUD } from "../../components/EquipmentHUD.js";
 import { EnemyController } from "../../core/EnemyController.js";
 import { GameState } from "../../data/dialogs.js";
+import { HealthHUD } from "../../components/HealthHUD.js";
 import { Inventory } from "../../core/Inventory.js";
 import { Persistence } from "../../core/Persistence.js";
 import { PlayerController } from "../../core/PlayerController.js";
+import { PotionHUD } from "../../components/PotionHUD.js";
+import { showItemPickup } from "../../core/ItemPickupEffect.js";
 import { SpriteLoader } from "../../core/SpriteLoader.js";
 import {
   createPotionChests,
@@ -61,6 +65,7 @@ class Act2Scene extends Scene {
     manager.create(this);
     this.sceneTransitioning = false;
     this.spacePressed = false;
+    this.ePressed = false;
     this.isRespawning = false;
 
     this.player = PlayerController.create(
@@ -110,6 +115,9 @@ class Act2Scene extends Scene {
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     BattleController.setup(this, this.player);
+    HealthHUD.init();
+    EquipmentHUD.init();
+    PotionHUD.init();
 
     this.time.addEvent({
       delay: 1000,
@@ -150,6 +158,9 @@ class Act2Scene extends Scene {
       );
     }
     Equipment.update(this, this.player);
+    HealthHUD.update();
+    EquipmentHUD.update();
+    PotionHUD.update();
 
     const nearInteractable = this.getNearInteractable();
     if (nearInteractable && !Dialog.isOpen()) {
@@ -168,6 +179,13 @@ class Act2Scene extends Scene {
     }
     if (this.keys.space.isUp) {
       this.spacePressed = false;
+    }
+    if (!this.ePressed && this.keys.e.isDown) {
+      this.ePressed = true;
+      this.tryUsePotion();
+    }
+    if (this.keys.e.isUp) {
+      this.ePressed = false;
     }
 
     for (const entry of this.enemies) {
@@ -319,6 +337,19 @@ class Act2Scene extends Scene {
 
   handleChestInteraction(chest) {
     handleAct2ChestInteraction(this, chest);
+  }
+
+  tryUsePotion() {
+    if (Dialog.isOpen()) return;
+    const maxHealth = 3;
+    if ((GameState.playerHealth || 0) >= maxHealth) return;
+    if (!Inventory.removeOne("potion")) {
+      PotionHUD.shake();
+      return;
+    }
+
+    GameState.playerHealth = Math.min(maxHealth, (GameState.playerHealth || 0) + 1);
+    showItemPickup(this, this.player, "heart_full", 0);
   }
 }
 

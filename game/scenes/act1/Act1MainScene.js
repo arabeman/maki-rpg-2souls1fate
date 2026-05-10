@@ -21,6 +21,7 @@ import { BattleController } from "../../core/BattleController.js";
 import { Dialog } from "../../components/Dialog.js";
 import { EnemyController } from "../../core/EnemyController.js";
 import { Equipment } from "../../core/Equipment.js";
+import { EquipmentHUD } from "../../components/EquipmentHUD.js";
 import {
   GameState,
 } from "../../data/dialogs.js";
@@ -163,6 +164,7 @@ class Act1Scene extends Scene {
     }
 
     HealthHUD.init();
+    EquipmentHUD.init();
     PotionHUD.init();
 
     // Physics world bounds must match the actual map size in world coordinates.
@@ -285,6 +287,7 @@ class Act1Scene extends Scene {
     // --- HUD, equipment, dialog ---
     Equipment.update(this, this.player);
     HealthHUD.update();
+    EquipmentHUD.update();
     PotionHUD.update();
     Dialog.update(time);
     this.tryGrantGeorgesPotionReward();

@@ -6,6 +6,8 @@ export class HealthHUD {
   static init() {
     this._injectStyles();
     this._buildDOM();
+    this.lastHealth = null;
+    this.update();
   }
 
   static _injectStyles() {
@@ -34,6 +36,13 @@ export class HealthHUD {
   }
 
   static _buildDOM() {
+    const existing = document.querySelector(".health-hud");
+    if (existing) {
+      this.container = existing;
+      this.heartImgs = Array.from(existing.querySelectorAll("img"));
+      return;
+    }
+
     this.container = document.createElement("div");
     this.container.className = "health-hud";
     this.container.style.flexDirection = "row-reverse";

@@ -1,13 +1,16 @@
 import { Inventory } from "../core/Inventory.js";
+import { GameState } from "../data/dialogs.js";
 
 export class PotionHUD {
-  static unlocked = false;
   static lastCountText = null;
   static wasVisible = false;
 
   static init() {
     this._injectStyles();
     this._buildDOM();
+    this.lastCountText = null;
+    this.wasVisible = false;
+    this.update();
   }
 
   static _injectStyles() {
@@ -98,6 +101,13 @@ export class PotionHUD {
   }
 
   static _buildDOM() {
+    const existing = document.querySelector(".potion-hud");
+    if (existing) {
+      this.container = existing;
+      this.count = existing.querySelector(".potion-hud-count");
+      return;
+    }
+
     this.container = document.createElement("div");
     this.container.className = "potion-hud";
 
@@ -112,7 +122,7 @@ export class PotionHUD {
 
     this.count = document.createElement("div");
     this.count.className = "potion-hud-count";
-    this.count.textContent = "0";
+    this.count.textContent = "x0";
     this.container.appendChild(this.count);
 
     document.body.appendChild(this.container);
@@ -122,16 +132,8 @@ export class PotionHUD {
     if (!this.container) return;
 
     const potionCount = Inventory.count("potion");
-    let shouldBeVisible = false;
-    let countText = "x0";
-
-    if (potionCount > 0) {
-      this.unlocked = true;
-      shouldBeVisible = true;
-      countText = `x${potionCount}`;
-    } else {
-      shouldBeVisible = this.unlocked;
-    }
+    const shouldBeVisible = potionCount > 0 || (GameState.totalPotionsReceived || 0) > 0;
+    const countText = `x${potionCount}`;
 
     if (shouldBeVisible !== this.wasVisible) {
       this.container.classList.toggle("visible", shouldBeVisible);
@@ -145,7 +147,7 @@ export class PotionHUD {
   }
 
   static shake() {
-    if (!this.container || !this.unlocked) return;
+    if (!this.container || !this.wasVisible) return;
     this.container.classList.remove("shake");
     // Force reflow so repeated shakes retrigger animation.
     void this.container.offsetWidth;

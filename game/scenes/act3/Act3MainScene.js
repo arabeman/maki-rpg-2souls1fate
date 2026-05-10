@@ -2,12 +2,17 @@ import { Scene, manager } from "@tialops/maki";
 import { BattleController } from "../../core/BattleController.js";
 import { Dialog } from "../../components/Dialog.js";
 import { Equipment } from "../../core/Equipment.js";
-import { EnemyController } from "../../core/EnemyController.js";
+import { EquipmentHUD } from "../../components/EquipmentHUD.js";
+import { EnemyController, EnemyBehavior } from "../../core/EnemyController.js";
 import { GameState } from "../../data/dialogs.js";
+import { HealthHUD } from "../../components/HealthHUD.js";
 import { Inventory } from "../../core/Inventory.js";
 import { Persistence } from "../../core/Persistence.js";
 import { PlayerController } from "../../core/PlayerController.js";
+import { PotionHUD } from "../../components/PotionHUD.js";
 import { SpriteLoader } from "../../core/SpriteLoader.js";
+import { showEmote } from "../../core/EmoteController.js";
+import { showItemPickup } from "../../core/ItemPickupEffect.js";
 
 const ACT3_TILE_SIZE = 16;
 const ACT3_MAP_WIDTH_TILES = 50;
@@ -52,6 +57,7 @@ class Act3Scene extends Scene {
     super.create();
     manager.create(this);
     this.sceneTransitioning = false;
+    this.ePressed = false;
     this.isRespawning = false;
 
     this.player = PlayerController.create(
@@ -78,9 +84,17 @@ class Act3Scene extends Scene {
     this.cameras.main.startFollow(this.player, true, 0.03, 0.03);
     this.cameras.main.fadeIn(500);
 
-    this.enemies = [];
+    this.enemies = [
+      { sprite: this.createEnemy(69, 277, 4) },
+      { sprite: this.createEnemy(125, 271, 4) },
+      { sprite: this.createEnemy(125, 197, 4) },
+      { sprite: this.createEnemy(31, 151, 4) },
+    ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     BattleController.setup(this, this.player);
+    HealthHUD.init();
+    EquipmentHUD.init();
+    PotionHUD.init();
 
     this.time.addEvent({
       delay: 1000,
@@ -121,6 +135,17 @@ class Act3Scene extends Scene {
       );
     }
     Equipment.update(this, this.player);
+    HealthHUD.update();
+    EquipmentHUD.update();
+    PotionHUD.update();
+
+    if (!this.ePressed && this.keys.e.isDown) {
+      this.ePressed = true;
+      this.tryUsePotion();
+    }
+    if (this.keys.e.isUp) {
+      this.ePressed = false;
+    }
 
     for (const entry of this.enemies) {
       const enemy = entry.sprite;
@@ -226,9 +251,25 @@ class Act3Scene extends Scene {
     EnemyController.updateHealth(enemy, enemy.health);
 
     const dist = EnemyController.getDistanceToTarget(enemy, this.player);
-    if (dist < 100 && !Dialog.isOpen()) {
+    if (dist < EnemyBehavior.visionRange && !Dialog.isOpen()) {
+      if (!enemy.canMove && !enemy.enemyEmote) {
+        const emote = showEmote(this, enemy, "exclamations", 0);
+        if (emote) {
+          enemy.enemyEmote = emote;
+          this.time.delayedCall(200, () => {
+            if (enemy) enemy.canMove = true;
+          });
+        } else {
+          enemy.canMove = true;
+        }
+      }
+
       if (enemy.canMove) {
-        if (dist > 25) {
+        if (enemy.enemyEmote) {
+          enemy.enemyEmote.destroy();
+          enemy.enemyEmote = null;
+        }
+        if (dist > EnemyBehavior.attackRange) {
           EnemyController.chase(this, enemy, this.player);
         } else {
           enemy.hitbox.body.setVelocity(0);
@@ -236,7 +277,8 @@ class Act3Scene extends Scene {
           EnemyController.attack(this, enemy, this.player, entry.weapon);
         }
       } else {
-        enemy.canMove = true;
+        enemy.hitbox.body.setVelocity(0);
+        enemy.anims.stop();
       }
     } else {
       enemy.hitbox.body.setVelocity(0);
@@ -247,6 +289,19 @@ class Act3Scene extends Scene {
       entry.weapon.setPosition(enemy.x + 8, enemy.y + 4);
       entry.weapon.setFlipX(enemy.flipX);
     }
+  }
+
+  tryUsePotion() {
+    if (Dialog.isOpen()) return;
+    const maxHealth = 3;
+    if ((GameState.playerHealth || 0) >= maxHealth) return;
+    if (!Inventory.removeOne("potion")) {
+      PotionHUD.shake();
+      return;
+    }
+
+    GameState.playerHealth = Math.min(maxHealth, (GameState.playerHealth || 0) + 1);
+    showItemPickup(this, this.player, "heart_full", 0);
   }
 }
 
