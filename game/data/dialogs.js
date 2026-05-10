@@ -23,6 +23,7 @@ export const GameState = {
   act1ChestPotionTaken: false,
   act1ChestPotionTaken2: false,
   act1ChestPotionTaken3: false,
+  totalPotionsReceived: 0,
 };
 
 export const dadDialogNoSword = [
@@ -150,6 +151,34 @@ export const georgesNpcDialog3 = [
   {
     speaker: "Georges",
     text: "Press E to drink your potion when you need health.",
+    isEndOfDialog: true,
+  },
+];
+
+export const arthurDialog = [
+  {
+    speaker: "Arthur",
+    text: "The enemy is everywhere.",
+  },
+  {
+    speaker: "Arthur",
+    text: "Passing there is more dangerous.",
+  },
+  {
+    speaker: "Arthur",
+    text: "You need more potion before going there.",
+    isEndOfDialog: true,
+  },
+];
+
+export const arthurDialogHasPotions = [
+  {
+    speaker: "Arthur",
+    text: "Alright, you have enough potions.",
+  },
+  {
+    speaker: "Arthur",
+    text: "Good luck out there.",
     isEndOfDialog: true,
   },
 ];

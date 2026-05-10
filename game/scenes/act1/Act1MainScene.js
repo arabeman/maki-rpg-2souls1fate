@@ -105,6 +105,12 @@ class Act1Scene extends Scene {
     this.physics.add.collider(this.player.hitbox, this.georges.hitbox);
     this.physics.add.collider(this.georges.hitbox, manager.getWallGroup(this, "act_1"));
 
+    this.arthur = NPCController.create(this, 33.5 * 16 + 8, 9 * 16 + 8, "georges");
+    this.arthur.hitbox.body.setImmovable(true);
+    this.arthur.hitbox.body.setCollideWorldBounds(true);
+    this.physics.add.collider(this.player.hitbox, this.arthur.hitbox);
+    this.physics.add.collider(this.arthur.hitbox, manager.getWallGroup(this, "act_1"));
+
     createPotionChests(this);
 
     if (GameState.leftBeginScene) {
@@ -124,7 +130,7 @@ class Act1Scene extends Scene {
       { sprite: this.createEnemy(373, 114 + 16 - 10) },
       { sprite: this.createEnemy(295, 415) },
       { sprite: this.createEnemy(378, 413) },
-      { sprite: this.createEnemy(578, 240) },
+      { sprite: this.createEnemy(578, 287) },
       { sprite: this.createEnemy(511, 259) },
       {
         sprite: (() => {
@@ -232,6 +238,9 @@ class Act1Scene extends Scene {
     }
     if (this.georges) {
       NPCController.handleAnimation(this.georges, time);
+    }
+    if (this.arthur) {
+      NPCController.handleAnimation(this.arthur, time);
     }
 
     // --- Scene transition ---

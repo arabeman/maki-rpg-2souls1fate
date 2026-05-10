@@ -64,4 +64,5 @@ export function handleChestInteraction(scene, chest) {
   });
   showItemPickup(scene, chest, "potion", 0);
   GameState[chest.potionStateKey] = true;
+  GameState.totalPotionsReceived += 1;
 }

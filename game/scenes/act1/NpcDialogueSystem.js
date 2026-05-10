@@ -1,10 +1,13 @@
 import {
   GameState,
+  arthurDialog,
+  arthurDialogHasPotions,
   dadAct1Dialog,
   georgesNpcDialog,
   georgesNpcDialog2,
   georgesNpcDialog3,
 } from "../../data/dialogs.js";
+
 import { Dialog } from "../../components/Dialog.js";
 import { InteractionManager } from "../../core/InteractionManager.js";
 import { Inventory } from "../../core/Inventory.js";
@@ -18,6 +21,15 @@ export function getNearNpcInteractable(scene) {
       25,
     );
     if (nearGeorges) return { type: "npc", target: nearGeorges };
+  }
+
+  if (scene.arthur) {
+    const nearGeorgesGate = InteractionManager.getNearObject(
+      scene.player,
+      [scene.arthur],
+      25,
+    );
+    if (nearGeorgesGate) return { type: "npc", target: nearGeorgesGate };
   }
 
   if (scene.dad) {
@@ -54,6 +66,27 @@ export function handleNpcTalk(scene, npc) {
     return;
   }
 
+  if (npc === scene.arthur) {
+    // const dialogToOpen = GameState.totalPotionsReceived >= 3
+    const dialogToOpen = GameState.totalPotionsReceived >= 3
+      ? arthurDialogHasPotions
+      : arthurDialog;
+    Dialog.open(scene, dialogToOpen);
+    scene.tweens.add({
+      targets: scene.arthur,
+      y: scene.arthur.y - 16,
+      duration: 500,
+      ease: "Linear",
+    });
+    scene.tweens.add({
+      targets: scene.arthur.hitbox,
+      y: scene.arthur.hitbox.y - 16,
+      duration: 500,
+      ease: "Linear",
+    });
+    return;
+  }
+
   if (npc === scene.dad) {
     Dialog.open(scene, dadAct1Dialog);
   }
@@ -74,6 +107,7 @@ export function tryGrantGeorgesPotionReward(scene) {
   });
   showItemPickup(scene, scene.georges, "potion", 0);
   GameState.georgesPotionReceived = true;
+  GameState.totalPotionsReceived += 1;
 }
 
 function getNextGeorgesRepeatDialog() {

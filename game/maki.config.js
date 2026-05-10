@@ -29,6 +29,18 @@ export default {
       },
     },
     {
+      name: "georges",
+      file: "tiles_kenney/georges.png",
+      frameWidth: 16,
+      frameHeight: 16,
+      directions: {
+        down: { start: 0, end: 0 },
+        left: { start: 0, end: 0 },
+        right: { start: 0, end: 0 },
+        up: { start: 0, end: 0 },
+      },
+    },
+    {
       name: "sword1",
       file: "tiles_kenney/sword1.png",
       frameWidth: 16,
