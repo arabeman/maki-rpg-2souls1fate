@@ -281,7 +281,7 @@ export class EnemyController {
         this.applyKnockbackToPlayer(scene, target, dirX, dirY);
 
         // Apply damage to player
-        GameState.playerHealth = Math.max(0, (GameState.playerHealth || 3) - 0.5);
+        GameState.playerHealth = Math.max(0, (GameState.playerHealth ?? 3) - 0.5);
         HealthHUD.update();
 
         scene.time.delayedCall(80, () => {

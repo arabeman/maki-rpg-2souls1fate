@@ -113,6 +113,10 @@ class Act1Scene extends Scene {
     this.arthur = NPCController.create(this, 33.5 * 16 + 8, 9 * 16 + 8, "georges");
     this.arthur.hitbox.body.setImmovable(true);
     this.arthur.hitbox.body.setCollideWorldBounds(true);
+    if (GameState.arthurMoved) {
+      this.arthur.y -= 16;
+      this.arthur.hitbox.y -= 16;
+    }
     this.physics.add.collider(this.player.hitbox, this.arthur.hitbox);
     this.physics.add.collider(this.arthur.hitbox, manager.getWallGroup(this, "act_1"));
 

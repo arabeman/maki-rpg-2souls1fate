@@ -49,7 +49,7 @@ export class HealthHUD {
   static update() {
     if (!this.container) return;
 
-    const currentHealth = GameState.playerHealth || 3;
+    const currentHealth = GameState.playerHealth ?? 3;
     if (currentHealth === this.lastHealth) return;
 
     this.lastHealth = currentHealth;

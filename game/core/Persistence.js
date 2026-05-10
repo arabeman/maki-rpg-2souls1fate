@@ -124,4 +124,16 @@ export class Persistence {
       console.warn("Failed to clear scene save data:", error);
     }
   }
+
+  static clearAll() {
+    if (!this._hasStorage()) return;
+
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+      this._cachedSave = null;
+      this._lastSaveAt = 0;
+    } catch (error) {
+      console.warn("Failed to clear all save data:", error);
+    }
+  }
 }

@@ -1,9 +1,19 @@
 import { Act1Scene, Act2Scene, Act3Scene, BeginScene } from "./scenes/index.js";
+import { RestartHUD } from "./components/RestartHUD.js";
 import { Persistence } from "./core/Persistence.js";
 
 import Phaser from "phaser";
 
+const url = new URL(window.location.href);
+const isNewGame = url.searchParams.get("newGame") === "1";
+if (isNewGame) {
+  Persistence.clearAll();
+  url.searchParams.delete("newGame");
+  window.history.replaceState({}, "", url.toString());
+}
+
 Persistence.hydrateRuntimeState();
+RestartHUD.init();
 
 const sceneByKey = {
   BeginScene,
