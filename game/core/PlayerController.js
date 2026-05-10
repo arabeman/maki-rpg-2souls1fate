@@ -7,6 +7,7 @@ import {
 } from "./CharacterAnimation.js";
 import { Equipment } from "./Equipment.js";
 import { Inventory } from "./Inventory.js";
+import { Dialog } from "../components/Dialog.js";
 
 export class PlayerController {
   static create(scene, x, y, name) {
@@ -42,6 +43,11 @@ export class PlayerController {
   }
 
   static handleMovement(player, keys, speed = PlayerConfig.defaultSpeed) {
+    // Prevent movement when dialog is open
+    if (Dialog.isOpen()) {
+      return;
+    }
+
     const hitbox = player.hitbox;
     hitbox.body.setVelocity(0);
 

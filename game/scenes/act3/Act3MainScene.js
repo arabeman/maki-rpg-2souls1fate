@@ -1,9 +1,9 @@
 import { EnemyBehavior, EnemyController } from "../../core/EnemyController.js";
 import {
   GameState,
-  cyclopsDialogOnHit,
-  cyclopsDialogOnFoundCactusPlace,
   cyclopsDialogOnAlreadyVisited,
+  cyclopsDialogOnFoundCactusPlace,
+  cyclopsDialogOnHit,
   heroChoiceThoughtDialog,
 } from "../../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
