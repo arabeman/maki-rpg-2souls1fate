@@ -177,6 +177,20 @@ class Act1Scene extends Scene {
 
     this.cameras.main.fadeIn(500);
 
+    this.arthurMoveCallback = () => {
+      if (this.arthur && this.arthurPendingMove && !GameState.arthurMoved) {
+        GameState.arthurMoved = true;
+        this.arthurPendingMove = false;
+        this.arthurMoveStartY = this.arthur.y;
+        this.arthur.hitbox.body.setImmovable(false);
+        this.arthur.hitbox.body.setVelocity(0, -100);
+      }
+      if (!GameState.arthurMoved) {
+        Dialog.onCloseCallback(this.arthurMoveCallback);
+      }
+    };
+    Dialog.onCloseCallback(this.arthurMoveCallback);
+
     this.time.addEvent({
       delay: 1000,
       loop: true,
@@ -253,6 +267,11 @@ class Act1Scene extends Scene {
     }
     if (this.arthur) {
       NPCController.handleAnimation(this.arthur, time);
+      if (this.arthurMoveStartY && this.arthur.y <= this.arthurMoveStartY - 16) {
+        this.arthur.hitbox.body.setVelocity(0, 0);
+        this.arthur.hitbox.body.setImmovable(true);
+        this.arthurMoveStartY = null;
+      }
     }
 
     // --- Scene transition ---

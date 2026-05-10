@@ -17,6 +17,8 @@
 const KENNEY_UI_PATH = "../assets/ui_kenney/PNG/Default/Border";
 
 export class Dialog {
+  static _onCloseCallback = null;
+
   /**
    * Open dialog with given data
    * @param {Phaser.Scene} scene - Game scene reference
@@ -50,7 +52,7 @@ export class Dialog {
    * @param {Function} callback
    */
   static onCloseCallback(callback) {
-    this.onCloseCallback = callback;
+    this._onCloseCallback = typeof callback === "function" ? callback : null;
   }
 
   /**
@@ -335,9 +337,10 @@ export class Dialog {
    * Close dialog and clean up DOM elements
    */
   static close() {
-    if (this.onCloseCallback) {
-      this.onCloseCallback();
-      this.onCloseCallback = null;
+    const onClose = this._onCloseCallback;
+    this._onCloseCallback = null;
+    if (onClose) {
+      onClose();
     }
 
     if (this.bg && this.bg.parentNode) {

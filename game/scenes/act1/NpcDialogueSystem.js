@@ -75,38 +75,14 @@ export function handleNpcTalk(scene, npc) {
       GameState.arthurFirstTalkDone = true;
       if (GameState.totalPotionsReceived >= 3 && !GameState.arthurMoved) {
         dialogToOpen = arthurDialogFirstHasPotions;
-        GameState.arthurMoved = true;
-        scene.tweens.add({
-          targets: scene.arthur,
-          y: scene.arthur.y - 16,
-          duration: 500,
-          ease: "Linear",
-        });
-        scene.tweens.add({
-          targets: scene.arthur.hitbox,
-          y: scene.arthur.hitbox.y - 16,
-          duration: 500,
-          ease: "Linear",
-        });
+        scene.arthurPendingMove = true;
       } else {
         dialogToOpen = arthurDialog;
       }
     } else if (!GameState.arthurMoved) {
       if (GameState.totalPotionsReceived >= 3) {
         dialogToOpen = arthurDialogHasPotions;
-        GameState.arthurMoved = true;
-        scene.tweens.add({
-          targets: scene.arthur,
-          y: scene.arthur.y - 16,
-          duration: 500,
-          ease: "Linear",
-        });
-        scene.tweens.add({
-          targets: scene.arthur.hitbox,
-          y: scene.arthur.hitbox.y - 16,
-          duration: 500,
-          ease: "Linear",
-        });
+        scene.arthurPendingMove = true;
       } else {
         dialogToOpen = arthurDialog;
       }
