@@ -225,6 +225,14 @@ class Act1Scene extends Scene {
       );
       return;
     }
+    if (!this.sceneTransitioning && this.player.x > 640) {
+      this.sceneTransitioning = true;
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once("camerafadeoutcomplete", () =>
+        this.scene.start("Act2Scene"),
+      );
+      return;
+    }
 
     // --- Enemy death checks & AI ---
     for (const entry of this.enemies) {
