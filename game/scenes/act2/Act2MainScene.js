@@ -104,6 +104,15 @@ class Act2Scene extends Scene {
   }
 
   update(time) {
+    if (GameState.playerHealth <= 0) {
+      GameState.playerHealth = 3;
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once("camerafadeoutcomplete", () =>
+        this.scene.restart(),
+      );
+      return;
+    }
+
     if (!Dialog.isOpen()) {
       PlayerController.handleMovement(this.player, this.keys);
       PlayerController.handleAnimation(this.player, this.keys, time);

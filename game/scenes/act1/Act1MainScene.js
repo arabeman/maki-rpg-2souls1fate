@@ -1,18 +1,4 @@
-import {
-  GameState,
-} from "../../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
-
-import { BattleController } from "../../core/BattleController.js";
-import { Dialog } from "../../components/Dialog.js";
-import { Equipment } from "../../core/Equipment.js";
-import { HealthHUD } from "../../components/HealthHUD.js";
-import { Inventory } from "../../core/Inventory.js";
-import { NPCController } from "../../core/NPCController.js";
-import { PlayerController } from "../../core/PlayerController.js";
-import { PotionHUD } from "../../components/PotionHUD.js";
-import { SpriteLoader } from "../../core/SpriteLoader.js";
-import { showEmote } from "../../core/EmoteController.js";
 import {
   createEnemy as createAct1Enemy,
   createEnemyWeapon as createAct1EnemyWeapon,
@@ -30,6 +16,21 @@ import {
   handleNpcTalk,
   tryGrantGeorgesPotionReward as tryGrantAct1GeorgesPotionReward,
 } from "./NpcDialogueSystem.js";
+
+import { BattleController } from "../../core/BattleController.js";
+import { Dialog } from "../../components/Dialog.js";
+import { EnemyController } from "../../core/EnemyController.js";
+import { Equipment } from "../../core/Equipment.js";
+import {
+  GameState,
+} from "../../data/dialogs.js";
+import { HealthHUD } from "../../components/HealthHUD.js";
+import { Inventory } from "../../core/Inventory.js";
+import { NPCController } from "../../core/NPCController.js";
+import { PlayerController } from "../../core/PlayerController.js";
+import { PotionHUD } from "../../components/PotionHUD.js";
+import { SpriteLoader } from "../../core/SpriteLoader.js";
+import { showEmote } from "../../core/EmoteController.js";
 
 class Act1Scene extends Scene {
   constructor() {
@@ -125,7 +126,18 @@ class Act1Scene extends Scene {
       { sprite: this.createEnemy(378, 413) },
       { sprite: this.createEnemy(578, 240) },
       { sprite: this.createEnemy(511, 259) },
-      { sprite: this.createEnemy(586, 395, 6) },
+      {
+        sprite: (() => {
+          const e = createAct1Enemy(this, 586, 395, 6);
+          e.attackSpeedMultiplier = 0.2;
+          this.physics.add.collider(this.player.hitbox, e.hitbox);
+          this.physics.add.collider(e.hitbox, manager.getWallGroup(this, "act_1"));
+          e.hitbox.body.setImmovable(false);
+          e.hitbox.body.setCollideWorldBounds(true);
+          EnemyController.updateHealth(e, e.health);
+          return e;
+        })(),
+      },
       { sprite: this.createEnemy(73 + 32, 33, 4, "left") },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 

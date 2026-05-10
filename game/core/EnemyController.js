@@ -223,7 +223,9 @@ export class EnemyController {
 
     const now = scene.time.now;
     const lastAttack = enemy.lastAttackTime || 0;
-    const delay = 1000;
+    const baseDelay = 1000;
+    const multiplier = enemy.attackSpeedMultiplier ?? 1;
+    const delay = baseDelay * multiplier;
 
     if (now - lastAttack < delay) return;
 
