@@ -1,0 +1,312 @@
+import {
+  GameState,
+} from "../../data/dialogs.js";
+import { Scene, manager } from "@tialops/maki";
+
+import { BattleController } from "../../core/BattleController.js";
+import { Dialog } from "../../components/Dialog.js";
+import { Equipment } from "../../core/Equipment.js";
+import { HealthHUD } from "../../components/HealthHUD.js";
+import { Inventory } from "../../core/Inventory.js";
+import { NPCController } from "../../core/NPCController.js";
+import { PlayerController } from "../../core/PlayerController.js";
+import { PotionHUD } from "../../components/PotionHUD.js";
+import { SpriteLoader } from "../../core/SpriteLoader.js";
+import { showEmote } from "../../core/EmoteController.js";
+import {
+  createEnemy as createAct1Enemy,
+  createEnemyWeapon as createAct1EnemyWeapon,
+  destroyEnemyEntry as destroyAct1EnemyEntry,
+  triggerEnemyDeath as triggerAct1EnemyDeath,
+  updateEnemyAI as updateAct1EnemyAI,
+} from "./EnemyEncounterSystem.js";
+import {
+  createPotionChests,
+  getNearChestInteractable,
+  handleChestInteraction as handleAct1ChestInteraction,
+} from "./ChestPotionSystem.js";
+import {
+  getNearNpcInteractable,
+  handleNpcTalk,
+  tryGrantGeorgesPotionReward as tryGrantAct1GeorgesPotionReward,
+} from "./NpcDialogueSystem.js";
+
+class Act1Scene extends Scene {
+  constructor() {
+    super({ key: "Act1Scene" });
+  }
+
+  init() {
+    this.scale.resize(640, 448);
+    this.cameras.main.setZoom(1.4);
+  }
+
+  preload() {
+    super.preload();
+    SpriteLoader.load(this, "player", "player");
+    SpriteLoader.load(this, "enemy", "enemy");
+    SpriteLoader.load(this, "impact", "impact");
+    SpriteLoader.loadImage(this, "impact0", "impact0");
+    SpriteLoader.loadImage(this, "impact1", "impact1");
+    SpriteLoader.loadImage(this, "impact2", "impact2");
+    SpriteLoader.loadImage(this, "impact3", "impact3");
+    SpriteLoader.loadImage(this, "impact4", "impact4");
+    SpriteLoader.loadImage(this, "impact5", "impact5");
+    SpriteLoader.loadImage(this, "heart_full", "heart_full");
+    SpriteLoader.loadImage(this, "heart_half", "heart_half");
+    SpriteLoader.loadImage(this, "heart_empty", "heart_empty");
+    SpriteLoader.loadImage(this, "sword1", "sword1");
+    SpriteLoader.loadImage(this, "hammer", "hammer");
+    SpriteLoader.loadImage(this, "attack", "attack");
+    SpriteLoader.loadImage(this, "axe", "axe");
+    SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
+    SpriteLoader.loadImage(this, "emote_exclamations", "exclamations");
+    SpriteLoader.loadImage(this, "emote_question", "question");
+    this.load.image("chest_closed", "assets/tiles_kenney/chest_closed.png");
+    this.load.image("chest_opened", "assets/tiles_kenney/chest_opened.png");
+    this.load.spritesheet("georges", "assets/tiles_kenney/georges.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.image("potion", "assets/tiles_kenney/potion.png");
+    manager.map(this, "act_1");
+    manager.preload(this);
+  }
+
+  create() {
+    super.create();
+    manager.create(this);
+
+    this.dad = null;
+    this.sceneTransitioning = false;
+    this.playerDied = false;
+    this.pendingGeorgesPotionReward = false;
+    this.ePressed = false;
+
+    this.player = PlayerController.create(this, 16, 128, "player");
+    this.keys = PlayerController.setupInput(this);
+    SpriteLoader.createAnims(this, "player", "player");
+    SpriteLoader.createAnims(this, "enemy", "enemy");
+
+    this.physics.add.collider(
+      this.player.hitbox,
+      manager.getWallGroup(this, "act_1"),
+    );
+
+    this.georges = NPCController.create(this, 47, 33, "georges");
+    this.georges.hitbox.body.setImmovable(true);
+    this.georges.hitbox.body.setCollideWorldBounds(true);
+    this.physics.add.collider(this.player.hitbox, this.georges.hitbox);
+    this.physics.add.collider(this.georges.hitbox, manager.getWallGroup(this, "act_1"));
+
+    createPotionChests(this);
+
+    if (GameState.leftBeginScene) {
+      SpriteLoader.load(this, "dad", "dad");
+      this.dad = NPCController.create(this, 48, 118, "dad");
+      this.physics.add.collider(this.player.hitbox, this.dad.hitbox);
+      this.dad.hitbox.body.setImmovable(true);
+      SpriteLoader.createAnims(this, "dad", "dad");
+      this.dadEmote = showEmote(this, this.dad, "question", 0);
+    }
+
+    // enemies[i] = { sprite, weapon }
+    this.enemies = [
+      { sprite: this.createEnemy(88, 260) },
+      { sprite: this.createEnemy(89, 383) },
+      { sprite: this.createEnemy(373, 114 - 10) },
+      { sprite: this.createEnemy(373, 114 + 16 - 10) },
+      { sprite: this.createEnemy(295, 415) },
+      { sprite: this.createEnemy(378, 413) },
+      { sprite: this.createEnemy(578, 240) },
+      { sprite: this.createEnemy(511, 259) },
+      { sprite: this.createEnemy(586, 395, 6) },
+      { sprite: this.createEnemy(73 + 32, 33, 4, "left") },
+    ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
+
+    if (GameState.hasWeapon) {
+      const weaponItem = Inventory.getLastBySlot("mainHand");
+      if (weaponItem) {
+        Equipment.equip(this, this.player, weaponItem);
+      }
+    }
+
+    HealthHUD.init();
+    PotionHUD.init();
+
+    // Physics world bounds must match the actual map size in world coordinates.
+    // Without this, Phaser defaults to the canvas pixel size (640×448 before zoom).
+    // At zoom 1.4 that creates an invisible hard wall at ~320px on Y — that was the bug.
+    this.physics.world.setBounds(0, 0, 640, 448);
+
+    this.cameras.main.startFollow(this.player, true, 0.03, 0.03);
+    this.cameras.main.setBounds(0, 0, 640, 448);
+
+    this.cameras.main.fadeIn(500);
+
+    this.time.addEvent({
+      delay: 1000,
+      loop: true,
+      callback: () => {
+        console.log(
+          "Player pos:",
+          Math.round(this.player.x),
+          Math.round(this.player.y),
+        );
+      },
+    });
+
+    BattleController.setup(this, this.player);
+  }
+
+  createEnemy(x, y, health = 3, facing = "right") {
+    return createAct1Enemy(this, x, y, health, facing);
+  }
+
+  createEnemyWeapon(enemy) {
+    return createAct1EnemyWeapon(this, enemy);
+  }
+
+  // Triggers the flash-and-destroy death sequence for one enemy entry.
+  triggerEnemyDeath(entry) {
+    triggerAct1EnemyDeath(this, entry);
+  }
+
+  // Cleans up all objects belonging to one enemy entry.
+  destroyEnemyEntry(entry) {
+    destroyAct1EnemyEntry(this, entry);
+  }
+
+  // Runs the per-frame AI for one enemy entry.
+  updateEnemyAI(entry, time) {
+    updateAct1EnemyAI(this, entry, time);
+  }
+
+  update(time) {
+    if (GameState.playerHealth <= 0 && !this.playerDied) {
+      this.playerDied = true;
+      GameState.playerHealth = 3;
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once("camerafadeoutcomplete", () =>
+        this.scene.restart(),
+      );
+      return;
+    }
+
+    // --- Player input ---
+    if (!Dialog.isOpen()) {
+      if (!this.player.isKnockedBack) {
+        PlayerController.handleMovement(this.player, this.keys);
+      }
+      PlayerController.handleAnimation(this.player, this.keys, time);
+      BattleController.attack(
+        this,
+        this.player,
+        this.keys,
+        this.enemies.map((e) => e.sprite).filter(Boolean),
+      );
+    }
+
+    if (this.dad) {
+      NPCController.handleAnimation(this.dad, time);
+    }
+    if (this.georges) {
+      NPCController.handleAnimation(this.georges, time);
+    }
+
+    // --- Scene transition ---
+    if (!this.sceneTransitioning && this.player.x < 0) {
+      this.sceneTransitioning = true;
+      GameState.returnedFromAct1 = true;
+      GameState.leftBeginScene = false;
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once("camerafadeoutcomplete", () =>
+        this.scene.start("BeginScene"),
+      );
+      return;
+    }
+
+    // --- Enemy death checks & AI ---
+    for (const entry of this.enemies) {
+      const enemy = entry.sprite;
+      if (enemy && enemy.health <= 0 && !enemy.isDying) {
+        this.triggerEnemyDeath(entry);
+      }
+      this.updateEnemyAI(entry, time);
+    }
+
+    // --- HUD, equipment, dialog ---
+    Equipment.update(this, this.player);
+    HealthHUD.update();
+    PotionHUD.update();
+    Dialog.update(time);
+    this.tryGrantGeorgesPotionReward();
+
+    // --- Interaction prompt & space key ---
+    const nearInteractable = this.getNearInteractable();
+    if (nearInteractable && !Dialog.isOpen()) {
+      Dialog.showInteractPrompt(this, "Space to interact");
+    } else {
+      Dialog.hideInteractPrompt();
+    }
+
+    if (!this.spacePressed && this.keys.space.isDown) {
+      this.spacePressed = true;
+      if (Dialog.isOpen()) {
+        Dialog.skip();
+      } else {
+        this.handleInteraction();
+      }
+    }
+    if (this.keys.space.isUp) {
+      this.spacePressed = false;
+    }
+    if (!this.ePressed && this.keys.e.isDown) {
+      this.ePressed = true;
+      this.tryUsePotion();
+    }
+    if (this.keys.e.isUp) {
+      this.ePressed = false;
+    }
+  }
+
+  getNearInteractable() {
+    return getNearChestInteractable(this) || getNearNpcInteractable(this);
+  }
+
+  handleInteraction() {
+    const interactable = this.getNearInteractable();
+    if (!interactable) return;
+    if (interactable.type === "chest") {
+      this.handleChestInteraction(interactable.target);
+      return;
+    }
+    if (interactable.type === "npc") this.handleNPCTalk(interactable.target);
+  }
+
+  handleChestInteraction(chest) {
+    handleAct1ChestInteraction(this, chest);
+  }
+
+  handleNPCTalk(npc) {
+    handleNpcTalk(this, npc);
+  }
+
+  tryGrantGeorgesPotionReward() {
+    tryGrantAct1GeorgesPotionReward(this);
+  }
+
+  tryUsePotion() {
+    if (Dialog.isOpen()) return;
+    const maxHealth = 3;
+    if ((GameState.playerHealth || 0) >= maxHealth) return;
+    if (!Inventory.removeOne("potion")) {
+      PotionHUD.shake();
+      return;
+    }
+
+    GameState.playerHealth = Math.min(maxHealth, (GameState.playerHealth || 0) + 1);
+  }
+}
+
+export { Act1Scene };
