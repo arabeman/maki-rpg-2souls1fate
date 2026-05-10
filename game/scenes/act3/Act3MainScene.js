@@ -52,6 +52,8 @@ class Act3Scene extends Scene {
     SpriteLoader.loadImage(this, "axe", "axe");
     SpriteLoader.loadImage(this, "sword1", "sword1");
     SpriteLoader.loadImage(this, "sword2", "sword2");
+    SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
+    SpriteLoader.loadImage(this, "emote_exclamations", "exclamations");
     SpriteLoader.loadImage(this, "hammer", "hammer");
     this.load.spritesheet("georges", "assets/tiles_kenney/georges.png", {
       frameWidth: 16,
