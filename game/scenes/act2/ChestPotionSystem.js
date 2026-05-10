@@ -9,17 +9,49 @@ export function createPotionChests(scene) {
     {
       stateKey: "act2ChestPotionTaken",
       sprite: scene.physics.add.sprite(
-        354,
-        53,
+        74,
+        62,
         GameState.act2ChestPotionTaken ? "chest_opened" : "chest_closed",
       ),
     },
     {
       stateKey: "act2ChestPotionTaken2",
       sprite: scene.physics.add.sprite(
+        92,
+        59,
+        GameState.act2ChestPotionTaken2 ? "chest_opened" : "chest_closed",
+      ),
+    },
+    {
+      stateKey: "act2ChestPotionTaken3",
+      sprite: scene.physics.add.sprite(
+        110,
+        59,
+        GameState.act2ChestPotionTaken3 ? "chest_opened" : "chest_closed",
+      ),
+    },
+    {
+      stateKey: "act2ChestPotionTaken4",
+      sprite: scene.physics.add.sprite(
+        128,
+        62,
+        GameState.act2ChestPotionTaken4 ? "chest_opened" : "chest_closed",
+      ),
+    },
+    {
+      stateKey: "act2ChestPotionTaken5",
+      sprite: scene.physics.add.sprite(
+        354,
+        53,
+        GameState.act2ChestPotionTaken5 ? "chest_opened" : "chest_closed",
+      ),
+    },
+    {
+      stateKey: "act2ChestPotionTaken6",
+      sprite: scene.physics.add.sprite(
         648,
         522,
-        GameState.act2ChestPotionTaken2 ? "chest_opened" : "chest_closed",
+        GameState.act2ChestPotionTaken6 ? "chest_opened" : "chest_closed",
       ),
     },
   ];
@@ -45,6 +77,7 @@ export function getNearChestInteractable(scene) {
 }
 
 export function handleChestInteraction(scene, chest) {
+  if (!GameState.ameliaSisterTalked) return;
   if (!chest || !chest.potionStateKey || GameState[chest.potionStateKey]) return;
 
   chest.setTexture("chest_opened");

@@ -125,7 +125,7 @@ class Act2Scene extends Scene {
       manager.getWallGroup(this, "act_2"),
     );
 
-    this.ameliaSister = NPCController.create(this, 102, 78, "girl");
+    this.ameliaSister = NPCController.create(this, 102, 88, "girl");
     this.ameliaSister.hitbox.body.setImmovable(true);
     this.ameliaSister.hitbox.body.setCollideWorldBounds(true);
     this.physics.add.collider(this.player.hitbox, this.ameliaSister.hitbox);
@@ -144,22 +144,22 @@ class Act2Scene extends Scene {
 
     this.enemies = [
       { sprite: this.createEnemy(282, 191) },
-      { sprite: this.createEnemy(282, 167) },
-      { sprite: this.createEnemy(282, 143) },
-      { sprite: this.createEnemy(282, 118) },
-      { sprite: this.createEnemy(282, 94) },
-      { sprite: this.createEnemy(426, 191, 3, "left") },
-      { sprite: this.createEnemy(426, 167, 3, "left") },
-      { sprite: this.createEnemy(426, 143, 3, "left") },
-      { sprite: this.createEnemy(426, 118, 3, "left") },
-      { sprite: this.createEnemy(426, 94, 3, "left") },
-      { sprite: this.createEnemy(654, 286, 4) },
-      { sprite: this.createEnemy(683, 257, 4, "left") },
-      { sprite: this.createEnemy(590, 445) },
-      { sprite: this.createEnemy(621, 256, 4) },
-      { sprite: this.createEnemy(454, 383, 3, "left") },
-      { sprite: this.createEnemy(203, 426) },
-      { sprite: this.createEnemy(251, 479) },
+      // { sprite: this.createEnemy(282, 167) },
+      // { sprite: this.createEnemy(282, 143) },
+      // { sprite: this.createEnemy(282, 118) },
+      // { sprite: this.createEnemy(282, 94) },
+      // { sprite: this.createEnemy(426, 191, 3, "left") },
+      // { sprite: this.createEnemy(426, 167, 3, "left") },
+      // { sprite: this.createEnemy(426, 143, 3, "left") },
+      // { sprite: this.createEnemy(426, 118, 3, "left") },
+      // { sprite: this.createEnemy(426, 94, 3, "left") },
+      // { sprite: this.createEnemy(654, 286, 4) },
+      // { sprite: this.createEnemy(683, 257, 4, "left") },
+      // { sprite: this.createEnemy(590, 445) },
+      // { sprite: this.createEnemy(621, 256, 4) },
+      // { sprite: this.createEnemy(454, 383, 3, "left") },
+      // { sprite: this.createEnemy(203, 426) },
+      // { sprite: this.createEnemy(251, 479) },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     BattleController.setup(this, this.player);
@@ -425,6 +425,7 @@ class Act2Scene extends Scene {
         this.ameliaSisterEmote.destroy();
         this.ameliaSisterEmote = null;
       }
+      GameState.ameliaSisterTalked = true;
       Dialog.open(this, ameliaSisterDialog);
       return;
     }

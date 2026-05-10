@@ -28,9 +28,14 @@ export const GameState = {
   totalPotionsReceived: 0,
   raphaelFirstTalkDone: false,
   raphaelMoved: false,
+  ameliaSisterTalked: false,
   arthurTalkedAboutGirl: false,
   arthurFirstTalkDone: false,
   arthurMoved: false,
+  act2ChestPotionTaken3: false,
+  act2ChestPotionTaken4: false,
+  act2ChestPotionTaken5: false,
+  act2ChestPotionTaken6: false,
 };
 
 export const dadDialogNoSword = [
@@ -308,6 +313,10 @@ export const ameliaSisterDialog = [
 
 export const act2ChestPotionTaken = "act2ChestPotionTaken";
 export const act2ChestPotionTaken2 = "act2ChestPotionTaken2";
+export const act2ChestPotionTaken3 = "act2ChestPotionTaken3";
+export const act2ChestPotionTaken4 = "act2ChestPotionTaken4";
+export const act2ChestPotionTaken5 = "act2ChestPotionTaken5";
+export const act2ChestPotionTaken6 = "act2ChestPotionTaken6";
 
 export default {
   dadDialogNoSword,
@@ -321,4 +330,8 @@ export default {
   raphaelHasSwordDialog,
   act2ChestPotionTaken,
   act2ChestPotionTaken2,
+  act2ChestPotionTaken3,
+  act2ChestPotionTaken4,
+  act2ChestPotionTaken5,
+  act2ChestPotionTaken6,
 };
