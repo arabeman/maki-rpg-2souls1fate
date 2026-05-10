@@ -37,6 +37,8 @@ export const GameState = {
   act2ChestPotionTaken5: false,
   act2ChestPotionTaken6: false,
   act2HiddenPotionTaken: false,
+  cyclopsTeleported: false,
+  cyclopsDialogCompleted: false,
 };
 
 export const dadDialogNoSword = [
@@ -324,7 +326,10 @@ export const cyclopsDialogOnHit = [
   { speaker: "Cyclops", text: "Me no hurt anyone!" },
   { speaker: "Cyclops", text: "I just want quiet place..." },
   { speaker: "Cyclops", text: "Tree... rock... mountain..." },
-  { speaker: "Cyclops", text: "Me like cactus... they strong... they quiet..." },
+  {
+    speaker: "Cyclops",
+    text: "Me like cactus... they strong... they quiet...",
+  },
   { speaker: "Cyclops", text: "Beauty of life..." },
   { speaker: "Cyclops", text: "All beautiful fur Eye to see." },
   { speaker: "Cyclops", text: "You know place... where cactus grow?" },
@@ -342,6 +347,16 @@ export const cyclopsDialogOnAlreadyVisited = [
   { speaker: "Cyclops", text: "You know cactus place..." },
   { speaker: "Cyclops", text: "Then I don’t block your way." },
   { speaker: "Cyclops", text: "I go there instead.", isEndOfDialog: true },
+];
+
+export const heroChoiceThoughtDialog = [
+  { text: "I need to make a choice now…" },
+  { text: "North leads to my mother… South leads to Amelia…" },
+  { text: "There’s no way to reach both in time." },
+  {
+    text: "If I choose wrong… it might already be too late for the other.",
+    isEndOfDialog: true,
+  },
 ];
 
 export const act2ChestPotionTaken = "act2ChestPotionTaken";

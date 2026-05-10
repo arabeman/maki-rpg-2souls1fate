@@ -4,6 +4,7 @@ import {
   cyclopsDialogOnHit,
   cyclopsDialogOnFoundCactusPlace,
   cyclopsDialogOnAlreadyVisited,
+  heroChoiceThoughtDialog,
 } from "../../data/dialogs.js";
 import { Scene, manager } from "@tialops/maki";
 
@@ -70,9 +71,10 @@ class Act3Scene extends Scene {
     this.spacePressed = false;
     this.ePressed = false;
     this.isRespawning = false;
-    this.cyclopsDialogCompleted = false;
+    this.cyclopsDialogCompleted = GameState.cyclopsDialogCompleted || false;
     this.cyclopsTeleportTriggered = false;
-    this.cyclopsTeleported = false;
+    this.cyclopsTeleported = GameState.cyclopsTeleported || false;
+    this.heroChoiceDialogTriggered = false;
 
     this.player = PlayerController.create(
       this,
@@ -101,10 +103,10 @@ class Act3Scene extends Scene {
     this.cameras.main.fadeIn(500);
 
     this.enemies = [
-      { sprite: this.createEnemy(69, 277, 4) },
-      { sprite: this.createEnemy(125, 271, 4) },
-      { sprite: this.createEnemy(125, 197, 4) },
-      { sprite: this.createEnemy(31, 151, 4) },
+      // { sprite: this.createEnemy(69, 277, 4) },
+      // { sprite: this.createEnemy(125, 271, 4) },
+      // { sprite: this.createEnemy(125, 197, 4) },
+      // { sprite: this.createEnemy(31, 151, 4) },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     BattleController.setup(this, this.player);
@@ -204,11 +206,15 @@ class Act3Scene extends Scene {
 
     // Check for cyclops teleportation trigger
     this.checkCyclopsTeleport();
+    
+    // Check for hero choice dialog trigger
+    this.checkHeroChoiceDialog();
   }
 
   createAct3Cyclops() {
-    const cyclopsTileX = 39.5;
-    const cyclopsTileY = 12.5;
+    // Use different position based on teleportation state
+    const cyclopsTileX = this.cyclopsTeleported ? 3 : 39.5;
+    const cyclopsTileY = this.cyclopsTeleported ? 3 : 12.5;
     const x = cyclopsTileX * ACT3_TILE_SIZE + ACT3_TILE_SIZE / 2;
     const y = cyclopsTileY * ACT3_TILE_SIZE + ACT3_TILE_SIZE / 2;
     this.cyclops = EnemyController.create(this, x, y, "cyclops");
@@ -233,6 +239,7 @@ class Act3Scene extends Scene {
         // First time interaction
         dialogToShow = cyclopsDialogOnHit;
         this.cyclopsDialogCompleted = true;
+        GameState.cyclopsDialogCompleted = true;
       }
       
       Dialog.open(scene, dialogToShow);
@@ -430,10 +437,26 @@ class Act3Scene extends Scene {
       
       // Mark teleportation as complete
       this.cyclopsTeleported = true;
+      GameState.cyclopsTeleported = true;
       
       // Fade game back in
       this.cameras.main.fadeIn(500);
     });
+  }
+
+  checkHeroChoiceDialog() {
+    // Only trigger if dialog hasn't been shown yet and no dialog is currently open
+    if (this.heroChoiceDialogTriggered || Dialog.isOpen()) {
+      return;
+    }
+
+    // Check if player has passed tile x=41
+    const playerTileX = Math.round(this.player.x / ACT3_TILE_SIZE);
+    
+    if (playerTileX >= 41) {
+      this.heroChoiceDialogTriggered = true;
+      Dialog.open(this, heroChoiceThoughtDialog);
+    }
   }
 }
 
