@@ -238,6 +238,12 @@ class Act1Scene extends Scene {
       }
       PlayerController.handleAnimation(this.player, this.keys, time);
       PlayerController.handleWeaponSwitch(this, this.player, this.keys);
+      BattleController.attack(
+        this,
+        this.player,
+        this.keys,
+        this.enemies.map((e) => e.sprite).filter(Boolean),
+      );
     }
 
     if (this.dad) {

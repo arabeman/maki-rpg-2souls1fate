@@ -1,3 +1,4 @@
+import { BattleController } from "../core/BattleController.js";
 import {
   GameState,
   dadDialogHasSword,
@@ -40,6 +41,8 @@ class BeginScene extends Scene {
     SpriteLoader.loadImage(this, "sword2", "sword2");
     SpriteLoader.loadImage(this, "hammer", "hammer");
     SpriteLoader.loadImage(this, "emote_exclamation", "exclamation");
+    SpriteLoader.loadImage(this, "attack", "attack");
+    SpriteLoader.loadImage(this, "impact0", "impact0");
     manager.map(this, "begin");
     manager.preload(this);
   }
@@ -104,6 +107,8 @@ class BeginScene extends Scene {
     EquipmentHUD.init();
     PotionHUD.init();
 
+    BattleController.setup(this, this.player);
+
     // Create pickable objects
     this.pickables = [];
     if (!GameState.returnedFromAct1) {
@@ -140,6 +145,7 @@ class BeginScene extends Scene {
       PlayerController.handleMovement(this.player, this.keys);
       PlayerController.handleAnimation(this.player, this.keys, time);
       PlayerController.handleWeaponSwitch(this, this.player, this.keys);
+      BattleController.attack(this, this.player, this.keys);
     }
     Equipment.update(this, this.player);
     if (this.dad) {
