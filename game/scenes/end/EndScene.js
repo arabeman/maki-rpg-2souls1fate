@@ -1,5 +1,7 @@
 import { Scene, manager } from "@tialops/maki";
 
+import { Persistence } from "../../core/Persistence.js";
+
 class EndScene extends Scene {
  constructor() {
    super({ key: "EndScene" });
@@ -12,12 +14,11 @@ class EndScene extends Scene {
    super.preload();
  }
 
- create() {
-   super.create();
-   manager.create(this);
-
-   // Hide all HUD components except restart HUD
-   this.hideHUDComponents();
+create() {
+    super.create();
+    manager.create(this);
+    Persistence.clearAll();
+    this.hideHUDComponents();
 
    // Fade in
    this.cameras.main.fadeIn(500);
