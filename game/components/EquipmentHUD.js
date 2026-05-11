@@ -13,7 +13,7 @@ export class EquipmentHUD {
     this.update();
   }
 
-static _injectStyles() {
+  static _injectStyles() {
     if (document.getElementById("equipment-hud-styles")) return;
 
     const style = document.createElement("style");
@@ -87,7 +87,9 @@ static _injectStyles() {
     const existing = document.querySelector(".equipment-hud");
     if (existing) {
       this.container = existing;
-      this.slot = existing.querySelector(".equipment-hud-img, .equipment-hud-empty");
+      this.slot = existing.querySelector(
+        ".equipment-hud-img, .equipment-hud-empty",
+      );
       this.img = existing.querySelector("img");
       return;
     }
@@ -119,7 +121,9 @@ static _injectStyles() {
 
     if (isVisible !== this.wasVisible) {
       this.container.classList.toggle("visible", isVisible);
-      this.slot.className = isVisible ? "equipment-hud-img" : "equipment-hud-empty";
+      this.slot.className = isVisible
+        ? "equipment-hud-img"
+        : "equipment-hud-empty";
       this.wasVisible = isVisible;
     }
 
@@ -133,6 +137,7 @@ static _injectStyles() {
       this.lastTexture = null;
       if (this.img.parentNode) this.img.remove();
     }
+  }
   static hide() {
     if (!this.container) return;
     this.container.classList.remove("visible");

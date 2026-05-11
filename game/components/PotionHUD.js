@@ -1,5 +1,5 @@
-import { Inventory } from "../core/Inventory.js";
 import { GameState } from "../data/dialogs.js";
+import { Inventory } from "../core/Inventory.js";
 
 export class PotionHUD {
   static lastCountText = null;
@@ -136,7 +136,8 @@ export class PotionHUD {
     if (!this.container) return;
 
     const potionCount = Inventory.count("potion");
-    const shouldBeVisible = potionCount > 0 || (GameState.totalPotionsReceived || 0) > 0;
+    const shouldBeVisible =
+      potionCount > 0 || (GameState.totalPotionsReceived || 0) > 0;
     const countText = `x${potionCount}`;
 
     if (shouldBeVisible !== this.wasVisible) {
@@ -156,6 +157,7 @@ export class PotionHUD {
     // Force reflow so repeated shakes retrigger animation.
     void this.container.offsetWidth;
     this.container.classList.add("shake");
+  }
   static hide() {
     if (!this.container) return;
     this.container.classList.remove("visible");

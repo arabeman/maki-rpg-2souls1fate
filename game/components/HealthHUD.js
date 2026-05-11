@@ -83,6 +83,7 @@ export class HealthHUD {
         img.src = "assets/heart_kenney/heart_empty.png";
       }
     });
+  }
   static hide() {
     if (!this.container) return;
     this.container.classList.add("hidden");
