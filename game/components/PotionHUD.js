@@ -38,11 +38,15 @@ export class PotionHUD {
         justify-content: center;
         box-shadow: 0 2px 8px rgba(0,0,0,0.5);
         opacity: 0;
-        transition: opacity 0.2s ease-out;
+        transition: opacity 0.5s ease-out;
       }
 
       .potion-hud.visible {
         opacity: 1;
+      }
+
+      .potion-hud.hiding {
+        opacity: 0;
       }
 
       .potion-hud-panel {
@@ -152,5 +156,9 @@ export class PotionHUD {
     // Force reflow so repeated shakes retrigger animation.
     void this.container.offsetWidth;
     this.container.classList.add("shake");
+  static hide() {
+    if (!this.container) return;
+    this.container.classList.remove("visible");
+    this.container.classList.add("hiding");
   }
 }

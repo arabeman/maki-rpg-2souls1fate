@@ -39,11 +39,15 @@ static _injectStyles() {
         justify-content: center;
         box-shadow: 0 2px 8px rgba(0,0,0,0.5);
         opacity: 0;
-        transition: opacity 0.2s ease-out;
+        transition: opacity 0.5s ease-out;
       }
 
       .equipment-hud.visible {
         opacity: 1;
+      }
+
+      .equipment-hud.hiding {
+        opacity: 0;
       }
 
       .equipment-hud-panel {
@@ -129,5 +133,9 @@ static _injectStyles() {
       this.lastTexture = null;
       if (this.img.parentNode) this.img.remove();
     }
+  static hide() {
+    if (!this.container) return;
+    this.container.classList.remove("visible");
+    this.container.classList.add("hiding");
   }
 }

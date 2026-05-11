@@ -24,6 +24,11 @@ export class HealthHUD {
         display: flex;
         gap: 4px;
         opacity: 1;
+        transition: opacity 0.5s ease-out;
+      }
+
+      .health-hud.hidden {
+        opacity: 0;
       }
 
       .health-hud img {
@@ -78,5 +83,8 @@ export class HealthHUD {
         img.src = "assets/heart_kenney/heart_empty.png";
       }
     });
+  static hide() {
+    if (!this.container) return;
+    this.container.classList.add("hidden");
   }
 }
