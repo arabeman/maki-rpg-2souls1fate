@@ -351,7 +351,7 @@ export const cyclopsDialogOnAlreadyVisited = [
 
 export const heroChoiceThoughtDialog = [
   { text: "I need to make a choice now…" },
-  { text: "North leads to my mother… South leads to Amelia…" },
+  { text: "South leads to my mother… North leads to Amelia…" },
   { text: "There’s no way to reach both in time." },
   {
     text: "If I choose wrong… it might already be too late for the other.",
