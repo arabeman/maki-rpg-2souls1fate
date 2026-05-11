@@ -134,27 +134,27 @@ class Act1Scene extends Scene {
 
     // enemies[i] = { sprite, weapon }
     this.enemies = [
-      // { sprite: this.createEnemy(88, 260) },
-      // { sprite: this.createEnemy(89, 383) },
-      // { sprite: this.createEnemy(373, 114 - 10) },
-      // { sprite: this.createEnemy(373, 114 + 16 - 10) },
-      // { sprite: this.createEnemy(295, 415) },
-      // { sprite: this.createEnemy(378, 413) },
-      // { sprite: this.createEnemy(578, 287) },
-      // { sprite: this.createEnemy(511, 259) },
-      // {
-      //   sprite: (() => {
-      //     const e = createAct1Enemy(this, 586, 395, 6);
-      //     e.attackSpeedMultiplier = 0.2;
-      //     this.physics.add.collider(this.player.hitbox, e.hitbox);
-      //     this.physics.add.collider(e.hitbox, manager.getWallGroup(this, "act_1"));
-      //     e.hitbox.body.setImmovable(false);
-      //     e.hitbox.body.setCollideWorldBounds(true);
-      //     EnemyController.updateHealth(e, e.health);
-      //     return e;
-      //   })(),
-      // },
-      // { sprite: this.createEnemy(73 + 32, 33, 4, "left") },
+      { sprite: this.createEnemy(88, 260) },
+      { sprite: this.createEnemy(89, 383) },
+      { sprite: this.createEnemy(373, 114 - 10) },
+      { sprite: this.createEnemy(373, 114 + 16 - 10) },
+      { sprite: this.createEnemy(295, 415) },
+      { sprite: this.createEnemy(378, 413) },
+      { sprite: this.createEnemy(578, 287) },
+      { sprite: this.createEnemy(511, 259) },
+      {
+        sprite: (() => {
+          const e = createAct1Enemy(this, 586, 395, 6);
+          e.attackSpeedMultiplier = 0.2;
+          this.physics.add.collider(this.player.hitbox, e.hitbox);
+          this.physics.add.collider(e.hitbox, manager.getWallGroup(this, "act_1"));
+          e.hitbox.body.setImmovable(false);
+          e.hitbox.body.setCollideWorldBounds(true);
+          EnemyController.updateHealth(e, e.health);
+          return e;
+        })(),
+      },
+      { sprite: this.createEnemy(73 + 32, 33, 4, "left") },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     if (GameState.hasWeapon) {

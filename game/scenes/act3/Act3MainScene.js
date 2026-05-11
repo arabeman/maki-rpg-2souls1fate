@@ -13,11 +13,11 @@ import { Dialog } from "../../components/Dialog.js";
 import { Equipment } from "../../core/Equipment.js";
 import { EquipmentHUD } from "../../components/EquipmentHUD.js";
 import { HealthHUD } from "../../components/HealthHUD.js";
-import { RestartHUD } from "../../components/RestartHUD.js";
 import { Inventory } from "../../core/Inventory.js";
 import { Persistence } from "../../core/Persistence.js";
 import { PlayerController } from "../../core/PlayerController.js";
 import { PotionHUD } from "../../components/PotionHUD.js";
+import { RestartHUD } from "../../components/RestartHUD.js";
 import { SpriteLoader } from "../../core/SpriteLoader.js";
 import { showEmote } from "../../core/EmoteController.js";
 import { showItemPickup } from "../../core/ItemPickupEffect.js";
@@ -102,28 +102,28 @@ class Act3Scene extends Scene {
     this.cameras.main.fadeIn(500);
 
     this.enemies = [
-      // { sprite: this.createEnemy(69, 277, 4) },
-      // { sprite: this.createEnemy(125, 271, 4, "left") },
-      // { sprite: this.createEnemy(125, 197, 4) },
-      // { sprite: this.createEnemy(31, 151, 4) },
-      // { sprite: this.createEnemy(563, 202, 4, "left") },
-      // { sprite: this.createEnemy(545, 247, 3, "left") },
-      // { sprite: this.createEnemy(475, 325, 4) },
-      // { sprite: this.createEnemy(393, 351, 3, "left") },
-      // { sprite: this.createEnemy(302, 282, 4) },
-      // { sprite: this.createEnemy(209, 253, 3, "left") },
-      // { sprite: this.createEnemy(249, 162, 4, "left") },
-      // { sprite: this.createEnemy(225, 172, 4) },
-      // { sprite: this.createEnemy(228, 210, 4) },
-      // { sprite: this.createEnemy(228 + 16, 312, 4) },
-      // { sprite: this.createEnemy(228 + 80, 330, 4) },
-      // { sprite: this.createEnemy(228 + 150, 301, 5, "left") },
-      // { sprite: this.createEnemy(228 + 210, 288, 2, "left") },
-      // { sprite: this.createEnemy(251, 79, 3, "left") },
-      // { sprite: this.createEnemy(339, 93, 4) },
-      // { sprite: this.createEnemy(425, 101, 3, "left") },
-      // { sprite: this.createEnemy(521, 103, 4) },
-      // { sprite: this.createEnemy(550, 194, 3, "left") },
+      { sprite: this.createEnemy(69, 277, 4) },
+      { sprite: this.createEnemy(125, 271, 4, "left") },
+      { sprite: this.createEnemy(125, 197, 4) },
+      { sprite: this.createEnemy(31, 151, 4) },
+      { sprite: this.createEnemy(563, 202, 4, "left") },
+      { sprite: this.createEnemy(545, 247, 3, "left") },
+      { sprite: this.createEnemy(475, 325, 4) },
+      { sprite: this.createEnemy(393, 351, 3, "left") },
+      { sprite: this.createEnemy(302, 282, 4) },
+      { sprite: this.createEnemy(209, 253, 3, "left") },
+      { sprite: this.createEnemy(249, 162, 4, "left") },
+      { sprite: this.createEnemy(225, 172, 4) },
+      { sprite: this.createEnemy(228, 210, 4) },
+      { sprite: this.createEnemy(228 + 16, 312, 4) },
+      { sprite: this.createEnemy(228 + 80, 330, 4) },
+      { sprite: this.createEnemy(228 + 150, 301, 5, "left") },
+      { sprite: this.createEnemy(228 + 210, 288, 2, "left") },
+      { sprite: this.createEnemy(251, 79, 3, "left") },
+      { sprite: this.createEnemy(339, 93, 4) },
+      { sprite: this.createEnemy(425, 101, 3, "left") },
+      { sprite: this.createEnemy(521, 103, 4) },
+      { sprite: this.createEnemy(550, 194, 3, "left") },
     ].map((e) => ({ ...e, weapon: this.createEnemyWeapon(e.sprite) }));
 
     BattleController.setup(this, this.player);
