@@ -201,18 +201,12 @@ class Act3Scene extends Scene {
 
     if (!this.sceneTransitioning && this.player.y > ACT3_MAP_HEIGHT && this.player.x >= ACT3_MAP_WIDTH / 2) {
       this.sceneTransitioning = true;
-      this.cameras.main.fadeOut(500);
-      this.cameras.main.once("camerafadeoutcomplete", () =>
-        this.scene.start("EndScene"),
-      );
+      console.log("EndScene reached!");
     }
 
     if (!this.sceneTransitioning && this.player.y < 0 && this.player.x >= ACT3_MAP_WIDTH / 2) {
       this.sceneTransitioning = true;
-      this.cameras.main.fadeOut(500);
-      this.cameras.main.once("camerafadeoutcomplete", () =>
-        this.scene.start("EndScene"),
-      );
+      console.log("EndScene reached!");
     }
 
     if (!this.sceneTransitioning && this.player.x < 0) {

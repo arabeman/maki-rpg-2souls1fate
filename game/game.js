@@ -1,4 +1,4 @@
-import { Act1Scene, Act2Scene, Act3Scene, BeginScene, EndScene } from "./scenes/index.js";
+import { Act1Scene, Act2Scene, Act3Scene, BeginScene } from "./scenes/index.js";
 
 import { Persistence } from "./core/Persistence.js";
 import Phaser from "phaser";
@@ -20,12 +20,11 @@ const sceneByKey = {
  Act1Scene,
  Act2Scene,
  Act3Scene,
- EndScene,
 };
 
 const savedSceneKey = Persistence.getSavedSceneKey();
 const initialScene = sceneByKey[savedSceneKey] || BeginScene;
-const sceneOrder = [initialScene, BeginScene, Act1Scene, Act2Scene, Act3Scene, EndScene].filter(
+const sceneOrder = [initialScene, BeginScene, Act1Scene, Act2Scene, Act3Scene].filter(
  (scene, index, arr) => arr.indexOf(scene) === index,
 );
 
