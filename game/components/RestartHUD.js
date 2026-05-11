@@ -92,4 +92,10 @@ export class RestartHUD {
 
     document.body.appendChild(this.container);
   }
+
+  static showRestart() {
+    if (!this.container) return;
+    this.container.style.opacity = "1";
+    this.container.style.pointerEvents = "auto";
+  }
 }

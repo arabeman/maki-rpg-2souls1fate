@@ -39,6 +39,7 @@ export const GameState = {
   act2HiddenPotionTaken: false,
   cyclopsTeleported: false,
   cyclopsDialogCompleted: false,
+  heroChoiceDialogShown: false,
 };
 
 export const dadDialogNoSword = [

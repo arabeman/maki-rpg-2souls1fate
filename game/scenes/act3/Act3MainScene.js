@@ -13,6 +13,7 @@ import { Dialog } from "../../components/Dialog.js";
 import { Equipment } from "../../core/Equipment.js";
 import { EquipmentHUD } from "../../components/EquipmentHUD.js";
 import { HealthHUD } from "../../components/HealthHUD.js";
+import { RestartHUD } from "../../components/RestartHUD.js";
 import { Inventory } from "../../core/Inventory.js";
 import { Persistence } from "../../core/Persistence.js";
 import { PlayerController } from "../../core/PlayerController.js";
@@ -206,7 +207,8 @@ class Act3Scene extends Scene {
       PotionHUD.hide();
       this.cameras.main.fadeOut(500);
       this.cameras.main.once("camerafadeoutcomplete", () => {
-        Dialog.open(this, [{ text: "To be continued..." }]);
+        Dialog.onCloseCallback(() => RestartHUD.showRestart());
+        Dialog.open(this, [{ text: "To be continued...", isEndOfDialog: true }]);
       });
     }
 
@@ -217,7 +219,8 @@ class Act3Scene extends Scene {
       PotionHUD.hide();
       this.cameras.main.fadeOut(500);
       this.cameras.main.once("camerafadeoutcomplete", () => {
-        Dialog.open(this, [{ text: "To be continued..." }]);
+        Dialog.onCloseCallback(() => RestartHUD.showRestart());
+        Dialog.open(this, [{ text: "To be continued...", isEndOfDialog: true }]);
       });
     }
 
@@ -492,16 +495,14 @@ class Act3Scene extends Scene {
   }
 
   checkHeroChoiceDialog() {
-    // Only trigger if dialog hasn't been shown yet and no dialog is currently open
-    if (this.heroChoiceDialogTriggered || Dialog.isOpen()) {
+    if (GameState.heroChoiceDialogShown || Dialog.isOpen()) {
       return;
     }
 
-    // Check if player has passed tile x=41
     const playerTileX = Math.round(this.player.x / ACT3_TILE_SIZE);
 
     if (playerTileX >= 41) {
-      this.heroChoiceDialogTriggered = true;
+      GameState.heroChoiceDialogShown = true;
       Dialog.open(this, heroChoiceThoughtDialog);
     }
   }
