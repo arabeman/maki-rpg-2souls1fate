@@ -204,8 +204,9 @@ class Act3Scene extends Scene {
       HealthHUD.hide();
       EquipmentHUD.hide();
       PotionHUD.hide();
-      this.time.delayedCall(500, () => {
-        console.log("EndScene reached!");
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once("camerafadeoutcomplete", () => {
+        Dialog.open(this, [{ text: "To be continued..." }]);
       });
     }
 
@@ -214,8 +215,9 @@ class Act3Scene extends Scene {
       HealthHUD.hide();
       EquipmentHUD.hide();
       PotionHUD.hide();
-      this.time.delayedCall(500, () => {
-        console.log("EndScene reached!");
+      this.cameras.main.fadeOut(500);
+      this.cameras.main.once("camerafadeoutcomplete", () => {
+        Dialog.open(this, [{ text: "To be continued..." }]);
       });
     }
 
