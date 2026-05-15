@@ -103,16 +103,26 @@ export const dadAct1Dialog = [
     speaker: "Dad",
     text: "Before you go any further... you need to know how to defend yourself.",
   },
-  { speaker: "Dad", text: "That sword isn't just for show. Listen carefully." },
+  {
+    speaker: "Dad",
+    text: "That sword isn't just for show. Listen carefully.",
+  },
   {
     speaker: "Dad",
     text: "Use W A S D to attack. The direction you press determines where you strike.",
   },
   {
     speaker: "Dad",
+    text: "You can also hold the button to keep attacking in that direction.",
+  },
+  {
+    speaker: "Dad",
     text: "Don't swing wildly. Wait between attacks... or you'll leave yourself open.",
   },
-  { speaker: "Dad", text: "Try it a few times." },
+  {
+    speaker: "Dad",
+    text: "Try it a few times.",
+  },
 ];
 
 export const georgesNpcDialog = [
@@ -186,7 +196,7 @@ export const arthurDialog = [
   },
   {
     speaker: "Arthur",
-    text: "And your mom... I heard she was somewhere in the south a few days ago.",
+    text: "And your mom... I heard she was somewhere in the south.",
   },
   {
     speaker: "Arthur",
