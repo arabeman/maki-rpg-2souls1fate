@@ -55,6 +55,8 @@ export class HealthHUD {
       <img src="assets/heart_kenney/heart_full.png" />
       <img src="assets/heart_kenney/heart_full.png" />
       <img src="assets/heart_kenney/heart_full.png" />
+      <img src="assets/heart_kenney/heart_full.png" />
+      <img src="assets/heart_kenney/heart_full.png" />
     `;
     this.heartImgs = Array.from(this.container.querySelectorAll("img"));
     document.body.appendChild(this.container);
