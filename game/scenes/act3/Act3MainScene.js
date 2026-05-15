@@ -423,7 +423,7 @@ class Act3Scene extends Scene {
 
   tryUsePotion() {
     if (Dialog.isOpen()) return;
-    const maxHealth = 3;
+    const maxHealth = 5;
     if ((GameState.playerHealth || 0) >= maxHealth) return;
     if (!Inventory.removeOne("potion")) {
       PotionHUD.shake();

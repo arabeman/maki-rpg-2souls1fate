@@ -63,11 +63,11 @@ export class HealthHUD {
   static update() {
     if (!this.container) return;
 
-    const currentHealth = GameState.playerHealth ?? 3;
+    const currentHealth = GameState.playerHealth ?? 5;
     if (currentHealth === this.lastHealth) return;
 
     this.lastHealth = currentHealth;
-    const maxHealth = 3;
+    const maxHealth = 5;
     const imgs = this.heartImgs || [];
 
     imgs.forEach((img, i) => {
