@@ -11,7 +11,7 @@
 export const GameState = {
   hasWeapon: false,
   exitUnlocked: false,
-  playerHealth: 3,
+  playerHealth: 5,
   returnedFromAct1: false,
   enteredAct1FromAct2: false,
   enteredAct2FromAct3: false,

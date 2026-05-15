@@ -222,7 +222,7 @@ class Act1Scene extends Scene {
     if (GameState.playerHealth <= 0 && !this.playerDied) {
       this.playerDied = true;
       this.isRespawning = true;
-      GameState.playerHealth = 3;
+      GameState.playerHealth = 5;
       Persistence.clearSceneState("Act1Scene");
       this.cameras.main.fadeOut(500);
       this.cameras.main.once("camerafadeoutcomplete", () =>

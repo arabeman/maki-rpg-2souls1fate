@@ -136,7 +136,7 @@ class Act3Scene extends Scene {
   update(time) {
     if (GameState.playerHealth <= 0) {
       this.isRespawning = true;
-      GameState.playerHealth = 3;
+      GameState.playerHealth = 5;
       Persistence.clearSceneState("Act3Scene");
       this.cameras.main.fadeOut(500);
       this.cameras.main.once("camerafadeoutcomplete", () =>
